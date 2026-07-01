@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SMAX Toolkit - TJSP
 // @namespace    https://github.com/rsalvessap/SMAX-TOOLS
-// @version      2.78
+// @version      2.79
 // @description  Conjunto de ferramentas para o SMAX TJSP: triagem, respostas em lote, scripts, discussões e consulta de processos no eProc
 // @author       rsalvessap
 // @match        https://suporte.tjsp.jus.br/saw/*
@@ -47,7 +47,7 @@
   const SMAX_SB_URL = 'https://rlcbmrjkojopipiwpktf.supabase.co';
   const SMAX_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Jtcmprb2pvcGlwaXdwa3RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MzI0MTksImV4cCI6MjA5NDMwODQxOX0.Ha4xRbFvbgb2yO64ga3dV8KrNGRgbV7zWFXc5bYHdeQ';
 
-  const SMAX_TOOLKIT_VERSION = '2.78';
+  const SMAX_TOOLKIT_VERSION = '2.79';
   const SMAX_TENANT_ID = '213963628';
   console.log('%c[SMAX Toolkit] v' + SMAX_TOOLKIT_VERSION + ' carregado', 'color:#60a5fa;font-weight:bold;font-size:13px;');
 
@@ -3490,19 +3490,19 @@
     const renderHeader = () => {
       const isDark = (personal.themeMode || 'dark') === 'dark';
       return `
-      <div id="smax-settings-header" style="display:flex;align-items:center;justify-content:space-between;min-height:52px;padding:10px 18px;background:linear-gradient(90deg,#0073e7 0%,#005bb5 100%);border-radius:0;flex-shrink:0;gap:12px;">
-        <div style="font-weight:700;font-size:16px;letter-spacing:.03em;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3);white-space:nowrap;">
+      <div id="smax-settings-header" style="display:flex;align-items:center;justify-content:space-between;min-height:52px;padding:10px 18px;background:var(--sp-header-bg);border-radius:0;flex-shrink:0;gap:12px;">
+        <div style="font-weight:700;font-size:16px;letter-spacing:.03em;color:var(--sp-header-fg);text-shadow:0 2px 8px rgba(0,0,0,.3);white-space:nowrap;">
           ⚙️ SMAX Toolkit
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <button id="smax-theme-toggle-btn"
             title="${isDark ? 'Mudar para modo claro' : 'Mudar para modo escuro'}"
-            style="border:none;background:rgba(255,255,255,.18);color:#fff;font-size:17px;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s ease;flex-shrink:0;">
+            style="border:none;background:var(--sp-header-btn);color:var(--sp-header-fg);font-size:17px;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s ease;flex-shrink:0;">
             ${isDark ? '☀️' : '🌙'}
           </button>
           <button id="smax-settings-close-btn"
             title="Fechar"
-            style="border:none;background:rgba(255,255,255,.18);color:#fff;font-size:18px;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s ease;flex-shrink:0;">
+            style="border:none;background:var(--sp-header-btn);color:var(--sp-header-fg);font-size:18px;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s ease;flex-shrink:0;">
             ✕
           </button>
         </div>
@@ -3544,7 +3544,7 @@
               <div style="display:flex;gap:6px;">
                 ${!isShared ? `<button class="smax-team-edit-btn" data-id="${t.id}" style="font-size:11px;padding:6px 12px;cursor:pointer;background:var(--sp-surface);color:var(--sp-text);border:1px solid var(--sp-border);border-radius:6px;transition:all .15s ease;">Editar</button>` : ''}
                 ${!isDefault && !isShared ? `<button class="smax-team-del-btn" data-id="${t.id}" style="font-size:11px;padding:6px 12px;cursor:pointer;color:#fca5a5;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);border-radius:6px;transition:all .15s ease;">Remover</button>` : ''}
-                ${isShared ? '<span style="font-size:11px;color:#6b7280;padding:6px 8px;">somente leitura</span>' : ''}
+                ${isShared ? '<span style="font-size:11px;color:var(--sp-text-muted);padding:6px 8px;">somente leitura</span>' : ''}
               </div>
             </div>
           </div>
@@ -3555,7 +3555,7 @@
         <div style="margin-top:16px;border-top:1px solid var(--sp-border);padding-top:12px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
             <span style="font-weight:600;color:var(--sp-text);font-size:14px;">Equipes e Regras</span>
-            <button id="smax-add-team-btn" style="font-size:12px;padding:6px 14px;cursor:pointer;background:var(--sp-accent);color:#fff;border:none;border-radius:8px;">+ Nova Equipe</button>
+            <button id="smax-add-team-btn" style="font-size:12px;padding:6px 14px;cursor:pointer;background:var(--sp-accent);color:var(--sp-on-accent);border:none;border-radius:8px;">+ Nova Equipe</button>
           </div>
           <div id="smax-teams-list-container">${listHtml}</div>
         </div>
@@ -3687,7 +3687,7 @@
 
           <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap;">
             <button class="smax-cancel-edit" style="padding:8px 14px;cursor:pointer;background:var(--sp-surface-2);color:var(--sp-text);border:1px solid var(--sp-border);border-radius:8px;font-size:12px;">Cancelar</button>
-            <button id="smax-save-team-btn" style="padding:8px 16px;cursor:pointer;background:var(--sp-accent);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;">Salvar Equipe</button>
+            <button id="smax-save-team-btn" style="padding:8px 16px;cursor:pointer;background:var(--sp-accent);color:var(--sp-on-accent);border:none;border-radius:8px;font-size:12px;font-weight:600;">Salvar Equipe</button>
           </div>
         </div>
       `;
@@ -4167,7 +4167,7 @@
             <input type="text" id="smax-shared-url-input" value="${Utils.escapeHtml(prefs.sharedConfigUrl || '')}"
               placeholder="https://raw.githubusercontent.com/..."
               style="flex:1;min-width:200px;padding:7px 10px;border-radius:7px;font-size:11px;box-sizing:border-box;">
-            <button type="button" id="smax-shared-save-btn" style="padding:7px 14px;border:none;border-radius:7px;background:var(--sp-primary);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">Salvar</button>
+            <button type="button" id="smax-shared-save-btn" style="padding:7px 14px;border:none;border-radius:7px;background:var(--sp-primary);color:var(--sp-on-accent);font-size:12px;font-weight:600;cursor:pointer;">Salvar</button>
             <button type="button" id="smax-shared-refresh-btn" style="padding:7px 14px;border:1px solid var(--sp-border);border-radius:7px;background:var(--sp-surface-2);color:var(--sp-text);font-size:11px;cursor:pointer;">↺ Atualizar</button>
           </div>
           <div id="smax-shared-status" style="font-size:11px;color:var(--sp-text-muted);min-height:16px;"></div>
@@ -4180,7 +4180,7 @@
           <div id="smax-config-io-status" style="font-size:11px;color:var(--sp-text-muted);min-height:16px;margin:8px 0;"></div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;">
             <button type="button" id="smax-config-copy-btn" style="padding:8px 14px;border-radius:8px;border:1px solid var(--sp-border);background:var(--sp-surface);color:var(--sp-text);font-size:12px;cursor:pointer;">📋 Copiar</button>
-            <button type="button" id="smax-config-save-btn" style="padding:8px 14px;border-radius:8px;border:none;background:var(--sp-primary);color:#fff;font-size:12px;cursor:pointer;font-weight:600;">💾 Salvar localmente</button>
+            <button type="button" id="smax-config-save-btn" style="padding:8px 14px;border-radius:8px;border:none;background:var(--sp-primary);color:var(--sp-on-accent);font-size:12px;cursor:pointer;font-weight:600;">💾 Salvar localmente</button>
           </div>
           <div style="border-top:1px solid var(--sp-border);margin-top:14px;padding-top:14px;">
             <div class="smax-sp-section-title" style="font-size:12px;margin-bottom:4px;">🚀 Publicar para a equipe (Git)</div>
@@ -4191,7 +4191,7 @@
                 style="flex:1;min-width:180px;padding:7px 10px;border-radius:7px;font-size:11px;box-sizing:border-box;border:1px solid var(--sp-border);background:var(--sp-surface);color:var(--sp-text);">
               <button type="button" id="smax-github-token-save-btn" style="padding:7px 14px;border:none;border-radius:7px;background:var(--sp-surface-2);color:var(--sp-text);font-size:11px;border:1px solid var(--sp-border);cursor:pointer;white-space:nowrap;">Salvar token</button>
             </div>
-            <button type="button" id="smax-config-publish-btn" style="width:100%;padding:10px;border-radius:8px;border:none;background:var(--sp-primary);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">🚀 Publicar para a equipe</button>
+            <button type="button" id="smax-config-publish-btn" style="width:100%;padding:10px;border-radius:8px;border:none;background:var(--sp-primary);color:var(--sp-on-accent);font-size:12px;font-weight:600;cursor:pointer;">🚀 Publicar para a equipe</button>
             <div id="smax-config-publish-status" style="font-size:11px;color:var(--sp-text-muted);min-height:16px;margin-top:8px;"></div>
           </div>
         </div>`;
@@ -4239,7 +4239,7 @@
         </div>
         <div id="smax-det-input-row" style="display:none;margin-top:8px;gap:6px;">
           <input type="text" id="smax-det-input" placeholder="Nome completo do usuário" style="flex:1;padding:7px 10px;border-radius:6px;font-size:12px;min-width:0;">
-          <button type="button" id="smax-det-confirm" style="padding:7px 14px;border-radius:6px;border:none;background:var(--sp-primary);color:#fff;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;">Salvar</button>
+          <button type="button" id="smax-det-confirm" style="padding:7px 14px;border-radius:6px;border:none;background:var(--sp-primary);color:var(--sp-on-accent);font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;">Salvar</button>
           <button type="button" id="smax-det-cancel" style="padding:7px 10px;border-radius:6px;border:1px solid var(--sp-border);background:var(--sp-surface);color:var(--sp-text-muted);font-size:12px;cursor:pointer;flex-shrink:0;">✕</button>
         </div>
       </div>`;
@@ -4254,7 +4254,7 @@
               <button id="smax-tpl-export-btn" style="padding:6px 12px;border-radius:6px;border:1px solid var(--sp-border);background:var(--sp-surface);color:var(--sp-text);font-size:11px;cursor:pointer;">📤 Exportar JSON</button>
               <button id="smax-tpl-import-btn" style="padding:6px 12px;border-radius:6px;border:1px solid var(--sp-border);background:var(--sp-surface);color:var(--sp-text);font-size:11px;cursor:pointer;">📥 Importar JSON</button>
               <button id="smax-tpl-sync-btn" title="Importar scripts do Gerenciador de Chamados" style="padding:6px 12px;border-radius:6px;border:1px solid var(--sp-border);background:var(--sp-surface);color:var(--sp-text);font-size:11px;cursor:pointer;">☁️ Do Gerenciador</button>
-              <button id="smax-tpl-new-btn" style="padding:6px 14px;border-radius:6px;border:none;background:var(--sp-primary);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">+ Novo</button>
+              <button id="smax-tpl-new-btn" style="padding:6px 14px;border-radius:6px;border:none;background:var(--sp-primary);color:var(--sp-on-accent);font-size:12px;font-weight:600;cursor:pointer;">+ Novo</button>
             </div>
           </div>
           <div style="display:flex;gap:0;border-bottom:1px solid var(--sp-border);margin-bottom:10px;">
@@ -4272,7 +4272,7 @@
           <textarea id="smax-tpl-sp-body" placeholder="Cole o conteúdo aqui ou escreva HTML..." style="min-height:140px;resize:vertical;padding:8px 10px;border-radius:6px;font-size:12px;font-family:'Segoe UI',system-ui,sans-serif;width:100%;box-sizing:border-box;line-height:1.5;"></textarea>
           <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
             <button id="smax-tpl-sp-cancel" style="padding:7px 14px;border-radius:6px;border:1px solid var(--sp-border);background:var(--sp-surface);color:var(--sp-text-muted);font-size:12px;cursor:pointer;">Cancelar</button>
-            <button id="smax-tpl-sp-save" style="padding:7px 18px;border-radius:6px;border:none;background:var(--sp-primary);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">Salvar script</button>
+            <button id="smax-tpl-sp-save" style="padding:7px 18px;border-radius:6px;border:none;background:var(--sp-primary);color:var(--sp-on-accent);font-size:12px;font-weight:600;cursor:pointer;">Salvar script</button>
           </div>
         </div>
         <div id="smax-tpl-import-area" class="smax-sp-card" style="display:none;flex-direction:column;gap:8px;">
@@ -4281,7 +4281,7 @@
           <textarea id="smax-tpl-import-json-input" style="min-height:100px;resize:vertical;padding:8px 10px;border-radius:6px;font-size:11px;font-family:monospace;width:100%;box-sizing:border-box;"></textarea>
           <div style="display:flex;gap:8px;justify-content:flex-end;">
             <button id="smax-tpl-import-cancel" style="padding:6px 12px;border-radius:6px;border:1px solid var(--sp-border);background:var(--sp-surface);color:var(--sp-text-muted);font-size:12px;cursor:pointer;">Cancelar</button>
-            <button id="smax-tpl-import-confirm" style="padding:6px 14px;border-radius:6px;border:none;background:var(--sp-primary);color:#fff;font-size:12px;font-weight:600;cursor:pointer;">Importar</button>
+            <button id="smax-tpl-import-confirm" style="padding:6px 14px;border-radius:6px;border:none;background:var(--sp-primary);color:var(--sp-on-accent);font-size:12px;font-weight:600;cursor:pointer;">Importar</button>
           </div>
         </div>
       </div>`;
@@ -4294,7 +4294,7 @@
             Abre o painel de triagem sobre a lista de chamados. Navegue pelos chamados, defina urgência, atribua responsável e envie respostas rapidamente.<br>
             <strong style="color:var(--sp-text);font-size:11px;">Dica:</strong> filtre e ordene os chamados no SMAX antes de iniciar.
           </div>
-          <button id="smax-launch-triage-btn" style="padding:11px 28px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:700;background:var(--sp-primary);color:#fff;transition:opacity .15s;">
+          <button id="smax-launch-triage-btn" style="padding:11px 28px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:700;background:var(--sp-primary);color:var(--sp-on-accent);transition:opacity .15s;">
             🚀 Iniciar Triagem
           </button>
         </div>
@@ -4325,7 +4325,7 @@
           <div class="smax-sp-muted" style="margin-bottom:14px;">
             Abre o painel de respostas em cima da tela atual. Selecione um colaborador, filtre por equipe e status, redija a solução com editor de texto e envie em lote.
           </div>
-          <button id="smax-launch-resp-btn" style="padding:11px 28px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:700;background:var(--sp-primary);color:#fff;transition:opacity .15s;">
+          <button id="smax-launch-resp-btn" style="padding:11px 28px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:700;background:var(--sp-primary);color:var(--sp-on-accent);transition:opacity .15s;">
             📨 Abrir Respostas
           </button>
         </div>
@@ -4357,7 +4357,7 @@
             <input type="date" id="smax-resp-report-from-sp" style="background:var(--sp-surface-2);border:1px solid var(--sp-border);border-radius:5px;padding:4px 8px;color:var(--sp-text);font-size:11px;outline:none;">
             <label style="font-size:11px;color:var(--sp-text-muted);">Até:</label>
             <input type="date" id="smax-resp-report-to-sp" style="background:var(--sp-surface-2);border:1px solid var(--sp-border);border-radius:5px;padding:4px 8px;color:var(--sp-text);font-size:11px;outline:none;">
-            <button type="button" id="smax-resp-report-gen-sp" style="padding:5px 14px;border:none;border-radius:6px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;font-size:11px;font-weight:600;cursor:pointer;">Gerar</button>
+            <button type="button" id="smax-resp-report-gen-sp" style="padding:5px 14px;border:none;border-radius:6px;background:var(--sp-accent);color:var(--sp-on-accent);font-size:11px;font-weight:600;cursor:pointer;">Gerar</button>
             <button type="button" id="smax-resp-report-export-sp" style="padding:5px 14px;border:1px solid var(--sp-border);border-radius:6px;background:var(--sp-surface-2);color:var(--sp-text);font-size:11px;cursor:pointer;display:none;">⬇ Exportar CSV</button>
           </div>
           <div id="smax-resp-report-content-sp"></div>
@@ -4681,7 +4681,7 @@
               navigator.clipboard?.writeText(tpl.html).catch(() => {});
               const toast = document.createElement('div');
               toast.textContent = '📋 Template copiado — cole no campo de resposta (Ctrl+V)';
-              toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#f8fafc;padding:11px 22px;border-radius:10px;font-size:13px;z-index:9999999;box-shadow:0 4px 18px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);';
+              toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#f8fafc;padding:11px 22px;border-radius:10px;font-size:13px;z-index:9999999;box-shadow:0 4px 18px rgba(0,0,0,.5);border:1px solid var(--sp-border);';
               document.body.appendChild(toast);
               setTimeout(() => toast.remove(), 3500);
             }
@@ -6039,7 +6039,7 @@
 
       if (!triageQueue.length) {
         triageIndex = -1;
-        if (ticketDetailsEl) ticketDetailsEl.innerHTML = '<div style="font-size:14px;color:#e5e7eb;">Nenhum chamado encontrado na lista atual. Verifique o campo "meus finais", logo acima.</div>';
+        if (ticketDetailsEl) ticketDetailsEl.innerHTML = '<div style="font-size:14px;color:var(--sp-text);">Nenhum chamado encontrado na lista atual. Verifique o campo "meus finais", logo acima.</div>';
         if (discussionsEl) discussionsEl.innerHTML = '<div class="smax-discussions-placeholder">Nenhuma discussão disponível.</div>';
         const rawFinals = (prefs.personalFinalsRaw || '').trim();
         if (statusEl) statusEl.textContent = personalFinalsSet.size
@@ -6107,7 +6107,7 @@
 
       if (ticketDetailsEl) {
         ticketDetailsEl.innerHTML = `
-          <div style="font-size:14px;color:#e5e7eb;">
+          <div style="font-size:14px;color:var(--sp-text);">
             Carregando detalhes completos do chamado ${item.idText || '-'}...
           </div>
         `;
@@ -6159,7 +6159,7 @@
         const processNumberHtml = rawProcNum
           ? `<span style="color:#64748b;">•</span> ${isCNJFormat
               ? `<span data-smax-proc="${Utils.escapeHtml(displayProcNum)}" style="color:#38bdf8;font-family:monospace;font-weight:600;border-bottom:1px dotted rgba(56,189,248,.6);cursor:pointer;" title="Consultar processo no eProc: ${Utils.escapeHtml(displayProcNum)}">${Utils.escapeHtml(displayProcNum)}</span>`
-              : `<span style="font-family:monospace;color:#a5b4fc;">${Utils.escapeHtml(rawProcNum)}</span>`
+              : `<span style="font-family:monospace;color:var(--sp-accent);">${Utils.escapeHtml(rawProcNum)}</span>`
             }`
           : '';
         if (!ticketDetailsEl) return;
@@ -6171,7 +6171,7 @@
           : '-';
         ticketDetailsEl.innerHTML = `
           ${warning}
-          <div class="smax-triage-meta-row" style="flex-shrink:0;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px;">
+          <div class="smax-triage-meta-row" style="flex-shrink:0;padding-bottom:8px;border-bottom:1px solid var(--sp-border);margin-bottom:8px;">
             ${idLink}${vipBadge}
             <span style="color:#64748b;">${createdDisplay}</span>
             ${requestedForHtml}
@@ -6728,14 +6728,14 @@
                   <button type="button" id="smax-triage-next" disabled aria-label="Próximo chamado" title="Próximo chamado">&#x203A;</button>
                 </span>
                 <button type="button" class="smax-triage-secondary" id="smax-triage-refresh" title="Sincronizar fila">&#x21bb;</button>
-                <button type="button" id="smax-triage-back" title="Voltar para Configurações" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0;">← Voltar</button>
-                <button id="smax-theme-toggle-hud" type="button" title="Alternar tema" style="width:30px;height:30px;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">🌙</button>
+                <button type="button" id="smax-triage-back" title="Voltar para Configurações" style="padding:4px 10px;border-radius:6px;border:1px solid var(--sp-border);background:var(--sp-surface-2);color:var(--sp-text-muted);font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0;">← Voltar</button>
+                <button id="smax-theme-toggle-hud" type="button" title="Alternar tema" style="width:30px;height:30px;border-radius:6px;border:1px solid var(--sp-border);background:var(--sp-surface-2);color:var(--sp-text);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">🌙</button>
                 <button type="button" class="smax-triage-secondary" id="smax-triage-close" title="Minimizar triagem">_</button>
               </div>
             </div>
             <div id="smax-triage-hud-body">
               <div id="smax-triage-ticket-details">
-                <div style="font-size:14px;color:#9ca3af;">Inicie a triagem para carregar um chamado.</div>
+                <div style="font-size:14px;color:var(--sp-text-muted);">Inicie a triagem para carregar um chamado.</div>
               </div>
             </div>
             <div id="smax-triage-hud-footer">
@@ -6772,7 +6772,7 @@
                 <span class="smax-indicator-value" id="smax-triage-assign-value" style="display:none;">Sem dono configurado</span>
                 <div id="smax-triage-assign-panel" data-state="disabled" style="display:none;"></div>
                 <div class="smax-global-hint" id="smax-triage-global-hint" style="display:none;"></div>
-                <button type="button" id="smax-triage-sig-btn" class="smax-triage-chip" title="Inserir assinatura" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);font-size:12px;padding:4px 10px;border-radius:16px;cursor:pointer;">✒️ Assinatura</button>
+                <button type="button" id="smax-triage-sig-btn" class="smax-triage-chip" title="Inserir assinatura" style="background:var(--sp-surface-2);border:1px solid var(--sp-border);color:var(--sp-text);font-size:12px;padding:4px 10px;border-radius:16px;cursor:pointer;">✒️ Assinatura</button>
                 <div id="smax-triage-signature-picker" class="smax-resp-field-picker" style="display:none;"></div>
                 <button type="button" class="smax-triage-primary smax-triage-chip" id="smax-triage-commit" disabled>ENVIAR</button>
               </div>
@@ -7288,7 +7288,7 @@
       const listEl = backdrop?.querySelector('#smax-resp-ticket-list');
       if (!listEl) return;
       if (!ticketList.length) {
-        listEl.innerHTML = '<div style="padding:16px 10px;color:#6b7280;font-size:12px;text-align:center;">Nenhum chamado encontrado.</div>';
+        listEl.innerHTML = '<div style="padding:16px 10px;color:var(--sp-text-muted);font-size:12px;text-align:center;">Nenhum chamado encontrado.</div>';
         updateSendButton();
         return;
       }
@@ -7435,7 +7435,7 @@
       if (!el) return;
       if (!discussions || !discussions.length) {
         currentDiscussions = [];
-        el.innerHTML = '<div style="color:#6b7280;font-size:11px;padding:8px;">Sem discussões.</div>';
+        el.innerHTML = '<div style="color:var(--sp-text-muted);font-size:11px;padding:8px;">Sem discussões.</div>';
         return;
       }
       // Ordena por data crescente (mais antigas primeiro, mais recentes no final/baixo)
@@ -7647,7 +7647,7 @@
       }
 
       const descEl = backdrop.querySelector('#smax-resp-desc-content');
-      if (descEl) descEl.innerHTML = Utils.linkifyCNJ(Utils.sanitizeRichText(entry.descriptionHtml)) || '<em style="color:#6b7280;">Sem descrição.</em>';
+      if (descEl) descEl.innerHTML = Utils.linkifyCNJ(Utils.sanitizeRichText(entry.descriptionHtml)) || '<em style="color:var(--sp-text-muted);">Sem descrição.</em>';
 
       setRespSolutionData(Utils.sanitizeRichText(entry.solutionHtml) || '');
 
@@ -7943,10 +7943,10 @@
       }
       el.innerHTML = presets.map(p => `
         <span class="smax-resp-preset-pill" data-preset-id="${Utils.escapeHtml(p.id)}"
-          style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#d1d5db;font-size:10px;cursor:pointer;white-space:nowrap;transition:all .12s;user-select:none;">
+          style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:12px;border:1px solid var(--sp-border);background:var(--sp-surface-2);color:var(--sp-text);font-size:10px;cursor:pointer;white-space:nowrap;transition:all .12s;user-select:none;">
           ${Utils.escapeHtml(p.name)}
           <button class="smax-resp-preset-del" data-preset-id="${Utils.escapeHtml(p.id)}"
-            style="background:none;border:none;color:#4b5563;cursor:pointer;font-size:10px;padding:0;line-height:1;margin-left:2px;" title="Excluir preset">✕</button>
+            style="background:none;border:none;color:var(--sp-text-dim);cursor:pointer;font-size:10px;padding:0;line-height:1;margin-left:2px;" title="Excluir preset">✕</button>
         </span>`).join('');
       el.querySelectorAll('.smax-resp-preset-pill').forEach(pill => {
         pill.addEventListener('click', e => {
@@ -8199,15 +8199,15 @@
         const infoEl = backdrop?.querySelector('#smax-resp-search-info');
         if (infoEl) {
           const teamLabels = teamsToSearch.map(t => t.name || t.id);
-          const gseLines = gseIds.map(id => `<div style="color:#d1d5db;padding-left:8px;font-size:10px;line-height:1.5;">${Utils.escapeHtml(gseNameMap[id] || id)} <span style="color:#4b5563;">(${id})</span></div>`).join('');
-          const section = (label) => `<div style="font-size:9px;font-weight:600;color:#4b5563;text-transform:uppercase;letter-spacing:.06em;margin-top:8px;margin-bottom:2px;">${label}</div>`;
+          const gseLines = gseIds.map(id => `<div style="color:var(--sp-text);padding-left:8px;font-size:10px;line-height:1.5;">${Utils.escapeHtml(gseNameMap[id] || id)} <span style="color:var(--sp-text-dim);">(${id})</span></div>`).join('');
+          const section = (label) => `<div style="font-size:9px;font-weight:600;color:var(--sp-text-dim);text-transform:uppercase;letter-spacing:.06em;margin-top:8px;margin-bottom:2px;">${label}</div>`;
           infoEl.innerHTML = section('Equipes buscadas')
-            + `<div style="color:#d1d5db;font-size:10px;line-height:1.5;">${Utils.escapeHtml(teamLabels.join(', ') || '—')}</div>`
+            + `<div style="color:var(--sp-text);font-size:10px;line-height:1.5;">${Utils.escapeHtml(teamLabels.join(', ') || '—')}</div>`
             + section(`GSEs (${gseIds.length})`)
             + gseLines
             + section('Filtros')
-            + `<div style="color:#d1d5db;font-size:10px;line-height:1.5;">Fase: excl. Close / Accept</div>`
-            + `<div style="color:#d1d5db;font-size:10px;line-height:1.5;">Status Op.: excl. Fechado</div>`;
+            + `<div style="color:var(--sp-text);font-size:10px;line-height:1.5;">Fase: excl. Close / Accept</div>`
+            + `<div style="color:var(--sp-text);font-size:10px;line-height:1.5;">Status Op.: excl. Fechado</div>`;
           infoEl.style.display = '';
         }
 
@@ -8602,15 +8602,15 @@
       };
 
       const gseColHtml = (row) => {
-        if (!pending.gse?.id) return '<span style="color:#6b7280">—</span>';
-        if (row.gseWillChange) return `<span style="color:#9ca3af">${Utils.escapeHtml(row.curGseName)}</span> → <span style="color:#93c5fd">${Utils.escapeHtml(pending.gse.name)}</span>`;
-        return `<span style="color:#6b7280">${Utils.escapeHtml(row.curGseName)} <em style="font-size:9px;">(igual)</em></span>`;
+        if (!pending.gse?.id) return '<span style="color:var(--sp-text-muted)">—</span>';
+        if (row.gseWillChange) return `<span style="color:var(--sp-text-muted)">${Utils.escapeHtml(row.curGseName)}</span> → <span style="color:var(--sp-accent)">${Utils.escapeHtml(pending.gse.name)}</span>`;
+        return `<span style="color:var(--sp-text-muted)">${Utils.escapeHtml(row.curGseName)} <em style="font-size:9px;">(igual)</em></span>`;
       };
 
       const assigneeColHtml = (row) => {
-        if (!pending.assignee?.id) return '<span style="color:#6b7280">—</span>';
-        if (row.assigneeWillChange) return `<span style="color:#9ca3af">${Utils.escapeHtml(row.curAssigneeName)}</span> → <span style="color:#c4b5fd">${Utils.escapeHtml(pending.assignee.name)}</span>`;
-        return `<span style="color:#6b7280">${Utils.escapeHtml(row.curAssigneeName)} <em style="font-size:9px;">(igual)</em></span>`;
+        if (!pending.assignee?.id) return '<span style="color:var(--sp-text-muted)">—</span>';
+        if (row.assigneeWillChange) return `<span style="color:var(--sp-text-muted)">${Utils.escapeHtml(row.curAssigneeName)}</span> → <span style="color:#c4b5fd">${Utils.escapeHtml(pending.assignee.name)}</span>`;
+        return `<span style="color:var(--sp-text-muted)">${Utils.escapeHtml(row.curAssigneeName)} <em style="font-size:9px;">(igual)</em></span>`;
       };
 
       const overlay = document.createElement('div');
@@ -8621,7 +8621,7 @@
         <div id="smax-batch-confirm-box">
           <div id="smax-batch-confirm-header">
             <span style="font-size:14px;font-weight:700;">Confirmar ações em lote</span>
-            <button id="smax-bc-cancel-x" style="background:none;border:none;color:#9ca3af;font-size:18px;cursor:pointer;line-height:1;">✕</button>
+            <button id="smax-bc-cancel-x" style="background:none;border:none;color:var(--sp-text-muted);font-size:18px;cursor:pointer;line-height:1;">✕</button>
           </div>
           <div id="smax-batch-confirm-body">
             <div>
@@ -8662,11 +8662,11 @@
             </div>
           </div>
           <div id="smax-batch-confirm-footer">
-            <span id="smax-batch-confirm-summary" style="color:#9ca3af;font-size:12px;">
+            <span id="smax-batch-confirm-summary" style="color:var(--sp-text-muted);font-size:12px;">
               ${willActCount > 0 ? `${willActCount} chamado(s) serão atualizados.` : 'Nenhum chamado será alterado.'}
             </span>
             <div style="display:flex;gap:8px;">
-              <button id="smax-bc-cancel-btn" style="padding:7px 18px;border:1px solid rgba(255,255,255,.15);border-radius:8px;background:transparent;color:#9ca3af;font-size:13px;cursor:pointer;">Cancelar</button>
+              <button id="smax-bc-cancel-btn" style="padding:7px 18px;border:1px solid var(--sp-border);border-radius:8px;background:transparent;color:var(--sp-text-muted);font-size:13px;cursor:pointer;">Cancelar</button>
               <button id="smax-bc-confirm-btn" ${willActCount === 0 ? 'disabled' : ''}
                 style="padding:7px 22px;border:none;border-radius:8px;background:${willActCount > 0 ? 'linear-gradient(135deg,#22c55e,#16a34a)' : '#374151'};color:#fff;font-size:13px;font-weight:700;cursor:${willActCount > 0 ? 'pointer' : 'default'};">
                 Confirmar e Enviar (${willActCount})
@@ -8803,10 +8803,10 @@
             ).join('');
 
             picker.innerHTML = `
-              <div style="padding:8px 12px;font-size:11px;color:#9ca3af;border-bottom:1px solid rgba(255,255,255,.08);">GSE selecionada:</div>
+              <div style="padding:8px 12px;font-size:11px;color:var(--sp-text-muted);border-bottom:1px solid var(--sp-border);">GSE selecionada:</div>
               <div style="padding:8px 12px 6px;font-size:12px;color:#e2e8f0;font-weight:600;">${Utils.escapeHtml(gname)}</div>
               <div style="padding:6px 12px 8px;border-top:1px solid rgba(255,255,255,.06);">
-                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:#d1d5db;user-select:none;">
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:var(--sp-text);user-select:none;">
                   <input type="checkbox" id="smax-gse-fwd-cb" style="cursor:pointer;"> 📤 Com encaminhamento
                 </label>
               </div>
@@ -8816,7 +8816,7 @@
                   data-placeholder="Texto de encaminhamento (suporta imagens coladas)..."></div>
               </div>
               <div style="display:flex;gap:6px;padding:8px 12px;border-top:1px solid rgba(255,255,255,.08);">
-                <button id="smax-gse-fwd-back" style="flex:1;padding:5px 0;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:transparent;color:#9ca3af;font-size:11px;cursor:pointer;">← Voltar</button>
+                <button id="smax-gse-fwd-back" style="flex:1;padding:5px 0;border-radius:6px;border:1px solid var(--sp-border);background:transparent;color:var(--sp-text-muted);font-size:11px;cursor:pointer;">← Voltar</button>
                 <button id="smax-gse-fwd-confirm" style="flex:2;padding:5px 0;border-radius:6px;border:none;background:#3b82f6;color:#fff;font-size:11px;font-weight:600;cursor:pointer;">Confirmar</button>
               </div>`;
 
@@ -9009,7 +9009,7 @@
       const ownStatus = cache?.status || '';
 
       const cancelHtml = pendSt
-        ? `<div class="smax-resp-field-picker-item" data-key="__clear__" style="color:#f87171;border-bottom:1px solid rgba(255,255,255,.1);">× Cancelar alteração de status</div>`
+        ? `<div class="smax-resp-field-picker-item" data-key="__clear__" style="color:#f87171;border-bottom:1px solid var(--sp-border);">× Cancelar alteração de status</div>`
         : '';
 
       picker.innerHTML = cancelHtml + CHANGEABLE_STATUSES.map(key => {
@@ -9084,7 +9084,7 @@
       const ownSCCD = cache?.statusSCCD || '';
 
       const cancelHtml = pendSCCD
-        ? `<div class="smax-resp-field-picker-item" data-key="__clear__" style="color:#f87171;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:8px;margin-bottom:4px;">× Cancelar alteração de status operacional</div>`
+        ? `<div class="smax-resp-field-picker-item" data-key="__clear__" style="color:#f87171;border-bottom:1px solid var(--sp-border);padding-bottom:8px;margin-bottom:4px;">× Cancelar alteração de status operacional</div>`
         : '';
 
       picker.innerHTML = cancelHtml + Object.entries(STATUS_SCCD_LABELS).map(([key, label]) => {
@@ -9242,7 +9242,7 @@
 
         // Separador entre existentes e disponíveis
         const sepHtml = existingHtml && availableHtml
-          ? '<div style="border-top:1px solid rgba(255,255,255,.1);margin:4px 0;font-size:10px;color:#6b7280;padding:4px 8px;">Adicionar novo:</div>'
+          ? '<div style="border-top:1px solid var(--sp-border);margin:4px 0;font-size:10px;color:var(--sp-text-muted);padding:4px 8px;">Adicionar novo:</div>'
           : '';
 
         listEl.innerHTML = existingHtml + sepHtml + availableHtml
@@ -9285,8 +9285,8 @@
       };
 
       const existingCount = existingList.length;
-      const headerHtml = `<div style="display:flex;gap:6px;padding:4px 6px 6px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:4px;align-items:center;">
-        ${existingCount ? `<span style="font-size:10px;color:#6b7280;">👁️ ${existingCount} atual</span>` : ''}
+      const headerHtml = `<div style="display:flex;gap:6px;padding:4px 6px 6px;border-bottom:1px solid var(--sp-border);margin-bottom:4px;align-items:center;">
+        ${existingCount ? `<span style="font-size:10px;color:var(--sp-text-muted);">👁️ ${existingCount} atual</span>` : ''}
         <span style="flex:1;"></span>
         <button class="smax-fp-clear-btn" style="padding:4px 8px;border:1px solid rgba(248,113,113,.4);background:transparent;color:#f87171;border-radius:5px;cursor:pointer;font-size:11px;">× Limpar</button>
         <button class="smax-fp-confirm-btn" style="padding:4px 8px;border:none;background:#22c55e;color:#fff;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600;">✓ OK</button>
@@ -9420,7 +9420,7 @@
           });
         });
       } else {
-        teamFilterEl.innerHTML = '<div style="font-size:11px;color:#6b7280;">Nenhuma equipe configurada.</div>';
+        teamFilterEl.innerHTML = '<div style="font-size:11px;color:var(--sp-text-muted);">Nenhuma equipe configurada.</div>';
       }
     };
 
@@ -9459,69 +9459,69 @@
           <div id="smax-resp-hud-list">
             <div id="smax-resp-filter-panel">
               <div id="smax-resp-filter-header">
-                <span style="font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;">Filtros</span>
+                <span style="font-size:10px;font-weight:600;color:var(--sp-text-muted);text-transform:uppercase;letter-spacing:.07em;">Filtros</span>
                 <div style="display:flex;align-items:center;gap:5px;margin-left:auto;">
                   <button id="smax-resp-clear-filters" title="Limpar filtros ativos" style="display:none;padding:3px 7px;border:1px solid rgba(248,113,113,.35);border-radius:5px;background:rgba(248,113,113,.08);color:#f87171;font-size:10px;cursor:pointer;white-space:nowrap;">✕ Limpar</button>
-                  <button id="smax-resp-fetch-btn" style="padding:5px 10px;border:none;border-radius:6px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;">↺ Carregar</button>
-                  <button id="smax-resp-toggle-criteria" title="Mostrar/ocultar critérios" style="padding:4px 7px;border:1px solid rgba(255,255,255,.12);border-radius:5px;background:transparent;color:#9ca3af;font-size:11px;cursor:pointer;line-height:1;">▲</button>
+                  <button id="smax-resp-fetch-btn" style="padding:5px 10px;border:none;border-radius:6px;background:var(--sp-accent);color:var(--sp-on-accent);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;">↺ Carregar</button>
+                  <button id="smax-resp-toggle-criteria" title="Mostrar/ocultar critérios" style="padding:4px 7px;border:1px solid var(--sp-border);border-radius:5px;background:transparent;color:var(--sp-text-muted);font-size:11px;cursor:pointer;line-height:1;">▲</button>
                 </div>
               </div>
-              <div id="smax-resp-preset-bar" style="padding:5px 12px 6px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:rgba(0,0,0,.12);">
-                <span style="font-size:9px;font-weight:700;color:#4b5563;text-transform:uppercase;letter-spacing:.07em;flex-shrink:0;">Presets</span>
+              <div id="smax-resp-preset-bar" style="padding:5px 12px 6px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:var(--sp-surface-2);">
+                <span style="font-size:9px;font-weight:700;color:var(--sp-text-dim);text-transform:uppercase;letter-spacing:.07em;flex-shrink:0;">Presets</span>
                 <div id="smax-resp-preset-pills" style="display:flex;flex-wrap:wrap;gap:4px;flex:1;align-items:center;min-height:20px;"></div>
                 <button id="smax-resp-preset-save" title="Salvar filtro atual como preset" style="flex-shrink:0;padding:3px 8px;border:1px solid rgba(74,222,128,.3);border-radius:6px;background:rgba(74,222,128,.08);color:#4ade80;font-size:10px;cursor:pointer;white-space:nowrap;">💾 Salvar</button>
               </div>
               <div id="smax-resp-filter-criteria">
-                <div style="font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Equipes</div>
+                <div style="font-size:10px;font-weight:600;color:var(--sp-text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Equipes</div>
                 <div id="smax-resp-team-filters" style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px;"></div>
                 <div id="smax-resp-req-status-section" style="display:none;">
-                  <div style="font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Status</div>
+                  <div style="font-size:10px;font-weight:600;color:var(--sp-text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Status</div>
                   <div id="smax-resp-req-status-filters" style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px;"></div>
                 </div>
                 <div id="smax-resp-status-section" style="display:none;">
-                  <div style="font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Status Operacional</div>
+                  <div style="font-size:10px;font-weight:600;color:var(--sp-text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Status Operacional</div>
                   <div id="smax-resp-status-filters" style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px;"></div>
                 </div>
                 <div id="smax-resp-assignee-section" style="display:none;">
-                  <div style="font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Designado</div>
+                  <div style="font-size:10px;font-weight:600;color:var(--sp-text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Designado</div>
                   <div id="smax-resp-assignee-filters" style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px;"></div>
                 </div>
                 <div id="smax-resp-search-info" style="display:none;padding:8px;background:rgba(255,255,255,.04);border-radius:6px;border:1px solid rgba(255,255,255,.07);"></div>
               </div>
             </div>
-            <div id="smax-resp-count-bar" style="padding:5px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(2,6,23,.4);">
+            <div id="smax-resp-count-bar" style="padding:5px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--sp-border);background:var(--sp-surface);">
               <span id="smax-resp-ticket-count" style="font-size:12px;font-weight:700;color:#60a5fa;"></span>
               <span id="smax-resp-status-msg" style="font-size:10px;"></span>
-              <div id="smax-resp-select-all-btn" style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11px;color:#9ca3af;padding:2px 6px;border-radius:4px;border:1px solid rgba(255,255,255,.1);transition:background .12s;" title="Selecionar/desmarcar todos">
+              <div id="smax-resp-select-all-btn" style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11px;color:var(--sp-text-muted);padding:2px 6px;border-radius:4px;border:1px solid var(--sp-border);transition:background .12s;" title="Selecionar/desmarcar todos">
                 <span id="smax-resp-select-all-icon" style="font-size:13px;">☐</span> Todos
               </div>
             </div>
-            <div id="smax-resp-num-search-bar" style="padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(2,6,23,.4);">
+            <div id="smax-resp-num-search-bar" style="padding:5px 8px;border-bottom:1px solid var(--sp-border);background:var(--sp-surface);">
               <div style="display:flex;gap:5px;">
                 <input type="text" id="smax-resp-num-search-input" placeholder="🔍 Buscar por número..." inputmode="numeric" autocomplete="off"
-                  style="flex:1;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.15);border-radius:5px;padding:4px 8px;color:#fff;font-size:11px;outline:none;min-width:0;">
+                  style="flex:1;background:var(--sp-input-bg);border:1px solid var(--sp-border);border-radius:5px;padding:4px 8px;color:var(--sp-input-text);font-size:11px;outline:none;min-width:0;">
                 <button id="smax-resp-num-search-btn" type="button" style="padding:4px 10px;border:none;border-radius:5px;background:rgba(59,130,246,.5);color:#fff;font-size:11px;cursor:pointer;white-space:nowrap;">→</button>
               </div>
             </div>
-            <div id="smax-resp-text-filter-bar" style="padding:4px 8px;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(2,6,23,.4);">
+            <div id="smax-resp-text-filter-bar" style="padding:4px 8px;border-bottom:1px solid var(--sp-border);background:var(--sp-surface);">
               <div style="position:relative;">
                 <input type="text" id="smax-resp-text-filter" placeholder="Filtrar lista (desc, solicitante, local)..." autocomplete="off"
-                  style="width:100%;box-sizing:border-box;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:5px;padding:4px 24px 4px 8px;color:#fff;font-size:11px;outline:none;">
+                  style="width:100%;box-sizing:border-box;background:var(--sp-input-bg);border:1px solid var(--sp-border);border-radius:5px;padding:4px 24px 4px 8px;color:var(--sp-input-text);font-size:11px;outline:none;">
                 <button id="smax-resp-text-filter-clear" type="button"
-                  style="display:none;position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;color:#6b7280;cursor:pointer;font-size:13px;line-height:1;padding:0 2px;" title="Limpar filtro">✕</button>
+                  style="display:none;position:absolute;right:4px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--sp-text-muted);cursor:pointer;font-size:13px;line-height:1;padding:0 2px;" title="Limpar filtro">✕</button>
               </div>
             </div>
-            <div id="smax-resp-sort-bar" style="padding:3px 8px;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(2,6,23,.4);display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
-              <span style="font-size:9px;color:#4b5563;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;">Ord.</span>
+            <div id="smax-resp-sort-bar" style="padding:3px 8px;border-bottom:1px solid var(--sp-border);background:var(--sp-surface);display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+              <span style="font-size:9px;color:var(--sp-text-dim);text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;">Ord.</span>
               <button class="smax-sort-btn active" data-field="id">ID</button>
               <button class="smax-sort-btn" data-field="createTime">Data</button>
               <button class="smax-sort-btn" data-field="status">Status</button>
               <button class="smax-sort-btn" data-field="assignee">Espec.</button>
-              <button id="smax-sort-dir-btn" type="button" style="margin-left:auto;background:none;border:none;color:#6b7280;font-size:12px;cursor:pointer;padding:0 2px;line-height:1;" title="Inverter ordem">↓</button>
+              <button id="smax-sort-dir-btn" type="button" style="margin-left:auto;background:none;border:none;color:var(--sp-text-muted);font-size:12px;cursor:pointer;padding:0 2px;line-height:1;" title="Inverter ordem">↓</button>
             </div>
             <div id="smax-resp-ticket-list" style="flex:1;overflow-y:auto;"></div>
             <div id="smax-resp-batch-bar" style="display:none;padding:6px 10px;border-top:1px solid rgba(255,255,255,.06);align-items:center;background:rgba(59,130,246,.08);">
-              <span id="smax-resp-batch-count" style="font-size:11px;color:#93c5fd;"></span>
+              <span id="smax-resp-batch-count" style="font-size:11px;color:var(--sp-accent);"></span>
             </div>
           </div>
 
@@ -9529,21 +9529,21 @@
           <div id="smax-resp-hud-main">
             <div id="smax-resp-hud-header">
               <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;overflow:hidden;">
-                <a id="smax-resp-ticket-id-link" href="#" target="_blank" style="font-size:16px;font-weight:700;color:#fff;text-decoration:none;white-space:nowrap;letter-spacing:.01em;">—</a>
+                <a id="smax-resp-ticket-id-link" href="#" target="_blank" style="font-size:16px;font-weight:700;color:var(--sp-header-fg);text-decoration:none;white-space:nowrap;letter-spacing:.01em;">—</a>
                 <span id="smax-resp-detail-global-badge" style="display:none;flex-shrink:0;"></span>
                 <span id="smax-resp-vip-badge" style="display:none;padding:2px 7px;border-radius:999px;background:#facc15;color:#854d0e;font-size:10px;font-weight:700;flex-shrink:0;">VIP</span>
-                <span id="smax-resp-opener" style="font-size:13px;color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;max-width:280px;"></span>
-                <span id="smax-resp-requester-title" style="display:none;font-size:13px;color:rgba(255,255,255,.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;max-width:240px;font-style:italic;"></span>
-                <span id="smax-resp-location-label" style="display:none;font-size:13px;color:rgba(255,255,255,.85);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;cursor:pointer;" title="Clique para ver nome completo"></span>
-                <span id="smax-resp-created-label" style="display:none;font-size:12px;color:rgba(255,255,255,.6);white-space:nowrap;flex-shrink:0;margin-left:auto;"></span>
+                <span id="smax-resp-opener" style="font-size:13px;color:var(--sp-header-fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;max-width:280px;"></span>
+                <span id="smax-resp-requester-title" style="display:none;font-size:13px;color:var(--sp-header-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;max-width:240px;font-style:italic;"></span>
+                <span id="smax-resp-location-label" style="display:none;font-size:13px;color:var(--sp-header-fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;cursor:pointer;" title="Clique para ver nome completo"></span>
+                <span id="smax-resp-created-label" style="display:none;font-size:12px;color:var(--sp-header-sub);white-space:nowrap;flex-shrink:0;margin-left:auto;"></span>
               </div>
               <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
                 <input type="text" id="smax-resp-global-id" placeholder="Global ID" inputmode="numeric" autocomplete="off"
-                  style="width:90px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 9px;color:#fff;font-size:12px;outline:none;">
+                  style="width:90px;background:var(--sp-input-bg);border:1px solid var(--sp-border);border-radius:6px;padding:5px 9px;color:#fff;font-size:12px;outline:none;">
                 <button type="button" id="smax-resp-global-link-btn" title="Vincular chamado ativo ao Global informado">🔗 Vincular</button>
-                <button type="button" id="smax-resp-back-btn" title="Voltar para Configurações" style="padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0;">← Voltar</button>
-                <button id="smax-theme-toggle-hud" type="button" title="Alternar tema" style="width:32px;height:32px;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">🌙</button>
-                <button type="button" id="smax-resp-close-btn" title="Fechar" style="border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.3);color:rgba(255,255,255,.85);font-size:15px;width:30px;height:30px;border-radius:6px;cursor:pointer;">✕</button>
+                <button type="button" id="smax-resp-back-btn" title="Voltar para Configurações" style="padding:4px 10px;border-radius:6px;border:1px solid var(--sp-border);background:var(--sp-surface-2);color:var(--sp-text-muted);font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0;">← Voltar</button>
+                <button id="smax-theme-toggle-hud" type="button" title="Alternar tema" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--sp-border);background:var(--sp-surface-2);color:var(--sp-text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">🌙</button>
+                <button type="button" id="smax-resp-close-btn" title="Fechar" style="border:1px solid var(--sp-border);background:var(--sp-input-bg);color:var(--sp-text);font-size:15px;width:30px;height:30px;border-radius:6px;cursor:pointer;">✕</button>
               </div>
             </div>
 
@@ -9619,7 +9619,7 @@
                       <div id="smax-resp-script-picker"></div>
                     </div>
                     <div id="smax-resp-completion-bar">
-                      <span style="font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;flex-shrink:0;">Código:</span>
+                      <span style="font-size:10px;font-weight:600;color:var(--sp-text-muted);text-transform:uppercase;letter-spacing:.07em;flex-shrink:0;">Código:</span>
                       <button type="button" class="smax-resp-completion-btn" data-code="CompletionCodeFulfilled">Atendido Offline</button>
                       <button type="button" class="smax-resp-completion-btn" data-code="CompletionCodeFulfilledByLiveSupport">Suporte ao Vivo</button>
                       <button type="button" class="smax-resp-completion-btn" data-code="CompletionCodeIncidentResolved">Incidente Resolvido</button>
@@ -9627,14 +9627,14 @@
                   </div>
                   <!-- Anexos -->
                   <div id="smax-resp-attachment-row" data-empty="true">
-                    <span style="font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;flex-shrink:0;">📎 Anexos</span>
+                    <span style="font-size:10px;font-weight:600;color:var(--sp-text-muted);text-transform:uppercase;letter-spacing:.07em;flex-shrink:0;">📎 Anexos</span>
                     <div id="smax-resp-attachment-list" data-state="empty"></div>
                   </div>
                 </div>
               </div>
 
               <aside id="smax-resp-hud-discussions">
-                <div style="font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;padding:10px 12px 8px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;">💬 Discussões</div>
+                <div style="font-size:10px;font-weight:600;color:var(--sp-text-muted);text-transform:uppercase;letter-spacing:.07em;padding:10px 12px 8px;border-bottom:1px solid var(--sp-border);flex-shrink:0;">💬 Discussões</div>
                 <div id="smax-resp-discussions-list"></div>
                 <div id="smax-resp-new-disc-panel">
                   <div id="smax-resp-new-disc-label">Nova discussão</div>
@@ -9680,7 +9680,7 @@
             <div id="smax-resp-script-box">
               <div id="smax-resp-script-box-header">
                 <h4>📋 Scripts de Respostas</h4>
-                <button id="smax-resp-script-modal-close" style="border:none;background:rgba(255,255,255,.18);color:#fff;font-size:16px;width:30px;height:30px;border-radius:6px;cursor:pointer;flex-shrink:0;">✕</button>
+                <button id="smax-resp-script-modal-close" style="border:none;background:var(--sp-header-btn);color:var(--sp-header-fg);font-size:16px;width:30px;height:30px;border-radius:6px;cursor:pointer;flex-shrink:0;">✕</button>
               </div>
               <div id="smax-resp-script-search-wrap">
                 <input id="smax-resp-script-search-inp" type="text" placeholder="Buscar por título ou conteúdo..." autocomplete="off">
@@ -9721,19 +9721,19 @@
           <!-- Activity Report Modal (overlay) -->
           <div id="smax-resp-report-modal" style="display:none;position:absolute;inset:0;background:rgba(2,6,23,.97);z-index:10;border-radius:inherit;flex-direction:column;overflow:hidden;">
             <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;">
-              <span style="font-size:14px;font-weight:700;color:#e5e7eb;">📊 Relatório de Atividades</span>
-              <button id="smax-resp-report-close" type="button" style="border:none;background:rgba(0,0,0,.3);color:rgba(255,255,255,.8);font-size:14px;width:28px;height:28px;border-radius:6px;cursor:pointer;border:1px solid rgba(255,255,255,.2);">✕</button>
+              <span style="font-size:14px;font-weight:700;color:var(--sp-text);">📊 Relatório de Atividades</span>
+              <button id="smax-resp-report-close" type="button" style="border:none;background:var(--sp-input-bg);color:var(--sp-text);font-size:14px;width:28px;height:28px;border-radius:6px;cursor:pointer;border:1px solid var(--sp-border);">✕</button>
             </div>
             <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-              <label style="font-size:11px;color:#9ca3af;">De:</label>
-              <input type="date" id="smax-resp-report-from" style="background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.15);border-radius:5px;padding:4px 8px;color:#e5e7eb;font-size:11px;outline:none;">
-              <label style="font-size:11px;color:#9ca3af;">Até:</label>
-              <input type="date" id="smax-resp-report-to" style="background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.15);border-radius:5px;padding:4px 8px;color:#e5e7eb;font-size:11px;outline:none;">
-              <button id="smax-resp-report-gen-btn" type="button" style="padding:5px 14px;border:none;border-radius:6px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;font-size:11px;font-weight:600;cursor:pointer;">Gerar</button>
-              <button id="smax-resp-report-export-btn" type="button" style="padding:5px 14px;border:1px solid rgba(255,255,255,.15);border-radius:6px;background:rgba(255,255,255,.06);color:#d1d5db;font-size:11px;cursor:pointer;display:none;">⬇ Exportar CSV</button>
+              <label style="font-size:11px;color:var(--sp-text-muted);">De:</label>
+              <input type="date" id="smax-resp-report-from" style="background:var(--sp-input-bg);border:1px solid var(--sp-border);border-radius:5px;padding:4px 8px;color:var(--sp-text);font-size:11px;outline:none;">
+              <label style="font-size:11px;color:var(--sp-text-muted);">Até:</label>
+              <input type="date" id="smax-resp-report-to" style="background:var(--sp-input-bg);border:1px solid var(--sp-border);border-radius:5px;padding:4px 8px;color:var(--sp-text);font-size:11px;outline:none;">
+              <button id="smax-resp-report-gen-btn" type="button" style="padding:5px 14px;border:none;border-radius:6px;background:var(--sp-accent);color:var(--sp-on-accent);font-size:11px;font-weight:600;cursor:pointer;">Gerar</button>
+              <button id="smax-resp-report-export-btn" type="button" style="padding:5px 14px;border:1px solid var(--sp-border);border-radius:6px;background:var(--sp-surface-2);color:var(--sp-text);font-size:11px;cursor:pointer;display:none;">⬇ Exportar CSV</button>
             </div>
             <div id="smax-resp-report-content" style="flex:1;overflow-y:auto;padding:12px 16px;">
-              <div style="color:#6b7280;font-size:12px;text-align:center;padding-top:40px;">Selecione o período e clique em Gerar.</div>
+              <div style="color:var(--sp-text-muted);font-size:12px;text-align:center;padding-top:40px;">Selecione o período e clique em Gerar.</div>
             </div>
           </div>
         </div>`;
@@ -10172,7 +10172,7 @@
         const fromTs = new Date(fromVal + 'T00:00:00').getTime();
         const toTs = new Date(toVal + 'T23:59:59').getTime();
         this.disabled = true; this.textContent = '…';
-        if (content) content.innerHTML = '<div style="color:#6b7280;font-size:12px;padding:20px;text-align:center;">Consultando Supabase…</div>';
+        if (content) content.innerHTML = '<div style="color:var(--sp-text-muted);font-size:12px;padding:20px;text-align:center;">Consultando Supabase…</div>';
         let entries, source;
         try {
           entries = await ActivityLog.fetchFromSupabase(fromTs, toTs);
@@ -10184,7 +10184,7 @@
         }
         this.disabled = false; this.textContent = 'Gerar';
         if (!entries.length) {
-          if (content) content.innerHTML = '<div style="color:#6b7280;font-size:12px;padding:20px;text-align:center;">Nenhuma atividade no período.</div>';
+          if (content) content.innerHTML = '<div style="color:var(--sp-text-muted);font-size:12px;padding:20px;text-align:center;">Nenhuma atividade no período.</div>';
           if (exportBtn) exportBtn.style.display = 'none';
           return;
         }
@@ -10196,44 +10196,44 @@
         const fmtDate = ts => { const d = new Date(ts); return `${pad2(d.getDate())}/${pad2(d.getMonth()+1)}/${d.getFullYear()}`; };
         const fmtTime = ts => { const d = new Date(ts); return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
         const summaryHtml = `
-          <div style="font-size:10px;color:#6b7280;margin-bottom:8px;">Fonte: <b style="color:#9ca3af;">${source}</b> — ${entries.length} registro(s)</div>
+          <div style="font-size:10px;color:var(--sp-text-muted);margin-bottom:8px;">Fonte: <b style="color:var(--sp-text-muted);">${source}</b> — ${entries.length} registro(s)</div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
             ${[['Respondidos','RESPONDIDO','#4ade80'],['Vinc. Global','VINCULO_GLOBAL','#60a5fa'],['Transferidos','TRANSFERIDO','#c084fc'],['Designados','DESIGNADO','#fbbf24'],['Status Op.','STATUS','#34d399'],['Outros','OUTRO','#6b7280']].map(([label, key, color]) =>
               `<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 14px;text-align:center;">
                 <div style="font-size:18px;font-weight:700;color:${color};">${counts[key]||0}</div>
-                <div style="font-size:10px;color:#9ca3af;">${label}</div>
+                <div style="font-size:10px;color:var(--sp-text-muted);">${label}</div>
               </div>`
             ).join('')}
             <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 14px;text-align:center;">
-              <div style="font-size:18px;font-weight:700;color:#e5e7eb;">${uniqueTickets}</div>
-              <div style="font-size:10px;color:#9ca3af;">Chamados únicos</div>
+              <div style="font-size:18px;font-weight:700;color:var(--sp-text);">${uniqueTickets}</div>
+              <div style="font-size:10px;color:var(--sp-text-muted);">Chamados únicos</div>
             </div>
             <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 14px;text-align:center;">
-              <div style="font-size:18px;font-weight:700;color:#e5e7eb;">${entries.length}</div>
-              <div style="font-size:10px;color:#9ca3af;">Total ações</div>
+              <div style="font-size:18px;font-weight:700;color:var(--sp-text);">${entries.length}</div>
+              <div style="font-size:10px;color:var(--sp-text-muted);">Total ações</div>
             </div>
           </div>
           <table style="width:100%;border-collapse:collapse;font-size:11px;">
-            <thead><tr style="background:rgba(255,255,255,.06);">
-              <th style="padding:5px 8px;text-align:left;color:#9ca3af;font-weight:600;white-space:nowrap;">Hora</th>
-              <th style="padding:5px 8px;text-align:left;color:#9ca3af;font-weight:600;white-space:nowrap;">Data</th>
-              <th style="padding:5px 8px;text-align:left;color:#9ca3af;font-weight:600;">Chamado</th>
-              <th style="padding:5px 8px;text-align:left;color:#9ca3af;font-weight:600;">Descrição</th>
-              <th style="padding:5px 8px;text-align:left;color:#9ca3af;font-weight:600;">Ação</th>
-              <th style="padding:5px 8px;text-align:left;color:#9ca3af;font-weight:600;">Detalhe</th>
-              <th style="padding:5px 8px;text-align:left;color:#9ca3af;font-weight:600;">Usuário</th>
+            <thead><tr style="background:var(--sp-surface-2);">
+              <th style="padding:5px 8px;text-align:left;color:var(--sp-text-muted);font-weight:600;white-space:nowrap;">Hora</th>
+              <th style="padding:5px 8px;text-align:left;color:var(--sp-text-muted);font-weight:600;white-space:nowrap;">Data</th>
+              <th style="padding:5px 8px;text-align:left;color:var(--sp-text-muted);font-weight:600;">Chamado</th>
+              <th style="padding:5px 8px;text-align:left;color:var(--sp-text-muted);font-weight:600;">Descrição</th>
+              <th style="padding:5px 8px;text-align:left;color:var(--sp-text-muted);font-weight:600;">Ação</th>
+              <th style="padding:5px 8px;text-align:left;color:var(--sp-text-muted);font-weight:600;">Detalhe</th>
+              <th style="padding:5px 8px;text-align:left;color:var(--sp-text-muted);font-weight:600;">Usuário</th>
             </tr></thead>
             <tbody>${entries.slice().reverse().map((e, i) => {
               const desc = e.ticketSubject || DataRepository.triageCache.get(e.ticketId)?.subjectText || '';
               const detalhe = e.globalChangeId ? `→ Global #${Utils.escapeHtml(e.globalChangeId)}` : e.statusSCCDTo ? `→ ${Utils.escapeHtml(STATUS_SCCD_LABELS?.[e.statusSCCDTo] || e.statusSCCDTo)}` : e.transferredTo ? `→ ${Utils.escapeHtml(e.transferredTo)}` : e.assignedTo ? `→ ${Utils.escapeHtml(e.assignedTo)}` : '';
               return `<tr style="background:${i%2===0?'transparent':'rgba(255,255,255,.02)'};border-bottom:1px solid rgba(255,255,255,.04);">
-                <td style="padding:4px 8px;color:#e5e7eb;font-weight:600;white-space:nowrap;">${fmtTime(e.ts)}</td>
-                <td style="padding:4px 8px;color:#6b7280;white-space:nowrap;">${fmtDate(e.ts)}</td>
+                <td style="padding:4px 8px;color:var(--sp-text);font-weight:600;white-space:nowrap;">${fmtTime(e.ts)}</td>
+                <td style="padding:4px 8px;color:var(--sp-text-muted);white-space:nowrap;">${fmtDate(e.ts)}</td>
                 <td style="padding:4px 8px;color:#60a5fa;white-space:nowrap;">#${Utils.escapeHtml(e.ticketId)}</td>
-                <td style="padding:4px 8px;color:#e5e7eb;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${Utils.escapeHtml(desc)}">${Utils.escapeHtml(desc)}</td>
-                <td style="padding:4px 8px;color:#e5e7eb;white-space:nowrap;">${Utils.escapeHtml(e.relevantWork)}</td>
-                <td style="padding:4px 8px;color:#9ca3af;white-space:nowrap;">${detalhe}</td>
-                <td style="padding:4px 8px;color:#9ca3af;white-space:nowrap;">${Utils.escapeHtml(e.user||'')}</td>
+                <td style="padding:4px 8px;color:var(--sp-text);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${Utils.escapeHtml(desc)}">${Utils.escapeHtml(desc)}</td>
+                <td style="padding:4px 8px;color:var(--sp-text);white-space:nowrap;">${Utils.escapeHtml(e.relevantWork)}</td>
+                <td style="padding:4px 8px;color:var(--sp-text-muted);white-space:nowrap;">${detalhe}</td>
+                <td style="padding:4px 8px;color:var(--sp-text-muted);white-space:nowrap;">${Utils.escapeHtml(e.user||'')}</td>
               </tr>`;
             }).join('')}
             </tbody>
@@ -10725,7 +10725,7 @@
     const toDateInput = (d) => d.toISOString().slice(0, 10);
 
     const PILL_ON  = 'background:#3b82f6;color:#fff;border:1px solid #3b82f6;border-radius:5px;padding:5px 11px;cursor:pointer;font-size:11px;white-space:nowrap;font-weight:500;';
-    const PILL_OFF = 'background:transparent;color:#64748b;border:1px solid rgba(255,255,255,.12);border-radius:5px;padding:5px 11px;cursor:pointer;font-size:11px;white-space:nowrap;';
+    const PILL_OFF = 'background:transparent;color:#64748b;border:1px solid var(--sp-border);border-radius:5px;padding:5px 11px;cursor:pointer;font-size:11px;white-space:nowrap;';
 
     const buildHtml = () => {
       const [wStart, wEnd] = weekRange();
@@ -10749,8 +10749,8 @@
           <div style="font-size:10px;color:#64748b;letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;">Especialista</div>
           <div style="position:relative;">
             <input id="aqp-person" type="text" placeholder="Digite o nome..." autocomplete="off"
-              style="width:100%;box-sizing:border-box;padding:8px 10px;background:#1e293b;color:inherit;border:1px solid rgba(255,255,255,.1);border-radius:7px;font-size:13px;outline:none;">
-            <div id="aqp-dd" style="display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;z-index:10;background:#1e293b;border:1px solid rgba(255,255,255,.12);border-radius:7px;max-height:150px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.5);"></div>
+              style="width:100%;box-sizing:border-box;padding:8px 10px;background:#1e293b;color:inherit;border:1px solid var(--sp-border);border-radius:7px;font-size:13px;outline:none;">
+            <div id="aqp-dd" style="display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;z-index:10;background:#1e293b;border:1px solid var(--sp-border);border-radius:7px;max-height:150px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.5);"></div>
           </div>
           <div id="aqp-ok" style="display:none;margin-top:5px;font-size:11px;color:#4ade80;"></div>
         </div>
@@ -10766,12 +10766,12 @@
             <div>
               <div style="font-size:10px;color:#475569;margin-bottom:3px;">De</div>
               <input id="aqp-from" type="date" value="${toDateInput(wStart)}"
-                style="width:100%;box-sizing:border-box;padding:7px 8px;background:#1e293b;color:inherit;border:1px solid rgba(255,255,255,.1);border-radius:7px;font-size:13px;outline:none;">
+                style="width:100%;box-sizing:border-box;padding:7px 8px;background:#1e293b;color:inherit;border:1px solid var(--sp-border);border-radius:7px;font-size:13px;outline:none;">
             </div>
             <div>
               <div style="font-size:10px;color:#475569;margin-bottom:3px;">Até</div>
               <input id="aqp-to" type="date" value="${toDateInput(wEnd)}"
-                style="width:100%;box-sizing:border-box;padding:7px 8px;background:#1e293b;color:inherit;border:1px solid rgba(255,255,255,.1);border-radius:7px;font-size:13px;outline:none;">
+                style="width:100%;box-sizing:border-box;padding:7px 8px;background:#1e293b;color:inherit;border:1px solid var(--sp-border);border-radius:7px;font-size:13px;outline:none;">
             </div>
           </div>
         </div>
@@ -10796,7 +10796,7 @@
       <div id="aqp-res-hdr" style="padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:12px;flex-shrink:0;">
         <span id="aqp-res-count" style="font-size:12px;color:#64748b;">—</span>
         <div style="flex:1;"></div>
-        <button id="aqp-export" style="display:none;padding:6px 14px;background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#94a3b8;cursor:pointer;font-size:12px;" title="Exportar para Excel (CSV)">⬇ Exportar CSV</button>
+        <button id="aqp-export" style="display:none;padding:6px 14px;background:transparent;border:1px solid var(--sp-border);border-radius:6px;color:#94a3b8;cursor:pointer;font-size:12px;" title="Exportar para Excel (CSV)">⬇ Exportar CSV</button>
       </div>
       <div id="aqp-results" style="flex:1;overflow-y:auto;padding:14px 18px;"></div>
     </div>

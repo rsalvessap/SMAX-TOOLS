@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SMAX Toolkit - TJSP
 // @namespace    https://github.com/rsalvessap/SMAX-TOOLS
-// @version      2.79
+// @version      2.80
 // @description  Conjunto de ferramentas para o SMAX TJSP: triagem, respostas em lote, scripts, discussões e consulta de processos no eProc
 // @author       rsalvessap
 // @match        https://suporte.tjsp.jus.br/saw/*
@@ -47,7 +47,7 @@
   const SMAX_SB_URL = 'https://rlcbmrjkojopipiwpktf.supabase.co';
   const SMAX_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Jtcmprb2pvcGlwaXdwa3RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MzI0MTksImV4cCI6MjA5NDMwODQxOX0.Ha4xRbFvbgb2yO64ga3dV8KrNGRgbV7zWFXc5bYHdeQ';
 
-  const SMAX_TOOLKIT_VERSION = '2.79';
+  const SMAX_TOOLKIT_VERSION = '2.80';
   const SMAX_TENANT_ID = '213963628';
   console.log('%c[SMAX Toolkit] v' + SMAX_TOOLKIT_VERSION + ' carregado', 'color:#60a5fa;font-weight:bold;font-size:13px;');
 
@@ -736,7 +736,7 @@
 [data-smax-theme="dark"] .smax-discussion-card[data-privacy="INTERNAL"] .smax-discussion-privacy,
 [data-smax-theme="gray"] .smax-discussion-card[data-privacy="INTERNAL"] .smax-discussion-privacy { background:rgba(167,139,250,.14); border-color:rgba(167,139,250,.55); color:#c4b5fd; }
 [data-smax-theme="dark"] .smax-discussion-card[data-privacy="EXTERNAL"] .smax-discussion-privacy,
-[data-smax-theme="gray"] .smax-discussion-card[data-privacy="EXTERNAL"] .smax-discussion-privacy { background:rgba(74,222,128,.14); border-color:rgba(74,222,128,.55); color:#86efac; }
+[data-smax-theme="gray"] .smax-discussion-card[data-privacy="EXTERNAL"] .smax-discussion-privacy { background:rgba(74,222,128,.14); border-color:rgba(74,222,128,.55); color:var(--sp-success-text); }
 .smax-discussion-body { font-size:13px; color:var(--sp-text); line-height:1.45; max-height:150px; overflow:auto; }
 .smax-discussion-body p { margin:0 0 6px; } .smax-discussion-body p:last-child { margin-bottom:0; }
 .smax-discussion-meta { font-size:11px; color:var(--sp-text-muted); }
@@ -751,7 +751,11 @@
 #smax-triage-attachment-list { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:6px; font-size:12px; color:var(--sp-text-muted); min-height:22px; max-width:55%; }
 .smax-attachment-chip { border:1px solid var(--sp-accent); border-radius:999px; padding:3px 10px; background:var(--sp-primary-bg); color:var(--sp-accent); font-size:11px; cursor:pointer; transition:all .15s; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .smax-attachment-chip:hover { background:var(--sp-accent); color:#fff; }
-#smax-attachment-modal button { border:none; width:40px; height:40px; border-radius:50%; background:var(--sp-surface); color:var(--sp-text); font-size:22px; cursor:pointer; }
+#smax-attachment-modal { position:fixed; inset:0; z-index:9999999; background:rgba(0,0,0,.85); display:none; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
+#smax-attachment-modal[data-visible="true"] { display:flex; }
+#smax-attachment-modal img { max-width:90vw; max-height:80vh; border-radius:8px; object-fit:contain; box-shadow:0 8px 32px rgba(0,0,0,.5); }
+#smax-attachment-modal button { position:absolute; top:16px; right:16px; border:none; width:40px; height:40px; border-radius:50%; background:var(--sp-surface); color:var(--sp-text); font-size:22px; cursor:pointer; z-index:1; }
+.smax-attachment-caption { color:#fff; font-size:13px; text-align:center; max-width:80vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 /* ============================================================
    RESPONSE HUD
@@ -1395,7 +1399,7 @@
         const span = document.createElement('span');
         span.textContent = formatted;
         span.dataset.smaxProc = formatted;
-        span.style.cssText = 'color:#38bdf8;font-family:monospace;font-weight:600;border-bottom:1px dotted rgba(56,189,248,.6);cursor:pointer;';
+        span.style.cssText = 'color:var(--sp-accent);font-family:monospace;font-weight:600;border-bottom:1px dotted var(--sp-accent);cursor:pointer;';
         span.title = `Consultar processo no eProc: ${formatted}`;
         return span;
       };
@@ -3510,7 +3514,7 @@
     };
 
     const renderSidebar = () => `
-      <nav id="smax-settings-sidebar" style="width:190px;flex-shrink:0;background:var(--sp-sidebar-bg,#0d1117);border-right:1px solid var(--sp-border,rgba(255,255,255,.1));padding:12px 8px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;">
+      <nav id="smax-settings-sidebar" style="width:190px;flex-shrink:0;background:var(--sp-sidebar-bg);border-right:1px solid var(--sp-border);padding:12px 8px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;">
         <div style="font-size:10px;font-weight:600;color:var(--sp-text-dim);text-transform:uppercase;letter-spacing:.08em;padding:4px 8px 8px;">Navegação</div>
         ${SECTIONS.map(s => `
           <button class="smax-sidebar-item${s.id === activeSection ? ' active' : ''}" data-section="${s.id}">
@@ -3533,17 +3537,17 @@
         const isDefault = !!t.isDefault;
         const isShared = !!t._shared;
         return `
-          <div class="smax-team-item" style="border:1px solid ${isShared ? 'rgba(251,191,36,.3)' : 'var(--sp-border)'};border-radius:10px;padding:10px 12px;margin-bottom:8px;background:${isShared ? 'rgba(251,191,36,.05)' : 'var(--sp-surface-2)'};transition:border-color .15s ease,box-shadow .15s ease;">
+          <div class="smax-team-item" style="border:1px solid ${isShared ? 'var(--sp-pending)' : 'var(--sp-border)'};border-radius:10px;padding:10px 12px;margin-bottom:8px;background:${isShared ? 'var(--sp-pending-bg)' : 'var(--sp-surface-2)'};transition:border-color .15s ease,box-shadow .15s ease;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div>
                 <strong style="font-size:13px;color:var(--sp-text);">${Utils.escapeHtml(t.name || t.id || 'Sem nome')}</strong>
-                ${isDefault ? '<span style="font-size:10px;background:rgba(56,189,248,0.2);color:#38bdf8;padding:2px 6px;border-radius:999px;margin-left:6px;border:1px solid rgba(56,189,248,0.3);">Padrão</span>' : ''}
-                ${isShared ? '<span style="font-size:10px;background:rgba(251,191,36,.15);color:#fbbf24;padding:2px 6px;border-radius:999px;margin-left:6px;border:1px solid rgba(251,191,36,.35);" title="Carregada do Config. Compartilhada — somente leitura">☁️ Compartilhada</span>' : ''}
+                ${isDefault ? '<span style="font-size:10px;background:var(--sp-primary-bg);color:var(--sp-accent);padding:2px 6px;border-radius:999px;margin-left:6px;border:1px solid var(--sp-accent);">Padrão</span>' : ''}
+                ${isShared ? '<span style="font-size:10px;background:var(--sp-pending-bg);color:var(--sp-pending);padding:2px 6px;border-radius:999px;margin-left:6px;border:1px solid var(--sp-pending);" title="Carregada do Config. Compartilhada — somente leitura">☁️ Compartilhada</span>' : ''}
                 <div class="smax-team-prio-info" style="font-size:11px;color:var(--sp-text-muted);margin-top:2px;">Prioridade: ${t.priority || 0} • Membros: ${t.workers ? t.workers.length : 0}</div>
               </div>
               <div style="display:flex;gap:6px;">
                 ${!isShared ? `<button class="smax-team-edit-btn" data-id="${t.id}" style="font-size:11px;padding:6px 12px;cursor:pointer;background:var(--sp-surface);color:var(--sp-text);border:1px solid var(--sp-border);border-radius:6px;transition:all .15s ease;">Editar</button>` : ''}
-                ${!isDefault && !isShared ? `<button class="smax-team-del-btn" data-id="${t.id}" style="font-size:11px;padding:6px 12px;cursor:pointer;color:#fca5a5;background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.3);border-radius:6px;transition:all .15s ease;">Remover</button>` : ''}
+                ${!isDefault && !isShared ? `<button class="smax-team-del-btn" data-id="${t.id}" style="font-size:11px;padding:6px 12px;cursor:pointer;color:var(--sp-danger);background:var(--sp-danger-bg);border:1px solid var(--sp-danger-border);border-radius:6px;transition:all .15s ease;">Remover</button>` : ''}
                 ${isShared ? '<span style="font-size:11px;color:var(--sp-text-muted);padding:6px 8px;">somente leitura</span>' : ''}
               </div>
             </div>
@@ -3598,7 +3602,7 @@
           <input type="text" class="smax-worker-digits" data-idx="${idx}" value="${Utils.escapeHtml(w.digits || '')}" style="width:80px;font-size:11px;padding:6px;border:1px solid var(--sp-border);border-radius:6px;background:var(--sp-input-bg);color:var(--sp-text);" placeholder="Dígitos (ex: 0-9)">
           <div class="smax-worker-absent-wrapper" style="display:flex;align-items:center;cursor:pointer;user-select:none;">
              <input type="checkbox" class="smax-worker-absent" data-idx="${idx}" ${w.isAbsent ? 'checked' : ''} style="display:none;">
-             <div class="smax-absent-fake" style="width:14px;height:14px;border:1px solid ${w.isAbsent ? '#d32f2f' : 'var(--sp-border)'};margin-right:4px;background:${w.isAbsent ? '#d32f2f' : 'transparent'};border-radius:2px;display:flex;align-items:center;justify-content:center;"></div>
+             <div class="smax-absent-fake" style="width:14px;height:14px;border:1px solid ${w.isAbsent ? 'var(--sp-danger)' : 'var(--sp-border)'};margin-right:4px;background:${w.isAbsent ? 'var(--sp-danger)' : 'transparent'};border-radius:2px;display:flex;align-items:center;justify-content:center;"></div>
              <span style="font-size:10px;color:var(--sp-danger-text);">Ausente</span>
           </div>
           <button class="smax-worker-del-btn" data-idx="${idx}" style="color:var(--sp-danger-text);border:1px solid var(--sp-danger-border);background:var(--sp-danger-bg);padding:4px 8px;border-radius:4px;cursor:pointer;">✕</button>
@@ -3721,8 +3725,8 @@
           const fake = wrapper.querySelector('.smax-absent-fake');
           wrapper.addEventListener('click', () => {
             chk.checked = !chk.checked;
-            fake.style.background = chk.checked ? '#d32f2f' : '#fff';
-            fake.style.borderColor = chk.checked ? '#d32f2f' : '#999';
+            fake.style.background = chk.checked ? 'var(--sp-danger)' : 'var(--sp-surface)';
+            fake.style.borderColor = chk.checked ? 'var(--sp-danger)' : 'var(--sp-border)';
           });
         });
 
@@ -3866,7 +3870,7 @@
 
             const groups = DataRepository.getSupportGroupsSnapshot();
             if (!groups.length) {
-              gseResultsEl.innerHTML = '<div style="padding:4px;color:#999;font-size:10px;">Carregando GSEs... (clique no HUD para forçar)</div>';
+              gseResultsEl.innerHTML = '<div style="padding:4px;color:var(--sp-text-muted);font-size:10px;">Carregando GSEs... (clique no HUD para forçar)</div>';
               DataRepository.ensureSupportGroups(); // Trigger load if needed
               return;
             }
@@ -3874,7 +3878,7 @@
             const matches = groups.filter(g => (g.name || '').toUpperCase().includes(q) || (g.id || '').includes(q)).slice(0, 15);
 
             if (!matches.length) {
-              gseResultsEl.innerHTML = '<div style="padding:4px;color:#999;font-size:10px;">Nenhum resultado.</div>';
+              gseResultsEl.innerHTML = '<div style="padding:4px;color:var(--sp-text-muted);font-size:10px;">Nenhum resultado.</div>';
             } else {
               gseResultsEl.innerHTML = matches.map(g => `
                   <div class="smax-gse-pick" data-id="${g.id}" data-name="${Utils.escapeHtml(g.name)}" style="padding:5px 8px;cursor:pointer;font-size:11px;border-bottom:1px solid var(--sp-border);color:var(--sp-text);">
@@ -3958,8 +3962,8 @@
 
           wrapper.addEventListener('click', () => {
             chk.checked = !chk.checked;
-            fake.style.background = chk.checked ? '#d32f2f' : 'transparent';
-            fake.style.borderColor = chk.checked ? '#d32f2f' : '#64748b';
+            fake.style.background = chk.checked ? 'var(--sp-danger)' : 'transparent';
+            fake.style.borderColor = chk.checked ? 'var(--sp-danger)' : 'var(--sp-border)';
           });
           if (list) list.appendChild(tempDiv.firstElementChild);
           // Clear search
@@ -3983,7 +3987,7 @@
             if (!q) return;
 
             if (!DataRepository.peopleCache.size) {
-              resultsEl.innerHTML = '<div style="padding:4px;color:#999;font-size:10px;">Carregando...</div>';
+              resultsEl.innerHTML = '<div style="padding:4px;color:var(--sp-text-muted);font-size:10px;">Carregando...</div>';
               return;
             }
 
@@ -3998,7 +4002,7 @@
             }
 
             if (!matches.length) {
-              resultsEl.innerHTML = '<div style="padding:4px;color:#999;font-size:10px;">Nenhum resultado.</div>';
+              resultsEl.innerHTML = '<div style="padding:4px;color:var(--sp-text-muted);font-size:10px;">Nenhum resultado.</div>';
             } else {
               resultsEl.innerHTML = matches.map(p => `
                    <div class="smax-person-pick" data-name="${Utils.escapeHtml(p.name)}" style="padding:5px 8px;cursor:pointer;font-size:11px;border-bottom:1px solid var(--sp-border);color:var(--sp-text);">
@@ -4136,7 +4140,7 @@
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
               <span style="font-size:20px;">👤</span>
               <div>
-                <div style="font-weight:600;color:var(--sp-primary,#38bdf8);font-size:15px;">Quem é você?</div>
+                <div style="font-weight:600;color:var(--sp-primary);font-size:15px;">Quem é você?</div>
                 <div class="smax-sp-muted">Seu nome será vinculado aos chamados globais</div>
               </div>
             </div>
@@ -4144,10 +4148,10 @@
               <div style="flex:1;position:relative;min-width:180px;">
                 <input type="text" id="smax-triador-search" placeholder="Buscar por nome..."
                   style="width:100%;padding:9px 12px;border-radius:8px;font-size:13px;box-sizing:border-box;transition:border-color .15s,box-shadow .15s;">
-                <div id="smax-triador-results" style="display:none;position:absolute;top:100%;left:0;right:0;max-height:220px;overflow-y:auto;background:var(--sp-surface-2,#020617);border:1px solid var(--sp-input-border,#475569);border-top:none;border-radius:0 0 8px 8px;z-index:200;box-shadow:0 12px 24px rgba(0,0,0,.5);"></div>
+                <div id="smax-triador-results" style="display:none;position:absolute;top:100%;left:0;right:0;max-height:220px;overflow-y:auto;background:var(--sp-surface-2);border:1px solid var(--sp-input-border);border-top:none;border-radius:0 0 8px 8px;z-index:200;box-shadow:0 12px 24px rgba(0,0,0,.5);"></div>
               </div>
               ${triadorName ? `
-                <div id="smax-triador-current" style="display:flex;align-items:center;padding:8px 14px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:8px;font-size:12px;color:#fff;font-weight:500;white-space:nowrap;box-shadow:0 4px 12px rgba(34,197,94,.35);flex-shrink:0;">
+                <div id="smax-triador-current" style="display:flex;align-items:center;padding:8px 14px;background:var(--sp-send);border-radius:8px;font-size:12px;color:#fff;font-weight:500;white-space:nowrap;box-shadow:0 4px 12px var(--sp-ring);flex-shrink:0;">
                   ✓ ${Utils.escapeHtml(triadorName)}
                 </div>
               ` : `
@@ -4258,7 +4262,7 @@
             </div>
           </div>
           <div style="display:flex;gap:0;border-bottom:1px solid var(--sp-border);margin-bottom:10px;">
-            <button class="smax-tpl-sp-tab active" data-disc="false" style="padding:7px 16px;border:none;border-bottom:2px solid var(--sp-primary,#38bdf8);background:none;color:var(--sp-primary,#38bdf8);font-size:12px;font-weight:600;cursor:pointer;">Solução</button>
+            <button class="smax-tpl-sp-tab active" data-disc="false" style="padding:7px 16px;border:none;border-bottom:2px solid var(--sp-primary);background:none;color:var(--sp-primary);font-size:12px;font-weight:600;cursor:pointer;">Solução</button>
             <button class="smax-tpl-sp-tab" data-disc="true" style="padding:7px 16px;border:none;border-bottom:2px solid transparent;background:none;color:var(--sp-text-muted);font-size:12px;cursor:pointer;">Discussão</button>
           </div>
           <div id="smax-tpl-sp-list" style="display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto;min-height:40px;">
@@ -4311,7 +4315,7 @@
         <div class="smax-sp-card">
           <div class="smax-sp-section-title">📊 Log de Atividades</div>
           <div class="smax-sp-muted" style="margin-bottom:10px;">${ActivityLog.getCount()} registros armazenados localmente.</div>
-          ${ActivityLog.getSyncFailCount() > 0 ? `<div style="display:inline-flex;align-items:center;gap:8px;margin-bottom:10px;padding:7px 12px;border-radius:8px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);color:#f87171;font-size:12px;">⚠️ ${ActivityLog.getSyncFailCount()} falha(s) de sincronização com Supabase nesta sessão. <button type="button" id="smax-log-reset-syncfail" style="border:none;background:none;color:#f87171;cursor:pointer;font-size:11px;text-decoration:underline;padding:0;">Limpar</button></div>` : ''}
+          ${ActivityLog.getSyncFailCount() > 0 ? `<div style="display:inline-flex;align-items:center;gap:8px;margin-bottom:10px;padding:7px 12px;border-radius:8px;background:var(--sp-danger-bg);border:1px solid var(--sp-danger-border);color:var(--sp-danger);font-size:12px;">⚠️ ${ActivityLog.getSyncFailCount()} falha(s) de sincronização com Supabase nesta sessão. <button type="button" id="smax-log-reset-syncfail" style="border:none;background:none;color:var(--sp-danger);cursor:pointer;font-size:11px;text-decoration:underline;padding:0;">Limpar</button></div>` : ''}
           <button type="button" id="smax-log-export-all" style="padding:9px 18px;border-radius:8px;border:1px solid var(--sp-border);background:var(--sp-surface-2);color:var(--sp-text);font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
             📥 Exportar CSV
           </button>
@@ -4371,7 +4375,7 @@
           <div style="display:flex;gap:6px;align-items:center;">
             <input type="text" class="smax-sig-name" value="${Utils.escapeHtml(s.name || '')}" placeholder="Nome (ex: Suporte N1)"
               style="flex:1;padding:5px 8px;border:1px solid var(--sp-border);border-radius:6px;background:var(--sp-input-bg);color:var(--sp-text);font-size:12px;outline:none;">
-            <button class="smax-sig-del-btn" style="background:none;border:1px solid var(--sp-danger-text,#f87171);border-radius:6px;color:var(--sp-danger-text,#f87171);cursor:pointer;padding:4px 10px;font-size:11px;">✕ Remover</button>
+            <button class="smax-sig-del-btn" style="background:none;border:1px solid var(--sp-danger-text);border-radius:6px;color:var(--sp-danger-text);cursor:pointer;padding:4px 10px;font-size:11px;">✕ Remover</button>
           </div>
           <textarea class="smax-sig-html" placeholder="<p>Atenciosamente,<br>Suporte TJSP</p>" rows="4"
             style="width:100%;padding:7px 10px;border:1px solid var(--sp-border);border-radius:6px;background:var(--sp-input-bg);color:var(--sp-text);font-size:11px;resize:vertical;box-sizing:border-box;font-family:monospace;outline:none;">${Utils.escapeHtml(s.html || '')}</textarea>
@@ -4432,7 +4436,7 @@
           <div style="display:flex;gap:6px;align-items:center;">
             <input type="text" class="smax-sig-name" placeholder="Nome (ex: Suporte N1)"
               style="flex:1;padding:5px 8px;border:1px solid var(--sp-border);border-radius:6px;background:var(--sp-input-bg);color:var(--sp-text);font-size:12px;outline:none;">
-            <button class="smax-sig-del-btn" style="background:none;border:1px solid var(--sp-danger-text,#f87171);border-radius:6px;color:var(--sp-danger-text,#f87171);cursor:pointer;padding:4px 10px;font-size:11px;">✕ Remover</button>
+            <button class="smax-sig-del-btn" style="background:none;border:1px solid var(--sp-danger-text);border-radius:6px;color:var(--sp-danger-text);cursor:pointer;padding:4px 10px;font-size:11px;">✕ Remover</button>
           </div>
           <textarea class="smax-sig-html" placeholder="<p>Atenciosamente,<br>Suporte TJSP</p>" rows="4"
             style="width:100%;padding:7px 10px;border:1px solid var(--sp-border);border-radius:6px;background:var(--sp-input-bg);color:var(--sp-text);font-size:11px;resize:vertical;box-sizing:border-box;font-family:monospace;outline:none;"></textarea>
@@ -4478,7 +4482,7 @@
           triadorResults.style.display = q ? 'block' : 'none';
           if (!q) return;
           if (!DataRepository.peopleCache.size) {
-            triadorResults.innerHTML = '<div style="padding:8px;color:#999;font-size:11px;">Carregando...</div>';
+            triadorResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Carregando...</div>';
             return;
           }
           const people = [...DataRepository.peopleCache.values()];
@@ -4486,11 +4490,11 @@
             (p.name || '').toUpperCase().includes(q) || (p.upn || '').toUpperCase().includes(q)
           ).slice(0, 10);
           if (!matches.length) {
-            triadorResults.innerHTML = '<div style="padding:8px;color:#999;font-size:11px;">Nenhum resultado.</div>';
+            triadorResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Nenhum resultado.</div>';
           } else {
             triadorResults.innerHTML = matches.map(p => `
               <div class="smax-triador-pick" data-id="${p.id}" data-name="${Utils.escapeHtml(p.name)}"
-                style="padding:6px 8px;cursor:pointer;font-size:11px;border-bottom:1px solid var(--sp-border,#eee);transition:background .1s;">
+                style="padding:6px 8px;cursor:pointer;font-size:11px;border-bottom:1px solid var(--sp-border);transition:background .1s;">
                 <div style="font-weight:500;color:var(--sp-text);">${Utils.escapeHtml(p.name)}</div>
                 <div style="color:var(--sp-text-muted);font-size:10px;">${Utils.escapeHtml(p.upn || p.id)}</div>
               </div>
@@ -4681,7 +4685,7 @@
               navigator.clipboard?.writeText(tpl.html).catch(() => {});
               const toast = document.createElement('div');
               toast.textContent = '📋 Template copiado — cole no campo de resposta (Ctrl+V)';
-              toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#f8fafc;padding:11px 22px;border-radius:10px;font-size:13px;z-index:9999999;box-shadow:0 4px 18px rgba(0,0,0,.5);border:1px solid var(--sp-border);';
+              toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--sp-surface);color:var(--sp-text);padding:11px 22px;border-radius:10px;font-size:13px;z-index:9999999;box-shadow:0 4px 18px rgba(0,0,0,.5);border:1px solid var(--sp-border);';
               document.body.appendChild(toast);
               setTimeout(() => toast.remove(), 3500);
             }
@@ -4743,8 +4747,8 @@
           tplActiveDisc = tab.dataset.disc === 'true';
           container.querySelectorAll('.smax-tpl-sp-tab').forEach(t => {
             const isActive = t === tab;
-            t.style.borderBottomColor  = isActive ? 'var(--sp-primary,#38bdf8)' : 'transparent';
-            t.style.color = isActive ? 'var(--sp-primary,#38bdf8)' : 'var(--sp-text-muted)';
+            t.style.borderBottomColor  = isActive ? 'var(--sp-primary)' : 'transparent';
+            t.style.color = isActive ? 'var(--sp-primary)' : 'var(--sp-text-muted)';
             t.style.fontWeight = isActive ? '600' : '400';
             if (isActive) t.classList.add('active'); else t.classList.remove('active');
           });
@@ -4889,7 +4893,7 @@
       // Launch triage
       const launchBtn = container.querySelector('#smax-launch-triage-btn');
       if (launchBtn) {
-        launchBtn.addEventListener('mouseenter', () => { launchBtn.style.transform = 'translateY(-2px)'; launchBtn.style.boxShadow = '0 10px 28px rgba(59,130,246,.55),0 0 0 1px rgba(255,255,255,.15) inset'; });
+        launchBtn.addEventListener('mouseenter', () => { launchBtn.style.transform = 'translateY(-2px)'; launchBtn.style.boxShadow = '0 10px 28px var(--sp-ring)'; });
         launchBtn.addEventListener('mouseleave', () => { launchBtn.style.transform = ''; launchBtn.style.boxShadow = ''; });
         launchBtn.addEventListener('click', () => {
           container.style.display = 'none';
@@ -4936,7 +4940,7 @@
           <div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0;">
             <input class="smax-fwd-btn-label" placeholder="Rótulo" value="${Utils.escapeHtml(btn.label || '')}"
               style="width:110px;padding:4px 7px;border-radius:5px;border:1px solid var(--sp-border);background:var(--sp-surface-2);color:var(--sp-text);font-size:11px;outline:none;">
-            <button class="smax-fwd-btn-remove" style="padding:2px 8px;border-radius:5px;border:1px solid rgba(248,113,113,.35);background:rgba(248,113,113,.1);color:#f87171;font-size:12px;cursor:pointer;">× Remover</button>
+            <button class="smax-fwd-btn-remove" style="padding:2px 8px;border-radius:5px;border:1px solid var(--sp-danger-border);background:var(--sp-danger-bg);color:var(--sp-danger);font-size:12px;cursor:pointer;">× Remover</button>
           </div>
           <textarea class="smax-fwd-btn-text" placeholder="Texto de encaminhamento (pode ser elaborado, com múltiplas linhas)..."
             style="flex:1;min-height:72px;padding:5px 7px;border-radius:5px;border:1px solid var(--sp-border);background:var(--sp-surface-2);color:var(--sp-text);font-size:11px;outline:none;resize:vertical;line-height:1.5;font-family:inherit;">${Utils.escapeHtml(btn.text || '')}</textarea>`;
@@ -4958,7 +4962,7 @@
 
       const launchBtn = container.querySelector('#smax-launch-resp-btn');
       if (launchBtn) {
-        launchBtn.addEventListener('mouseenter', () => { launchBtn.style.transform = 'translateY(-2px)'; launchBtn.style.boxShadow = '0 10px 28px rgba(139,92,246,.55),0 0 0 1px rgba(255,255,255,.15) inset'; });
+        launchBtn.addEventListener('mouseenter', () => { launchBtn.style.transform = 'translateY(-2px)'; launchBtn.style.boxShadow = '0 10px 28px var(--sp-ring)'; });
         launchBtn.addEventListener('mouseleave', () => { launchBtn.style.transform = ''; launchBtn.style.boxShadow = ''; });
         launchBtn.addEventListener('click', () => {
           container.style.display = 'none';
@@ -5019,7 +5023,7 @@
         const summaryHtml = `
           <div style="font-size:10px;color:var(--sp-text-muted);margin-bottom:8px;">Fonte: <b>${source}</b> — ${entries.length} registro(s)</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-            ${[['Respondidos','RESPONDIDO','#4ade80'],['Vinc. Global','VINCULO_GLOBAL','#60a5fa'],['Transferidos','TRANSFERIDO','#c084fc'],['Designados','DESIGNADO','#fbbf24'],['Status Op.','STATUS','#34d399'],['Outros','OUTRO','#6b7280']].map(([label, key, color]) =>
+            ${[['Respondidos','RESPONDIDO','var(--sp-success-text)'],['Vinc. Global','VINCULO_GLOBAL','var(--sp-accent)'],['Transferidos','TRANSFERIDO','var(--sp-pending)'],['Designados','DESIGNADO','var(--sp-pending)'],['Status Op.','STATUS','var(--sp-success)'],['Outros','OUTRO','var(--sp-text-dim)']].map(([label, key, color]) =>
               `<div style="background:var(--sp-surface-2);border:1px solid var(--sp-border);border-radius:8px;padding:6px 12px;text-align:center;">
                 <div style="font-size:16px;font-weight:700;color:${color};">${counts[key]||0}</div>
                 <div style="font-size:10px;color:var(--sp-text-muted);">${label}</div>
@@ -5051,7 +5055,7 @@
               return `<tr style="background:${i%2===0?'transparent':'var(--sp-surface-2)'};border-bottom:1px solid var(--sp-border);">
                 <td style="padding:4px 8px;color:var(--sp-text);font-weight:600;white-space:nowrap;">${fmtTime(e.ts)}</td>
                 <td style="padding:4px 8px;color:var(--sp-text-muted);white-space:nowrap;">${fmtDate(e.ts)}</td>
-                <td style="padding:4px 8px;color:#60a5fa;white-space:nowrap;">#${Utils.escapeHtml(e.ticketId)}</td>
+                <td style="padding:4px 8px;color:var(--sp-accent);white-space:nowrap;">#${Utils.escapeHtml(e.ticketId)}</td>
                 <td style="padding:4px 8px;color:var(--sp-text);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${Utils.escapeHtml(desc)}">${Utils.escapeHtml(desc)}</td>
                 <td style="padding:4px 8px;color:var(--sp-text);white-space:nowrap;">${Utils.escapeHtml(e.relevantWork)}</td>
                 <td style="padding:4px 8px;color:var(--sp-text-muted);white-space:nowrap;">${Utils.escapeHtml(detalhe)}</td>
@@ -5930,7 +5934,7 @@
         const title = Utils.escapeHtml(entry.purposeLabel || 'Discussão');
         const privacy = Utils.escapeHtml(entry.privacyCode || '');
         const privacyLabel = Utils.escapeHtml(entry.privacyLabel || 'Interno');
-        const bodyHtml = Utils.linkifyCNJ(entry.bodyHtml) || '<div style="color:#94a3b8;">(Sem conteúdo)</div>';
+        const bodyHtml = Utils.linkifyCNJ(entry.bodyHtml) || '<div style="color:var(--sp-text-muted);">(Sem conteúdo)</div>';
         const timestamp = Utils.formatBrDate(entry.createdTs, entry.createdRaw, DISCUSSION_DATE_OPTIONS, 'Data desconhecida');
         const name = resolveSubmitterName(entry);
         const authorName = name ? String(name) : (entry.submitterDisplay ? String(entry.submitterDisplay) : 'Registro manual');
@@ -5997,7 +6001,7 @@
       workers.forEach(w => {
         const isSel = w.name === selectedWorkerName;
         if (isSel) selName = w.name;
-        const rangeLabel = w.ranges ? ` <span style="color:#94a3b8;font-size:10px;">(${Utils.escapeHtml(w.ranges)})</span>` : '';
+        const rangeLabel = w.ranges ? ` <span style="color:var(--sp-text-muted);font-size:10px;">(${Utils.escapeHtml(w.ranges)})</span>` : '';
         html += `<div class="smax-custom-dropdown-item" data-value="${Utils.escapeHtml(w.name)}" data-label="${Utils.escapeHtml(w.name)}" data-selected="${isSel ? 'true' : 'false'}">
                    <span>${Utils.escapeHtml(w.name)}</span>${rangeLabel}
                  </div>`;
@@ -6121,7 +6125,7 @@
         if (!full) {
           if (ticketDetailsEl) {
             ticketDetailsEl.innerHTML = `
-              <div style="font-size:14px;color:#fecaca;">
+              <div style="font-size:14px;color:var(--sp-danger-text);">
                 Não foi possível carregar os detalhes completos deste chamado.
               </div>
             `;
@@ -6142,13 +6146,13 @@
         stageAssignmentGroup('', '');
         refreshGseSelect();
         const warning = missing.length
-          ? `<div style="margin-bottom:6px;padding:6px 8px;border-radius:6px;background:#7f1d1d;color:#fee2e2;font-size:12px;">
+          ? `<div style="margin-bottom:6px;padding:6px 8px;border-radius:6px;background:var(--sp-danger-bg);color:var(--sp-danger-text);font-size:12px;">
                Aviso: faltam ${missing.join(', ')} na visão atual.
              </div>`
           : '';
         const vipBadge = full.isVip ? '<span style="margin-left:8px;padding:2px 6px;border-radius:999px;background:#facc15;color:#854d0e;font-size:11px;font-weight:700;">VIP</span>' : '';
         const requestedForHtml = full.requestedForName
-          ? `<span style="color:#64748b;">→</span> ${Utils.escapeHtml(full.requestedForName)}`
+          ? `<span style="color:var(--sp-text-muted);">→</span> ${Utils.escapeHtml(full.requestedForName)}`
           : '';
         // Process number (optional field) - link to eProc if CNJ format detected (formatado ou 20 dígitos brutos)
         const rawProcNum = (full.processNumber || '').trim();
@@ -6157,27 +6161,27 @@
         const isCNJFormat = rawProcNum && (isCNJFormatted || isCNJRaw);
         const displayProcNum = isCNJFormat ? Utils.normalizeCNJ(rawProcNum) : rawProcNum;
         const processNumberHtml = rawProcNum
-          ? `<span style="color:#64748b;">•</span> ${isCNJFormat
-              ? `<span data-smax-proc="${Utils.escapeHtml(displayProcNum)}" style="color:#38bdf8;font-family:monospace;font-weight:600;border-bottom:1px dotted rgba(56,189,248,.6);cursor:pointer;" title="Consultar processo no eProc: ${Utils.escapeHtml(displayProcNum)}">${Utils.escapeHtml(displayProcNum)}</span>`
+          ? `<span style="color:var(--sp-text-muted);">•</span> ${isCNJFormat
+              ? `<span data-smax-proc="${Utils.escapeHtml(displayProcNum)}" style="color:var(--sp-accent);font-family:monospace;font-weight:600;border-bottom:1px dotted var(--sp-accent);cursor:pointer;" title="Consultar processo no eProc: ${Utils.escapeHtml(displayProcNum)}">${Utils.escapeHtml(displayProcNum)}</span>`
               : `<span style="font-family:monospace;color:var(--sp-accent);">${Utils.escapeHtml(rawProcNum)}</span>`
             }`
           : '';
         if (!ticketDetailsEl) return;
         const createdDisplay = Utils.formatBrDate(full.createdTs, full.createdText);
         const descHtml = Utils.linkifyCNJ(Utils.sanitizeRichText(full.descriptionHtml || full.descriptionText || full.subjectText || ''));
-        const descDisplay = descHtml || `<span style="color:#64748b;">(Sem descrição disponível)</span>`;
+        const descDisplay = descHtml || `<span style="color:var(--sp-text-muted);">(Sem descrição disponível)</span>`;
         const idLink = full.idText
-          ? `<a href="https://suporte.tjsp.jus.br/saw/Request/${encodeURIComponent(full.idText)}/general" target="_blank" rel="noreferrer noopener" style="color:#38bdf8;text-decoration:none;font-weight:600;">${full.idText}</a>`
+          ? `<a href="https://suporte.tjsp.jus.br/saw/Request/${encodeURIComponent(full.idText)}/general" target="_blank" rel="noreferrer noopener" style="color:var(--sp-accent);text-decoration:none;font-weight:600;">${full.idText}</a>`
           : '-';
         ticketDetailsEl.innerHTML = `
           ${warning}
           <div class="smax-triage-meta-row" style="flex-shrink:0;padding-bottom:8px;border-bottom:1px solid var(--sp-border);margin-bottom:8px;">
             ${idLink}${vipBadge}
-            <span style="color:#64748b;">${createdDisplay}</span>
+            <span style="color:var(--sp-text-muted);">${createdDisplay}</span>
             ${requestedForHtml}
             ${processNumberHtml}
           </div>
-          <div class="smax-triage-desc-scroll" style="flex:1;overflow-y:auto;color:#e2e8f0;font-size:14px;line-height:1.55;">${descDisplay}</div>
+          <div class="smax-triage-desc-scroll" style="flex:1;overflow-y:auto;color:var(--sp-text);font-size:14px;line-height:1.55;">${descDisplay}</div>
         `;
 
         if (discussionsEl) {
@@ -6629,9 +6633,9 @@
       if (!startBtn) return;
       if (activeTicketId) {
         startBtn.textContent = 'Restaurar triagem';
-        startBtn.style.background = '#0ea5e9';
-        startBtn.style.border = '1px solid #38bdf8';
-        startBtn.style.boxShadow = '0 0 12px rgba(14,165,233,.5)';
+        startBtn.style.background = 'var(--sp-accent)';
+        startBtn.style.border = '1px solid var(--sp-accent)';
+        startBtn.style.boxShadow = '0 0 12px var(--sp-ring)';
       } else {
         startBtn.textContent = 'Iniciar triagem';
         startBtn.style.background = '';
@@ -7255,14 +7259,14 @@
 
       let idLineHtml;
       if (isBothParentAndChild) {
-        idLineHtml = `<span style="color:#fb923c;font-weight:700;">#${Utils.escapeHtml(t.id)}</span>`
-          + ` <span class="smax-warning-badge" style="color:#fb923c;font-size:9px;padding:1px 5px;border-radius:10px;border:1px solid rgba(251,146,60,.5);vertical-align:middle;">⚠️ Global — filho de #${Utils.escapeHtml(globalChangeId)}</span>`;
+        idLineHtml = `<span style="color:var(--sp-pending);font-weight:700;">#${Utils.escapeHtml(t.id)}</span>`
+          + ` <span class="smax-warning-badge" style="color:var(--sp-pending);font-size:9px;padding:1px 5px;border-radius:10px;border:1px solid var(--sp-pending);vertical-align:middle;">⚠️ Global — filho de #${Utils.escapeHtml(globalChangeId)}</span>`;
       } else if (isGlobalParent) {
-        idLineHtml = `<span style="color:#4ade80;font-weight:700;">#${Utils.escapeHtml(t.id)}</span>`
-          + `<span style="margin-left:5px;color:#4ade80;font-size:9px;padding:1px 5px;border-radius:10px;border:1px solid rgba(74,222,128,.45);vertical-align:middle;">🌐 Global (${childCount} filho${childCount !== 1 ? 's' : ''})</span>`;
+        idLineHtml = `<span style="color:var(--sp-success);font-weight:700;">#${Utils.escapeHtml(t.id)}</span>`
+          + `<span style="margin-left:5px;color:var(--sp-success);font-size:9px;padding:1px 5px;border-radius:10px;border:1px solid var(--sp-staged);vertical-align:middle;">🌐 Global (${childCount} filho${childCount !== 1 ? 's' : ''})</span>`;
       } else if (globalChangeId) {
-        idLineHtml = `<span style="color:#60a5fa;font-weight:700;">#${Utils.escapeHtml(t.id)}</span>`
-          + ` <span style="color:#f87171;font-size:9px;padding:1px 5px;border-radius:10px;border:1px solid rgba(248,113,113,.35);vertical-align:middle;">⬆ Global #${Utils.escapeHtml(globalChangeId)}</span>`;
+        idLineHtml = `<span style="color:var(--sp-accent);font-weight:700;">#${Utils.escapeHtml(t.id)}</span>`
+          + ` <span style="color:var(--sp-danger);font-size:9px;padding:1px 5px;border-radius:10px;border:1px solid var(--sp-danger);vertical-align:middle;">⬆ Global #${Utils.escapeHtml(globalChangeId)}</span>`;
       } else {
         idLineHtml = `#${Utils.escapeHtml(t.id)}`;
       }
@@ -7273,7 +7277,7 @@
       return `
         <div class="smax-resp-ticket-item${isActive ? ' active' : ''}" data-id="${Utils.escapeHtml(t.id)}" style="display:flex;align-items:flex-start;gap:6px;padding:8px 10px;cursor:pointer;">
           <div class="smax-resp-tick-sel" data-id="${Utils.escapeHtml(t.id)}" title="Selecionar para lote"
-            style="flex-shrink:0;width:16px;height:16px;border-radius:4px;margin-top:2px;border:1.5px solid ${isChecked ? '#3b82f6' : 'rgba(255,255,255,.25)'};background:${isChecked ? '#3b82f6' : 'transparent'};display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;transition:all .12s;cursor:pointer;">
+            style="flex-shrink:0;width:16px;height:16px;border-radius:4px;margin-top:2px;border:1.5px solid ${isChecked ? 'var(--sp-accent)' : 'var(--sp-border)'};background:${isChecked ? 'var(--sp-accent)' : 'transparent'};display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;transition:all .12s;cursor:pointer;">
             ${isChecked ? '✓' : ''}
           </div>
           <div class="smax-resp-ticket-info" style="flex:1;min-width:0;">
@@ -7343,13 +7347,13 @@
             const id = sel.dataset.id;
             if (selectedTicketIds.has(id)) {
               selectedTicketIds.delete(id);
-              sel.style.border = '1.5px solid rgba(255,255,255,.25)';
+              sel.style.border = '1.5px solid var(--sp-border)';
               sel.style.background = 'transparent';
               sel.textContent = '';
             } else {
               selectedTicketIds.add(id);
-              sel.style.border = '1.5px solid #3b82f6';
-              sel.style.background = '#3b82f6';
+              sel.style.border = '1.5px solid var(--sp-accent)';
+              sel.style.background = 'var(--sp-accent)';
               sel.textContent = '✓';
             }
             updateBatchBar();
@@ -7536,13 +7540,13 @@
       if (detailGlobalBadge) {
         const mkLink = id => `https://suporte.tjsp.jus.br/saw/Request/${encodeURIComponent(id)}/general`;
         if (detailIsBoth) {
-          detailGlobalBadge.innerHTML = `<span style="color:#fb923c;font-size:12px;padding:2px 7px;border-radius:10px;border:1px solid rgba(251,146,60,.5);white-space:nowrap;">⚠️ filho de <a href="${mkLink(detailGlobalId)}" target="_blank" style="color:#fb923c;text-decoration:underline;">#${Utils.escapeHtml(detailGlobalId)}</a></span>`;
+          detailGlobalBadge.innerHTML = `<span style="color:var(--sp-pending);font-size:12px;padding:2px 7px;border-radius:10px;border:1px solid var(--sp-pending);white-space:nowrap;">⚠️ filho de <a href="${mkLink(detailGlobalId)}" target="_blank" style="color:var(--sp-pending);text-decoration:underline;">#${Utils.escapeHtml(detailGlobalId)}</a></span>`;
           detailGlobalBadge.style.display = '';
         } else if (detailIsParent) {
-          detailGlobalBadge.innerHTML = `<span style="color:#4ade80;font-size:12px;padding:2px 7px;border-radius:10px;border:1px solid rgba(74,222,128,.45);white-space:nowrap;">🌐 Global (${detailChildCount} filho${detailChildCount !== 1 ? 's' : ''})</span>`;
+          detailGlobalBadge.innerHTML = `<span style="color:var(--sp-success);font-size:12px;padding:2px 7px;border-radius:10px;border:1px solid var(--sp-staged);white-space:nowrap;">🌐 Global (${detailChildCount} filho${detailChildCount !== 1 ? 's' : ''})</span>`;
           detailGlobalBadge.style.display = '';
         } else if (detailGlobalId) {
-          detailGlobalBadge.innerHTML = `<span style="color:#f87171;font-size:12px;padding:2px 7px;border-radius:10px;border:1px solid rgba(248,113,113,.35);white-space:nowrap;">⬆ Global <a href="${mkLink(detailGlobalId)}" target="_blank" style="color:#f87171;text-decoration:underline;">#${Utils.escapeHtml(detailGlobalId)}</a></span>`;
+          detailGlobalBadge.innerHTML = `<span style="color:var(--sp-danger);font-size:12px;padding:2px 7px;border-radius:10px;border:1px solid var(--sp-danger);white-space:nowrap;">⬆ Global <a href="${mkLink(detailGlobalId)}" target="_blank" style="color:var(--sp-danger);text-decoration:underline;">#${Utils.escapeHtml(detailGlobalId)}</a></span>`;
           detailGlobalBadge.style.display = '';
         } else {
           detailGlobalBadge.innerHTML = '';
@@ -7726,8 +7730,8 @@
         const globalId = DataRepository.triageCache.get(ticketId)?.globalChangeId || '';
         const idDiv = listItem.querySelector('.smax-resp-ticket-id');
         if (idDiv && globalId && !idDiv.querySelector('.smax-global-badge') && !idDiv.querySelector('.smax-warning-badge')) {
-          idDiv.innerHTML = `<span style="color:#60a5fa;font-weight:700;">#${Utils.escapeHtml(ticketId)}</span>`
-            + ` <span class="smax-global-badge" style="color:#f87171;font-size:9px;padding:1px 5px;border-radius:10px;border:1px solid rgba(248,113,113,.35);vertical-align:middle;">⬆ Global #${Utils.escapeHtml(globalId)}</span>`;
+          idDiv.innerHTML = `<span style="color:var(--sp-accent);font-weight:700;">#${Utils.escapeHtml(ticketId)}</span>`
+            + ` <span class="smax-global-badge" style="color:var(--sp-danger);font-size:9px;padding:1px 5px;border-radius:10px;border:1px solid var(--sp-danger);vertical-align:middle;">⬆ Global #${Utils.escapeHtml(globalId)}</span>`;
         }
       };
 
@@ -7744,21 +7748,17 @@
 
     // Returns border/bg/color/dotBg/dotBorder for filter pills, theme-aware
     const getPillStyle = (type, active) => {
-      const dark = document.body.getAttribute('data-smax-theme') === 'dark';
       if (active) {
         const c = {
-          team:      dark ? ['#3b82f6','rgba(59,130,246,.25)','#93c5fd']   : ['#0064d2','rgba(0,100,210,.14)','#003e8a'],
-          opStatus:  dark ? ['#3b82f6','rgba(59,130,246,.25)','#93c5fd']   : ['#0064d2','rgba(0,100,210,.14)','#003e8a'],
-          reqStatus: dark ? ['#34d399','rgba(52,211,153,.2)','#6ee7b7']    : ['#059669','rgba(5,150,105,.12)','#064e3b'],
-          assignee:  dark ? ['#a78bfa','rgba(167,139,250,.2)','#c4b5fd']   : ['#7c3aed','rgba(124,58,237,.12)','#4c1d95'],
+          team:      ['var(--sp-accent)','var(--sp-primary-bg)','var(--sp-accent)'],
+          opStatus:  ['var(--sp-accent)','var(--sp-primary-bg)','var(--sp-accent)'],
+          reqStatus: ['var(--sp-success)','var(--sp-success-bg)','var(--sp-success-text)'],
+          assignee:  ['var(--sp-pending)','var(--sp-pending-bg)','var(--sp-pending)'],
         };
         const [brd, bg, clr] = c[type] || c.team;
         return { border:`1px solid ${brd}`, bg, color:clr, dotBg:brd, dotBorder:`1.5px solid ${brd}` };
       }
-      const dark_border = dark ? 'rgba(255,255,255,.12)' : 'rgba(0,0,0,.18)';
-      const dark_color  = dark ? '#9ca3af' : '#4a5568';
-      const dark_dot    = dark ? '#6b7280' : '#a0aec0';
-      return { border:`1px solid ${dark_border}`, bg:'transparent', color:dark_color, dotBg:'transparent', dotBorder:`1.5px solid ${dark_dot}` };
+      return { border:'1px solid var(--sp-border)', bg:'transparent', color:'var(--sp-text-muted)', dotBg:'transparent', dotBorder:'1.5px solid var(--sp-text-dim)' };
     };
 
     const renderStatusPills = (entries) => {
@@ -7938,7 +7938,7 @@
       if (!el) return;
       const presets = loadPresets();
       if (!presets.length) {
-        el.innerHTML = '<span style="font-size:10px;color:#374151;font-style:italic;">Nenhum preset</span>';
+        el.innerHTML = '<span style="font-size:10px;color:var(--sp-text-dim);font-style:italic;">Nenhum preset</span>';
         return;
       }
       el.innerHTML = presets.map(p => `
@@ -7954,8 +7954,8 @@
           const p = loadPresets().find(p => p.id === pill.dataset.presetId);
           if (p) applyPreset(p);
         });
-        pill.addEventListener('mouseenter', () => { pill.style.background = 'rgba(59,130,246,.2)'; pill.style.borderColor = 'rgba(59,130,246,.4)'; });
-        pill.addEventListener('mouseleave', () => { pill.style.background = 'rgba(255,255,255,.05)'; pill.style.borderColor = 'rgba(255,255,255,.15)'; });
+        pill.addEventListener('mouseenter', () => { pill.style.background = 'var(--sp-primary-bg)'; pill.style.borderColor = 'var(--sp-accent)'; });
+        pill.addEventListener('mouseleave', () => { pill.style.background = 'var(--sp-surface-2)'; pill.style.borderColor = 'var(--sp-border)'; });
       });
       el.querySelectorAll('.smax-resp-preset-del').forEach(btn => {
         btn.addEventListener('click', e => {
@@ -8319,7 +8319,7 @@
           const stripped = (s.conteudo_bruto || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
           const badge = s._local
             ? `<span style="font-size:9px;padding:1px 4px;border-radius:999px;background:var(--sp-primary-bg);color:var(--sp-accent);border:1px solid var(--sp-accent);">local</span>`
-            : s._shared ? `<span style="font-size:9px;padding:1px 4px;border-radius:999px;background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3);">☁️</span>` : '';
+            : s._shared ? `<span style="font-size:9px;padding:1px 4px;border-radius:999px;background:var(--sp-primary-bg);color:var(--sp-accent);border:1px solid var(--sp-accent);">☁️</span>` : '';
           const origIdx = allScripts.indexOf(s);
           return `<div class="smax-resp-script-row${selectedScript === s ? ' selected' : ''}" data-idx="${origIdx}">
             <div class="smax-resp-script-row-title">${Utils.escapeHtml(s.nome)} ${badge}</div>
@@ -8609,7 +8609,7 @@
 
       const assigneeColHtml = (row) => {
         if (!pending.assignee?.id) return '<span style="color:var(--sp-text-muted)">—</span>';
-        if (row.assigneeWillChange) return `<span style="color:var(--sp-text-muted)">${Utils.escapeHtml(row.curAssigneeName)}</span> → <span style="color:#c4b5fd">${Utils.escapeHtml(pending.assignee.name)}</span>`;
+        if (row.assigneeWillChange) return `<span style="color:var(--sp-text-muted)">${Utils.escapeHtml(row.curAssigneeName)}</span> → <span style="color:var(--sp-accent)">${Utils.escapeHtml(pending.assignee.name)}</span>`;
         return `<span style="color:var(--sp-text-muted)">${Utils.escapeHtml(row.curAssigneeName)} <em style="font-size:9px;">(igual)</em></span>`;
       };
 
@@ -8631,7 +8631,7 @@
                 ${pending.assignee?.id ? `<span class="smax-bc-change-pill assignee">👤 Especialista → ${Utils.escapeHtml(pending.assignee.name)}</span>` : ''}
                 ${pending.followers?.length ? `<span class="smax-bc-change-pill assignee">👁️ Seguidor(es) → ${Utils.escapeHtml((pending.followers||[]).map(f=>f.name).join(', '))}</span>` : ''}
                 ${solutionPlain   ? `<span class="smax-bc-change-pill solution">📋 Solução: "${Utils.escapeHtml(solutionPreview)}"</span>` : ''}
-                ${!pending.gse?.id && !pending.assignee?.id && !pending.followers?.length && !solutionPlain ? '<span style="color:#f87171;font-size:12px;">Nenhuma alteração definida.</span>' : ''}
+                ${!pending.gse?.id && !pending.assignee?.id && !pending.followers?.length && !solutionPlain ? '<span style="color:var(--sp-danger);font-size:12px;">Nenhuma alteração definida.</span>' : ''}
               </div>
             </div>
             <div>
@@ -8650,11 +8650,11 @@
                 <tbody>
                   ${rows.map(r => `
                     <tr style="${!r.willAct ? 'opacity:.45;' : ''}">
-                      <td style="font-weight:700;color:#60a5fa;">#${Utils.escapeHtml(r.id)}</td>
+                      <td style="font-weight:700;color:var(--sp-accent);">#${Utils.escapeHtml(r.id)}</td>
                       ${pending.gse?.id      ? `<td>${gseColHtml(r)}</td>`      : ''}
                       ${pending.assignee?.id ? `<td>${assigneeColHtml(r)}</td>` : ''}
-                      ${pending.followers?.length ? `<td><span style="color:#86efac;">✓ ${Utils.escapeHtml((pending.followers||[]).map(f=>f.name).join(', '))}</span></td>` : ''}
-                      ${solutionPlain   ? `<td><span style="color:${r.hasSolution ? '#86efac' : '#6b7280'};">${r.hasSolution ? '✓' : '—'}</span></td>` : ''}
+                      ${pending.followers?.length ? `<td><span style="color:var(--sp-success-text);">✓ ${Utils.escapeHtml((pending.followers||[]).map(f=>f.name).join(', '))}</span></td>` : ''}
+                      ${solutionPlain   ? `<td><span style="color:${r.hasSolution ? 'var(--sp-success-text)' : 'var(--sp-text-dim)'};">${r.hasSolution ? '✓' : '—'}</span></td>` : ''}
                       <td>${tagHtml(r)}</td>
                     </tr>`).join('')}
                 </tbody>
@@ -8668,7 +8668,7 @@
             <div style="display:flex;gap:8px;">
               <button id="smax-bc-cancel-btn" style="padding:7px 18px;border:1px solid var(--sp-border);border-radius:8px;background:transparent;color:var(--sp-text-muted);font-size:13px;cursor:pointer;">Cancelar</button>
               <button id="smax-bc-confirm-btn" ${willActCount === 0 ? 'disabled' : ''}
-                style="padding:7px 22px;border:none;border-radius:8px;background:${willActCount > 0 ? 'linear-gradient(135deg,#22c55e,#16a34a)' : '#374151'};color:#fff;font-size:13px;font-weight:700;cursor:${willActCount > 0 ? 'pointer' : 'default'};">
+                style="padding:7px 22px;border:none;border-radius:8px;background:${willActCount > 0 ? 'var(--sp-send)' : 'var(--sp-surface-2)'};color:${willActCount > 0 ? '#fff' : 'var(--sp-text-muted)'};font-size:13px;font-weight:700;cursor:${willActCount > 0 ? 'pointer' : 'default'};">
                 Confirmar e Enviar (${willActCount})
               </button>
             </div>
@@ -8799,13 +8799,13 @@
             ];
             const quickHtml = QUICK_BTNS.map(b =>
               `<button class="smax-gse-fwd-quick" data-text="${Utils.escapeHtml(b.text)}"
-                style="font-size:10px;padding:2px 8px;border-radius:12px;border:1px solid rgba(148,163,184,.35);background:rgba(148,163,184,.1);color:#94a3b8;cursor:pointer;white-space:nowrap;">${Utils.escapeHtml(b.label)}</button>`
+                style="font-size:10px;padding:2px 8px;border-radius:12px;border:1px solid var(--sp-border);background:var(--sp-surface-2);color:var(--sp-text-muted);cursor:pointer;white-space:nowrap;">${Utils.escapeHtml(b.label)}</button>`
             ).join('');
 
             picker.innerHTML = `
               <div style="padding:8px 12px;font-size:11px;color:var(--sp-text-muted);border-bottom:1px solid var(--sp-border);">GSE selecionada:</div>
-              <div style="padding:8px 12px 6px;font-size:12px;color:#e2e8f0;font-weight:600;">${Utils.escapeHtml(gname)}</div>
-              <div style="padding:6px 12px 8px;border-top:1px solid rgba(255,255,255,.06);">
+              <div style="padding:8px 12px 6px;font-size:12px;color:var(--sp-text);font-weight:600;">${Utils.escapeHtml(gname)}</div>
+              <div style="padding:6px 12px 8px;border-top:1px solid var(--sp-border);">
                 <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:var(--sp-text);user-select:none;">
                   <input type="checkbox" id="smax-gse-fwd-cb" style="cursor:pointer;"> 📤 Com encaminhamento
                 </label>
@@ -8815,9 +8815,9 @@
                 <div id="smax-gse-fwd-editor" contenteditable="true" spellcheck="false"
                   data-placeholder="Texto de encaminhamento (suporta imagens coladas)..."></div>
               </div>
-              <div style="display:flex;gap:6px;padding:8px 12px;border-top:1px solid rgba(255,255,255,.08);">
+              <div style="display:flex;gap:6px;padding:8px 12px;border-top:1px solid var(--sp-border);">
                 <button id="smax-gse-fwd-back" style="flex:1;padding:5px 0;border-radius:6px;border:1px solid var(--sp-border);background:transparent;color:var(--sp-text-muted);font-size:11px;cursor:pointer;">← Voltar</button>
-                <button id="smax-gse-fwd-confirm" style="flex:2;padding:5px 0;border-radius:6px;border:none;background:#3b82f6;color:#fff;font-size:11px;font-weight:600;cursor:pointer;">Confirmar</button>
+                <button id="smax-gse-fwd-confirm" style="flex:2;padding:5px 0;border-radius:6px;border:none;background:var(--sp-accent);color:var(--sp-on-accent);font-size:11px;font-weight:600;cursor:pointer;">Confirmar</button>
               </div>`;
 
             // Checkbox toggle
@@ -9009,7 +9009,7 @@
       const ownStatus = cache?.status || '';
 
       const cancelHtml = pendSt
-        ? `<div class="smax-resp-field-picker-item" data-key="__clear__" style="color:#f87171;border-bottom:1px solid var(--sp-border);">× Cancelar alteração de status</div>`
+        ? `<div class="smax-resp-field-picker-item" data-key="__clear__" style="color:var(--sp-danger);border-bottom:1px solid var(--sp-border);">× Cancelar alteração de status</div>`
         : '';
 
       picker.innerHTML = cancelHtml + CHANGEABLE_STATUSES.map(key => {
@@ -9084,7 +9084,7 @@
       const ownSCCD = cache?.statusSCCD || '';
 
       const cancelHtml = pendSCCD
-        ? `<div class="smax-resp-field-picker-item" data-key="__clear__" style="color:#f87171;border-bottom:1px solid var(--sp-border);padding-bottom:8px;margin-bottom:4px;">× Cancelar alteração de status operacional</div>`
+        ? `<div class="smax-resp-field-picker-item" data-key="__clear__" style="color:var(--sp-danger);border-bottom:1px solid var(--sp-border);padding-bottom:8px;margin-bottom:4px;">× Cancelar alteração de status operacional</div>`
         : '';
 
       picker.innerHTML = cancelHtml + Object.entries(STATUS_SCCD_LABELS).map(([key, label]) => {
@@ -9222,10 +9222,10 @@
         // 1) Seguidores existentes (sempre no topo, independente do filtro de busca)
         const existingHtml = existingList
           .filter(f => !q || f.name.toLowerCase().includes(q))
-          .map(f => `<div class="smax-resp-field-picker-item" data-id="${Utils.escapeHtml(f.id)}" data-name="${Utils.escapeHtml(f.name)}" data-existing="1" style="cursor:pointer;background:rgba(34,197,94,.08);border-left:3px solid #22c55e;">
-            <span style="display:inline-block;width:18px;text-align:center;color:#22c55e;">●</span>
-            <span style="font-weight:600;color:#86efac;">${Utils.escapeHtml(f.name)}</span>
-            <span style="margin-left:auto;font-size:10px;color:#f87171;cursor:pointer;" title="Remover seguidor">✕</span>
+          .map(f => `<div class="smax-resp-field-picker-item" data-id="${Utils.escapeHtml(f.id)}" data-name="${Utils.escapeHtml(f.name)}" data-existing="1" style="cursor:pointer;background:var(--sp-success-bg);border-left:3px solid var(--sp-success);">
+            <span style="display:inline-block;width:18px;text-align:center;color:var(--sp-success);">●</span>
+            <span style="font-weight:600;color:var(--sp-success-text);">${Utils.escapeHtml(f.name)}</span>
+            <span style="margin-left:auto;font-size:10px;color:var(--sp-danger);cursor:pointer;" title="Remover seguidor">✕</span>
           </div>`).join('');
 
         // 2) Pessoas disponíveis (não existentes)
@@ -9288,8 +9288,8 @@
       const headerHtml = `<div style="display:flex;gap:6px;padding:4px 6px 6px;border-bottom:1px solid var(--sp-border);margin-bottom:4px;align-items:center;">
         ${existingCount ? `<span style="font-size:10px;color:var(--sp-text-muted);">👁️ ${existingCount} atual</span>` : ''}
         <span style="flex:1;"></span>
-        <button class="smax-fp-clear-btn" style="padding:4px 8px;border:1px solid rgba(248,113,113,.4);background:transparent;color:#f87171;border-radius:5px;cursor:pointer;font-size:11px;">× Limpar</button>
-        <button class="smax-fp-confirm-btn" style="padding:4px 8px;border:none;background:#22c55e;color:#fff;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600;">✓ OK</button>
+        <button class="smax-fp-clear-btn" style="padding:4px 8px;border:1px solid var(--sp-danger-border);background:transparent;color:var(--sp-danger);border-radius:5px;cursor:pointer;font-size:11px;">× Limpar</button>
+        <button class="smax-fp-confirm-btn" style="padding:4px 8px;border:none;background:var(--sp-send);color:#fff;border-radius:5px;cursor:pointer;font-size:11px;font-weight:600;">✓ OK</button>
       </div>`;
 
       picker.innerHTML = headerHtml + `
@@ -9461,15 +9461,15 @@
               <div id="smax-resp-filter-header">
                 <span style="font-size:10px;font-weight:600;color:var(--sp-text-muted);text-transform:uppercase;letter-spacing:.07em;">Filtros</span>
                 <div style="display:flex;align-items:center;gap:5px;margin-left:auto;">
-                  <button id="smax-resp-clear-filters" title="Limpar filtros ativos" style="display:none;padding:3px 7px;border:1px solid rgba(248,113,113,.35);border-radius:5px;background:rgba(248,113,113,.08);color:#f87171;font-size:10px;cursor:pointer;white-space:nowrap;">✕ Limpar</button>
+                  <button id="smax-resp-clear-filters" title="Limpar filtros ativos" style="display:none;padding:3px 7px;border:1px solid var(--sp-danger-border);border-radius:5px;background:var(--sp-danger-bg);color:var(--sp-danger);font-size:10px;cursor:pointer;white-space:nowrap;">✕ Limpar</button>
                   <button id="smax-resp-fetch-btn" style="padding:5px 10px;border:none;border-radius:6px;background:var(--sp-accent);color:var(--sp-on-accent);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;">↺ Carregar</button>
                   <button id="smax-resp-toggle-criteria" title="Mostrar/ocultar critérios" style="padding:4px 7px;border:1px solid var(--sp-border);border-radius:5px;background:transparent;color:var(--sp-text-muted);font-size:11px;cursor:pointer;line-height:1;">▲</button>
                 </div>
               </div>
-              <div id="smax-resp-preset-bar" style="padding:5px 12px 6px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:var(--sp-surface-2);">
+              <div id="smax-resp-preset-bar" style="padding:5px 12px 6px;border-bottom:1px solid var(--sp-border);display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:var(--sp-surface-2);">
                 <span style="font-size:9px;font-weight:700;color:var(--sp-text-dim);text-transform:uppercase;letter-spacing:.07em;flex-shrink:0;">Presets</span>
                 <div id="smax-resp-preset-pills" style="display:flex;flex-wrap:wrap;gap:4px;flex:1;align-items:center;min-height:20px;"></div>
-                <button id="smax-resp-preset-save" title="Salvar filtro atual como preset" style="flex-shrink:0;padding:3px 8px;border:1px solid rgba(74,222,128,.3);border-radius:6px;background:rgba(74,222,128,.08);color:#4ade80;font-size:10px;cursor:pointer;white-space:nowrap;">💾 Salvar</button>
+                <button id="smax-resp-preset-save" title="Salvar filtro atual como preset" style="flex-shrink:0;padding:3px 8px;border:1px solid var(--sp-staged);border-radius:6px;background:var(--sp-staged-bg);color:var(--sp-success);font-size:10px;cursor:pointer;white-space:nowrap;">💾 Salvar</button>
               </div>
               <div id="smax-resp-filter-criteria">
                 <div style="font-size:10px;font-weight:600;color:var(--sp-text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Equipes</div>
@@ -9486,11 +9486,11 @@
                   <div style="font-size:10px;font-weight:600;color:var(--sp-text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Designado</div>
                   <div id="smax-resp-assignee-filters" style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px;"></div>
                 </div>
-                <div id="smax-resp-search-info" style="display:none;padding:8px;background:rgba(255,255,255,.04);border-radius:6px;border:1px solid rgba(255,255,255,.07);"></div>
+                <div id="smax-resp-search-info" style="display:none;padding:8px;background:var(--sp-surface-2);border-radius:6px;border:1px solid var(--sp-border);"></div>
               </div>
             </div>
             <div id="smax-resp-count-bar" style="padding:5px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--sp-border);background:var(--sp-surface);">
-              <span id="smax-resp-ticket-count" style="font-size:12px;font-weight:700;color:#60a5fa;"></span>
+              <span id="smax-resp-ticket-count" style="font-size:12px;font-weight:700;color:var(--sp-accent);"></span>
               <span id="smax-resp-status-msg" style="font-size:10px;"></span>
               <div id="smax-resp-select-all-btn" style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11px;color:var(--sp-text-muted);padding:2px 6px;border-radius:4px;border:1px solid var(--sp-border);transition:background .12s;" title="Selecionar/desmarcar todos">
                 <span id="smax-resp-select-all-icon" style="font-size:13px;">☐</span> Todos
@@ -9500,7 +9500,7 @@
               <div style="display:flex;gap:5px;">
                 <input type="text" id="smax-resp-num-search-input" placeholder="🔍 Buscar por número..." inputmode="numeric" autocomplete="off"
                   style="flex:1;background:var(--sp-input-bg);border:1px solid var(--sp-border);border-radius:5px;padding:4px 8px;color:var(--sp-input-text);font-size:11px;outline:none;min-width:0;">
-                <button id="smax-resp-num-search-btn" type="button" style="padding:4px 10px;border:none;border-radius:5px;background:rgba(59,130,246,.5);color:#fff;font-size:11px;cursor:pointer;white-space:nowrap;">→</button>
+                <button id="smax-resp-num-search-btn" type="button" style="padding:4px 10px;border:none;border-radius:5px;background:var(--sp-accent);color:var(--sp-on-accent);font-size:11px;cursor:pointer;white-space:nowrap;">→</button>
               </div>
             </div>
             <div id="smax-resp-text-filter-bar" style="padding:4px 8px;border-bottom:1px solid var(--sp-border);background:var(--sp-surface);">
@@ -9520,7 +9520,7 @@
               <button id="smax-sort-dir-btn" type="button" style="margin-left:auto;background:none;border:none;color:var(--sp-text-muted);font-size:12px;cursor:pointer;padding:0 2px;line-height:1;" title="Inverter ordem">↓</button>
             </div>
             <div id="smax-resp-ticket-list" style="flex:1;overflow-y:auto;"></div>
-            <div id="smax-resp-batch-bar" style="display:none;padding:6px 10px;border-top:1px solid rgba(255,255,255,.06);align-items:center;background:rgba(59,130,246,.08);">
+            <div id="smax-resp-batch-bar" style="display:none;padding:6px 10px;border-top:1px solid var(--sp-border);align-items:center;background:var(--sp-primary-bg);">
               <span id="smax-resp-batch-count" style="font-size:11px;color:var(--sp-accent);"></span>
             </div>
           </div>
@@ -9539,7 +9539,7 @@
               </div>
               <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
                 <input type="text" id="smax-resp-global-id" placeholder="Global ID" inputmode="numeric" autocomplete="off"
-                  style="width:90px;background:var(--sp-input-bg);border:1px solid var(--sp-border);border-radius:6px;padding:5px 9px;color:#fff;font-size:12px;outline:none;">
+                  style="width:90px;background:var(--sp-input-bg);border:1px solid var(--sp-border);border-radius:6px;padding:5px 9px;color:var(--sp-input-text);font-size:12px;outline:none;">
                 <button type="button" id="smax-resp-global-link-btn" title="Vincular chamado ativo ao Global informado">🔗 Vincular</button>
                 <button type="button" id="smax-resp-back-btn" title="Voltar para Configurações" style="padding:4px 10px;border-radius:6px;border:1px solid var(--sp-border);background:var(--sp-surface-2);color:var(--sp-text-muted);font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0;">← Voltar</button>
                 <button id="smax-theme-toggle-hud" type="button" title="Alternar tema" style="width:32px;height:32px;border-radius:6px;border:1px solid var(--sp-border);background:var(--sp-surface-2);color:var(--sp-text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">🌙</button>
@@ -9671,7 +9671,7 @@
               <div style="font-size:11px;color:var(--sp-text-muted);">Escritas reais: <span style="color:${prefs.enableRealWrites ? 'var(--sp-success)' : 'var(--sp-danger)'};font-weight:600;">${prefs.enableRealWrites ? 'ativadas' : 'desativadas'}</span></div>
               <div style="display:flex;align-items:center;gap:8px;">
                 <button id="smax-resp-report-btn" type="button" class="smax-resp-action-btn">📊 Relatório</button>
-                <button id="smax-resp-send-btn" type="button" style="padding:8px 28px;border:none;border-radius:8px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(34,197,94,.35);transition:transform .12s,box-shadow .12s;">ENVIAR</button>
+                <button id="smax-resp-send-btn" type="button" style="padding:8px 28px;border:none;border-radius:8px;background:var(--sp-send);color:#fff;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px var(--sp-ring);transition:transform .12s,box-shadow .12s;">ENVIAR</button>
               </div>
             </div>
           </div>
@@ -9719,12 +9719,12 @@
           </div>
 
           <!-- Activity Report Modal (overlay) -->
-          <div id="smax-resp-report-modal" style="display:none;position:absolute;inset:0;background:rgba(2,6,23,.97);z-index:10;border-radius:inherit;flex-direction:column;overflow:hidden;">
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;">
+          <div id="smax-resp-report-modal" style="display:none;position:absolute;inset:0;background:var(--sp-bg);z-index:10;border-radius:inherit;flex-direction:column;overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--sp-border);flex-shrink:0;">
               <span style="font-size:14px;font-weight:700;color:var(--sp-text);">📊 Relatório de Atividades</span>
               <button id="smax-resp-report-close" type="button" style="border:none;background:var(--sp-input-bg);color:var(--sp-text);font-size:14px;width:28px;height:28px;border-radius:6px;cursor:pointer;border:1px solid var(--sp-border);">✕</button>
             </div>
-            <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div style="padding:12px 16px;border-bottom:1px solid var(--sp-border);flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
               <label style="font-size:11px;color:var(--sp-text-muted);">De:</label>
               <input type="date" id="smax-resp-report-from" style="background:var(--sp-input-bg);border:1px solid var(--sp-border);border-radius:5px;padding:4px 8px;color:var(--sp-text);font-size:11px;outline:none;">
               <label style="font-size:11px;color:var(--sp-text-muted);">Até:</label>
@@ -9781,9 +9781,9 @@
           tip = document.createElement('div');
           tip.id = 'smax-resp-location-tip';
           Object.assign(tip.style, {
-            position: 'fixed', background: '#1e293b', color: '#e5e7eb', fontSize: '12px',
-            padding: '6px 10px', borderRadius: '7px', border: '1px solid rgba(255,255,255,.15)',
-            boxShadow: '0 4px 16px rgba(0,0,0,.5)', zIndex: '9999999',
+            position: 'fixed', background: 'var(--sp-elevated)', color: 'var(--sp-text)', fontSize: '12px',
+            padding: '6px 10px', borderRadius: '7px', border: '1px solid var(--sp-border)',
+            boxShadow: 'var(--sp-shadow)', zIndex: '9999999',
             maxWidth: '320px', wordBreak: 'break-word', cursor: 'pointer',
             lineHeight: '1.5',
           });
@@ -10017,8 +10017,8 @@
               const listItem = backdrop.querySelector(`.smax-resp-ticket-item[data-id="${CSS.escape(ticketId)}"]`);
               const idDiv = listItem?.querySelector('.smax-resp-ticket-id');
               if (idDiv && !idDiv.querySelector('.smax-global-badge') && !idDiv.querySelector('.smax-warning-badge')) {
-                idDiv.innerHTML = `<span style="color:#60a5fa;font-weight:700;">#${Utils.escapeHtml(ticketId)}</span>`
-                  + ` <span class="smax-global-badge" style="color:#f87171;font-size:9px;padding:1px 5px;border-radius:10px;border:1px solid rgba(248,113,113,.35);vertical-align:middle;">⬆ Global #${Utils.escapeHtml(globalId)}</span>`;
+                idDiv.innerHTML = `<span style="color:var(--sp-accent);font-weight:700;">#${Utils.escapeHtml(ticketId)}</span>`
+                  + ` <span class="smax-global-badge" style="color:var(--sp-danger);font-size:9px;padding:1px 5px;border-radius:10px;border:1px solid var(--sp-danger);vertical-align:middle;">⬆ Global #${Utils.escapeHtml(globalId)}</span>`;
               }
               ok++;
             } else {
@@ -10168,7 +10168,7 @@
         const toVal = backdrop.querySelector('#smax-resp-report-to')?.value;
         const content = backdrop.querySelector('#smax-resp-report-content');
         const exportBtn = backdrop.querySelector('#smax-resp-report-export-btn');
-        if (!fromVal || !toVal) { if (content) content.innerHTML = '<div style="color:#fca5a5;font-size:12px;padding:20px;">Informe o período completo.</div>'; return; }
+        if (!fromVal || !toVal) { if (content) content.innerHTML = '<div style="color:var(--sp-danger);font-size:12px;padding:20px;">Informe o período completo.</div>'; return; }
         const fromTs = new Date(fromVal + 'T00:00:00').getTime();
         const toTs = new Date(toVal + 'T23:59:59').getTime();
         this.disabled = true; this.textContent = '…';
@@ -10198,17 +10198,17 @@
         const summaryHtml = `
           <div style="font-size:10px;color:var(--sp-text-muted);margin-bottom:8px;">Fonte: <b style="color:var(--sp-text-muted);">${source}</b> — ${entries.length} registro(s)</div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-            ${[['Respondidos','RESPONDIDO','#4ade80'],['Vinc. Global','VINCULO_GLOBAL','#60a5fa'],['Transferidos','TRANSFERIDO','#c084fc'],['Designados','DESIGNADO','#fbbf24'],['Status Op.','STATUS','#34d399'],['Outros','OUTRO','#6b7280']].map(([label, key, color]) =>
-              `<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 14px;text-align:center;">
+            ${[['Respondidos','RESPONDIDO','var(--sp-success-text)'],['Vinc. Global','VINCULO_GLOBAL','var(--sp-accent)'],['Transferidos','TRANSFERIDO','var(--sp-pending)'],['Designados','DESIGNADO','var(--sp-pending)'],['Status Op.','STATUS','var(--sp-success)'],['Outros','OUTRO','var(--sp-text-dim)']].map(([label, key, color]) =>
+              `<div style="background:var(--sp-surface-2);border:1px solid var(--sp-border);border-radius:8px;padding:8px 14px;text-align:center;">
                 <div style="font-size:18px;font-weight:700;color:${color};">${counts[key]||0}</div>
                 <div style="font-size:10px;color:var(--sp-text-muted);">${label}</div>
               </div>`
             ).join('')}
-            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 14px;text-align:center;">
+            <div style="background:var(--sp-surface-2);border:1px solid var(--sp-border);border-radius:8px;padding:8px 14px;text-align:center;">
               <div style="font-size:18px;font-weight:700;color:var(--sp-text);">${uniqueTickets}</div>
               <div style="font-size:10px;color:var(--sp-text-muted);">Chamados únicos</div>
             </div>
-            <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 14px;text-align:center;">
+            <div style="background:var(--sp-surface-2);border:1px solid var(--sp-border);border-radius:8px;padding:8px 14px;text-align:center;">
               <div style="font-size:18px;font-weight:700;color:var(--sp-text);">${entries.length}</div>
               <div style="font-size:10px;color:var(--sp-text-muted);">Total ações</div>
             </div>
@@ -10226,10 +10226,10 @@
             <tbody>${entries.slice().reverse().map((e, i) => {
               const desc = e.ticketSubject || DataRepository.triageCache.get(e.ticketId)?.subjectText || '';
               const detalhe = e.globalChangeId ? `→ Global #${Utils.escapeHtml(e.globalChangeId)}` : e.statusSCCDTo ? `→ ${Utils.escapeHtml(STATUS_SCCD_LABELS?.[e.statusSCCDTo] || e.statusSCCDTo)}` : e.transferredTo ? `→ ${Utils.escapeHtml(e.transferredTo)}` : e.assignedTo ? `→ ${Utils.escapeHtml(e.assignedTo)}` : '';
-              return `<tr style="background:${i%2===0?'transparent':'rgba(255,255,255,.02)'};border-bottom:1px solid rgba(255,255,255,.04);">
+              return `<tr style="background:${i%2===0?'transparent':'var(--sp-surface-2)'};border-bottom:1px solid var(--sp-border);">
                 <td style="padding:4px 8px;color:var(--sp-text);font-weight:600;white-space:nowrap;">${fmtTime(e.ts)}</td>
                 <td style="padding:4px 8px;color:var(--sp-text-muted);white-space:nowrap;">${fmtDate(e.ts)}</td>
-                <td style="padding:4px 8px;color:#60a5fa;white-space:nowrap;">#${Utils.escapeHtml(e.ticketId)}</td>
+                <td style="padding:4px 8px;color:var(--sp-accent);white-space:nowrap;">#${Utils.escapeHtml(e.ticketId)}</td>
                 <td style="padding:4px 8px;color:var(--sp-text);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${Utils.escapeHtml(desc)}">${Utils.escapeHtml(desc)}</td>
                 <td style="padding:4px 8px;color:var(--sp-text);white-space:nowrap;">${Utils.escapeHtml(e.relevantWork)}</td>
                 <td style="padding:4px 8px;color:var(--sp-text-muted);white-space:nowrap;">${detalhe}</td>
@@ -10403,7 +10403,7 @@
           <div class="smax-tpl-item" data-idx="${i}" data-shared="${t._shared ? '1' : ''}">
             <div class="smax-tpl-item-title">
               ${Utils.escapeHtml(t.title)}
-              ${t._shared ? '<span style="margin-left:5px;font-size:9px;padding:1px 5px;border-radius:999px;background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3);vertical-align:middle;">☁️ Compartilhado</span>' : ''}
+              ${t._shared ? '<span style="margin-left:5px;font-size:9px;padding:1px 5px;border-radius:999px;background:var(--sp-primary-bg);color:var(--sp-accent);border:1px solid var(--sp-accent);vertical-align:middle;">☁️ Compartilhado</span>' : ''}
             </div>
             <div class="smax-tpl-item-preview">${Utils.escapeHtml((t.html || '').replace(/<[^>]+>/g, ' ').trim())}</div>
             ${!t._shared ? `<div class="smax-tpl-item-actions">
@@ -10724,8 +10724,8 @@
 
     const toDateInput = (d) => d.toISOString().slice(0, 10);
 
-    const PILL_ON  = 'background:#3b82f6;color:#fff;border:1px solid #3b82f6;border-radius:5px;padding:5px 11px;cursor:pointer;font-size:11px;white-space:nowrap;font-weight:500;';
-    const PILL_OFF = 'background:transparent;color:#64748b;border:1px solid var(--sp-border);border-radius:5px;padding:5px 11px;cursor:pointer;font-size:11px;white-space:nowrap;';
+    const PILL_ON  = 'background:var(--sp-accent);color:var(--sp-on-accent);border:1px solid var(--sp-accent);border-radius:5px;padding:5px 11px;cursor:pointer;font-size:11px;white-space:nowrap;font-weight:500;';
+    const PILL_OFF = 'background:transparent;color:var(--sp-text-muted);border:1px solid var(--sp-border);border-radius:5px;padding:5px 11px;cursor:pointer;font-size:11px;white-space:nowrap;';
 
     const buildHtml = () => {
       const [wStart, wEnd] = weekRange();
@@ -10735,56 +10735,56 @@
 
       return `
 <div id="aqp-backdrop" style="position:fixed;inset:0;z-index:999998;display:none;align-items:center;justify-content:center;padding:8px;background:linear-gradient(180deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.6) 100%);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">
-  <div id="aqp-card" style="position:relative;background:#0f172a;color:#e2e8f0;border-radius:12px;width:100%;max-width:1400px;height:calc(100vh - 16px);display:flex;overflow:hidden;font:13px/1.5 sans-serif;box-shadow:0 24px 64px rgba(0,0,0,.7);">
+  <div id="aqp-card" style="position:relative;background:var(--sp-bg);color:var(--sp-text);border-radius:12px;width:100%;max-width:1400px;height:calc(100vh - 16px);display:flex;overflow:hidden;font:13px/1.5 sans-serif;box-shadow:0 24px 64px rgba(0,0,0,.7);">
 
     <!-- COLUNA ESQUERDA — filtros -->
-    <div id="aqp-left" style="width:280px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,.07);background:#0d1424;">
-      <div style="padding:14px 16px 12px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between;">
+    <div id="aqp-left" style="width:280px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--sp-border);background:var(--sp-surface-2);">
+      <div style="padding:14px 16px 12px;border-bottom:1px solid var(--sp-border);display:flex;align-items:center;justify-content:space-between;">
         <span style="font-size:14px;font-weight:700;letter-spacing:.2px;">🔍 Consulta por Ação</span>
-        <button id="aqp-x" style="background:none;border:none;color:#64748b;font-size:20px;cursor:pointer;line-height:1;padding:0 2px;" title="Fechar">×</button>
+        <button id="aqp-x" style="background:none;border:none;color:var(--sp-text-muted);font-size:20px;cursor:pointer;line-height:1;padding:0 2px;" title="Fechar">×</button>
       </div>
       <div style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:14px;">
 
         <div>
-          <div style="font-size:10px;color:#64748b;letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;">Especialista</div>
+          <div style="font-size:10px;color:var(--sp-text-muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;">Especialista</div>
           <div style="position:relative;">
             <input id="aqp-person" type="text" placeholder="Digite o nome..." autocomplete="off"
-              style="width:100%;box-sizing:border-box;padding:8px 10px;background:#1e293b;color:inherit;border:1px solid var(--sp-border);border-radius:7px;font-size:13px;outline:none;">
-            <div id="aqp-dd" style="display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;z-index:10;background:#1e293b;border:1px solid var(--sp-border);border-radius:7px;max-height:150px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.5);"></div>
+              style="width:100%;box-sizing:border-box;padding:8px 10px;background:var(--sp-surface);color:inherit;border:1px solid var(--sp-border);border-radius:7px;font-size:13px;outline:none;">
+            <div id="aqp-dd" style="display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;z-index:10;background:var(--sp-surface);border:1px solid var(--sp-border);border-radius:7px;max-height:150px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.5);"></div>
           </div>
-          <div id="aqp-ok" style="display:none;margin-top:5px;font-size:11px;color:#4ade80;"></div>
+          <div id="aqp-ok" style="display:none;margin-top:5px;font-size:11px;color:var(--sp-success);"></div>
         </div>
 
         <div>
-          <div style="font-size:10px;color:#64748b;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px;">Tipo de Ação</div>
+          <div style="font-size:10px;color:var(--sp-text-muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px;">Tipo de Ação</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px;">${actionPills}</div>
         </div>
 
         <div>
-          <div style="font-size:10px;color:#64748b;letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;">Período</div>
+          <div style="font-size:10px;color:var(--sp-text-muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;">Período</div>
           <div style="display:flex;flex-direction:column;gap:8px;">
             <div>
-              <div style="font-size:10px;color:#475569;margin-bottom:3px;">De</div>
+              <div style="font-size:10px;color:var(--sp-text-dim);margin-bottom:3px;">De</div>
               <input id="aqp-from" type="date" value="${toDateInput(wStart)}"
-                style="width:100%;box-sizing:border-box;padding:7px 8px;background:#1e293b;color:inherit;border:1px solid var(--sp-border);border-radius:7px;font-size:13px;outline:none;">
+                style="width:100%;box-sizing:border-box;padding:7px 8px;background:var(--sp-surface);color:inherit;border:1px solid var(--sp-border);border-radius:7px;font-size:13px;outline:none;">
             </div>
             <div>
-              <div style="font-size:10px;color:#475569;margin-bottom:3px;">Até</div>
+              <div style="font-size:10px;color:var(--sp-text-dim);margin-bottom:3px;">Até</div>
               <input id="aqp-to" type="date" value="${toDateInput(wEnd)}"
-                style="width:100%;box-sizing:border-box;padding:7px 8px;background:#1e293b;color:inherit;border:1px solid var(--sp-border);border-radius:7px;font-size:13px;outline:none;">
+                style="width:100%;box-sizing:border-box;padding:7px 8px;background:var(--sp-surface);color:inherit;border:1px solid var(--sp-border);border-radius:7px;font-size:13px;outline:none;">
             </div>
           </div>
         </div>
 
-        <button id="aqp-run" style="padding:10px;background:#3b82f6;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;margin-top:4px;">Buscar</button>
+        <button id="aqp-run" style="padding:10px;background:var(--sp-accent);color:var(--sp-on-accent);border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;margin-top:4px;">Buscar</button>
 
         <div id="aqp-prog" style="display:none;">
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:5px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--sp-text-muted);margin-bottom:5px;">
             <span id="aqp-prog-txt">Aguardando...</span>
-            <button id="aqp-cancel" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:11px;padding:0;">Cancelar</button>
+            <button id="aqp-cancel" style="background:none;border:none;color:var(--sp-danger);cursor:pointer;font-size:11px;padding:0;">Cancelar</button>
           </div>
-          <div style="background:#1e293b;border-radius:4px;height:5px;overflow:hidden;">
-            <div id="aqp-prog-bar" style="background:#3b82f6;height:100%;width:0%;transition:width .2s;"></div>
+          <div style="background:var(--sp-surface);border-radius:4px;height:5px;overflow:hidden;">
+            <div id="aqp-prog-bar" style="background:var(--sp-accent);height:100%;width:0%;transition:width .2s;"></div>
           </div>
         </div>
 
@@ -10793,10 +10793,10 @@
 
     <!-- COLUNA DIREITA — resultados -->
     <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
-      <div id="aqp-res-hdr" style="padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:12px;flex-shrink:0;">
-        <span id="aqp-res-count" style="font-size:12px;color:#64748b;">—</span>
+      <div id="aqp-res-hdr" style="padding:12px 18px;border-bottom:1px solid var(--sp-border);display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <span id="aqp-res-count" style="font-size:12px;color:var(--sp-text-muted);">—</span>
         <div style="flex:1;"></div>
-        <button id="aqp-export" style="display:none;padding:6px 14px;background:transparent;border:1px solid var(--sp-border);border-radius:6px;color:#94a3b8;cursor:pointer;font-size:12px;" title="Exportar para Excel (CSV)">⬇ Exportar CSV</button>
+        <button id="aqp-export" style="display:none;padding:6px 14px;background:transparent;border:1px solid var(--sp-border);border-radius:6px;color:var(--sp-text-muted);cursor:pointer;font-size:12px;" title="Exportar para Excel (CSV)">⬇ Exportar CSV</button>
       </div>
       <div id="aqp-results" style="flex:1;overflow-y:auto;padding:14px 18px;"></div>
     </div>
@@ -10920,28 +10920,28 @@
         const rowsHtml = a.rows.map(r => {
           if (r.oldVal === null) {
             return `<div style="display:flex;align-items:baseline;gap:6px;padding:3px 0;">
-              <span style="font-size:11px;color:#64748b;min-width:120px;flex-shrink:0;">${Utils.escapeHtml(r.label)}</span>
-              <span style="font-size:12px;color:#4ade80;">${Utils.escapeHtml(r.newVal)}</span>
+              <span style="font-size:11px;color:var(--sp-text-muted);min-width:120px;flex-shrink:0;">${Utils.escapeHtml(r.label)}</span>
+              <span style="font-size:12px;color:var(--sp-success);">${Utils.escapeHtml(r.newVal)}</span>
             </div>`;
           }
           return `<div style="display:flex;align-items:baseline;gap:6px;padding:3px 0;">
-            <span style="font-size:11px;color:#64748b;min-width:120px;flex-shrink:0;">${Utils.escapeHtml(r.label)}</span>
-            <span style="font-size:12px;color:#f87171;text-decoration:line-through;opacity:.8;">${Utils.escapeHtml(r.oldVal)}</span>
-            <span style="font-size:11px;color:#475569;">→</span>
-            <span style="font-size:12px;color:#4ade80;">${Utils.escapeHtml(r.newVal)}</span>
+            <span style="font-size:11px;color:var(--sp-text-muted);min-width:120px;flex-shrink:0;">${Utils.escapeHtml(r.label)}</span>
+            <span style="font-size:12px;color:var(--sp-danger);text-decoration:line-through;opacity:.8;">${Utils.escapeHtml(r.oldVal)}</span>
+            <span style="font-size:11px;color:var(--sp-text-dim);">→</span>
+            <span style="font-size:12px;color:var(--sp-success);">${Utils.escapeHtml(r.newVal)}</span>
           </div>`;
         }).join('');
-        return `<div style="padding:8px 10px;border-left:2px solid rgba(255,255,255,.07);margin-bottom:6px;">
-          <div style="font-size:11px;color:#475569;margin-bottom:5px;">${fmtTs(a.time)}</div>
+        return `<div style="padding:8px 10px;border-left:2px solid var(--sp-border);margin-bottom:6px;">
+          <div style="font-size:11px;color:var(--sp-text-dim);margin-bottom:5px;">${fmtTs(a.time)}</div>
           ${rowsHtml}
         </div>`;
       }).join('');
 
-      return `<div style="background:#1e293b;border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:12px 14px;margin-bottom:10px;">
+      return `<div style="background:var(--sp-surface);border:1px solid var(--sp-border);border-radius:9px;padding:12px 14px;margin-bottom:10px;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
           <a href="/saw/Request/${m.id}" target="_blank"
-            style="color:#60a5fa;font-weight:700;font-size:14px;text-decoration:none;">#${m.id}</a>
-          <span style="font-size:11px;color:#475569;">${m.actions.length} alteraç${m.actions.length === 1 ? 'ão' : 'ões'}</span>
+            style="color:var(--sp-accent);font-weight:700;font-size:14px;text-decoration:none;">#${m.id}</a>
+          <span style="font-size:11px;color:var(--sp-text-dim);">${m.actions.length} alteraç${m.actions.length === 1 ? 'ão' : 'ões'}</span>
         </div>
         ${eventsHtml}
       </div>`;
@@ -11037,8 +11037,8 @@
         if (!results.length) { dd.style.display = 'none'; return; }
         dd.innerHTML = results.map(p =>
           `<div class="aqp-po" data-id="${Utils.escapeHtml(p.id)}" data-name="${Utils.escapeHtml(p.name)}" data-upn="${Utils.escapeHtml(p.upn)}"` +
-          ` style="padding:8px 12px;cursor:pointer;font-size:12px;border-bottom:1px solid rgba(255,255,255,.05);">` +
-          `${Utils.escapeHtml(p.name)}${p.upn ? ` <span style="color:#475569;">(${Utils.escapeHtml(p.upn)})</span>` : ''}</div>`
+          ` style="padding:8px 12px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--sp-border);">` +
+          `${Utils.escapeHtml(p.name)}${p.upn ? ` <span style="color:var(--sp-text-dim);">(${Utils.escapeHtml(p.upn)})</span>` : ''}</div>`
         ).join('');
         dd.style.display = 'block';
       };
@@ -11115,7 +11115,7 @@
       const exportBtn = backdropEl.querySelector('#aqp-export');
 
       if (!personId) {
-        resultsEl.innerHTML = '<div style="color:#f87171;font-size:13px;margin-top:20px;">Selecione um especialista.</div>';
+        resultsEl.innerHTML = '<div style="color:var(--sp-danger);font-size:13px;margin-top:20px;">Selecione um especialista.</div>';
         running = false;
         return;
       }
@@ -11123,7 +11123,7 @@
       const fromVal = backdropEl.querySelector('#aqp-from').value;
       const toVal   = backdropEl.querySelector('#aqp-to').value;
       if (!fromVal || !toVal) {
-        resultsEl.innerHTML = '<div style="color:#f87171;font-size:13px;margin-top:20px;">Defina o período.</div>';
+        resultsEl.innerHTML = '<div style="color:var(--sp-danger);font-size:13px;margin-top:20px;">Defina o período.</div>';
         running = false;
         return;
       }
@@ -11152,7 +11152,7 @@
         if (abortFlag) { finishSearch(runBtn); return; }
 
         if (!ids.length) {
-          resultsEl.innerHTML = '<div style="color:#64748b;font-size:13px;margin-top:20px;">Nenhum chamado no período.</div>';
+          resultsEl.innerHTML = '<div style="color:var(--sp-text-muted);font-size:13px;margin-top:20px;">Nenhum chamado no período.</div>';
           finishSearch(runBtn);
           return;
         }
@@ -11178,10 +11178,10 @@
         }
 
         if (!currentMatches.length)
-          resultsEl.innerHTML = '<div style="color:#64748b;font-size:13px;margin-top:20px;">Nenhum chamado encontrado com essa ação.</div>';
+          resultsEl.innerHTML = '<div style="color:var(--sp-text-muted);font-size:13px;margin-top:20px;">Nenhum chamado encontrado com essa ação.</div>';
         progTxt.textContent = `Concluído — ${doneCount}/${ids.length} verificados, ${currentMatches.length} encontrado${currentMatches.length !== 1 ? 's' : ''}.`;
       } catch (err) {
-        resultsEl.innerHTML = `<div style="color:#f87171;font-size:13px;margin-top:20px;">Erro: ${Utils.escapeHtml(err.message)}</div>`;
+        resultsEl.innerHTML = `<div style="color:var(--sp-danger);font-size:13px;margin-top:20px;">Erro: ${Utils.escapeHtml(err.message)}</div>`;
       }
 
       finishSearch(runBtn);
@@ -11222,7 +11222,7 @@
       btn.id = 'smax-aqp-btn';
       btn.title = 'Consulta por Ação';
       btn.textContent = '🔍';
-      btn.style.cssText = 'position:fixed;bottom:110px;right:16px;z-index:99998;width:36px;height:36px;border-radius:50%;border:none;background:#3b82f6;color:#fff;cursor:pointer;font-size:15px;box-shadow:0 2px 8px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;';
+      btn.style.cssText = 'position:fixed;bottom:110px;right:16px;z-index:99998;width:36px;height:36px;border-radius:50%;border:none;background:var(--sp-accent);color:var(--sp-on-accent);cursor:pointer;font-size:15px;box-shadow:0 2px 8px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;';
       btn.addEventListener('click', () => (isOpen ? close() : open()));
       document.body.appendChild(btn);
     };

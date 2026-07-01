@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SMAX Toolkit - TJSP
 // @namespace    https://github.com/rsalvessap/SMAX-TOOLS
-// @version      2.76
+// @version      2.77
 // @description  Conjunto de ferramentas para o SMAX TJSP: triagem, respostas em lote, scripts, discussões e consulta de processos no eProc
 // @author       rsalvessap
 // @match        https://suporte.tjsp.jus.br/saw/*
@@ -47,7 +47,7 @@
   const SMAX_SB_URL = 'https://rlcbmrjkojopipiwpktf.supabase.co';
   const SMAX_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Jtcmprb2pvcGlwaXdwa3RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MzI0MTksImV4cCI6MjA5NDMwODQxOX0.Ha4xRbFvbgb2yO64ga3dV8KrNGRgbV7zWFXc5bYHdeQ';
 
-  const SMAX_TOOLKIT_VERSION = '2.76';
+  const SMAX_TOOLKIT_VERSION = '2.77';
   const SMAX_TENANT_ID = '213963628';
   console.log('%c[SMAX Toolkit] v' + SMAX_TOOLKIT_VERSION + ' carregado', 'color:#60a5fa;font-weight:bold;font-size:13px;');
 
@@ -597,7 +597,7 @@
 /* ============================================================
    TRIAGE HUD
    ============================================================ */
-#smax-triage-hud-backdrop { background:rgba(0,0,0,.55); z-index:999997; display:flex; align-items:stretch; justify-content:stretch; overflow:hidden; }
+#smax-triage-hud-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:999997; display:flex; align-items:stretch; justify-content:stretch; overflow:hidden; }
 #smax-triage-hud { position:relative; width:100%; height:100%; max-width:none; max-height:none; border-radius:0; padding:0; background:var(--sp-bg); color:var(--sp-text); box-shadow:var(--sp-shadow); font-family:'Metric-Regular','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:13px; display:flex; gap:0; align-items:stretch; overflow:hidden; }
 #smax-triage-hud-main { display:flex; flex-direction:column; gap:12px; flex:1; min-width:0; }
 
@@ -748,7 +748,7 @@
 /* ============================================================
    RESPONSE HUD
    ============================================================ */
-#smax-resp-hud-backdrop { background:rgba(0,0,0,.55); z-index:999997; display:flex; align-items:stretch; justify-content:stretch; overflow:hidden; }
+#smax-resp-hud-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:999997; display:flex; align-items:stretch; justify-content:stretch; overflow:hidden; }
 #smax-resp-hud { position:relative; width:100%; height:100%; max-width:none; max-height:none; border-radius:0; background:var(--sp-bg); color:var(--sp-text); box-shadow:var(--sp-shadow); font-family:'Metric-Regular','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:14px; display:flex; overflow:hidden; }
 #smax-resp-hud-list { width:270px; flex-shrink:0; display:flex; flex-direction:column; border-right:1px solid var(--sp-border); background:var(--sp-surface-2); overflow:hidden; }
 #smax-resp-hud-main { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; background:var(--sp-bg); }
@@ -897,7 +897,7 @@
 /* ============================================================
    BATCH CONFIRM
    ============================================================ */
-#smax-batch-confirm-overlay { z-index:9999999; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; padding:16px; }
+#smax-batch-confirm-overlay { position:fixed; inset:0; z-index:9999999; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; padding:16px; }
 #smax-batch-confirm-box { background:var(--sp-surface); border:1px solid var(--sp-border); border-radius:var(--sp-r-lg); width:100%; max-width:720px; max-height:88vh; display:flex; flex-direction:column; box-shadow:var(--sp-shadow); font-family:"Segoe UI",system-ui,-apple-system,sans-serif; color:var(--sp-text); overflow:hidden; }
 #smax-batch-confirm-header { padding:14px 18px; border-bottom:1px solid var(--sp-border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; background:var(--sp-surface-2); }
 #smax-batch-confirm-body { flex:1; overflow-y:auto; padding:14px 18px; display:flex; flex-direction:column; gap:14px; }

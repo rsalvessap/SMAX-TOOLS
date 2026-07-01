@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SMAX Toolkit - TJSP
 // @namespace    https://github.com/rsalvessap/SMAX-TOOLS
-// @version      2.77
+// @version      2.78
 // @description  Conjunto de ferramentas para o SMAX TJSP: triagem, respostas em lote, scripts, discussões e consulta de processos no eProc
 // @author       rsalvessap
 // @match        https://suporte.tjsp.jus.br/saw/*
@@ -47,7 +47,7 @@
   const SMAX_SB_URL = 'https://rlcbmrjkojopipiwpktf.supabase.co';
   const SMAX_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Jtcmprb2pvcGlwaXdwa3RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MzI0MTksImV4cCI6MjA5NDMwODQxOX0.Ha4xRbFvbgb2yO64ga3dV8KrNGRgbV7zWFXc5bYHdeQ';
 
-  const SMAX_TOOLKIT_VERSION = '2.77';
+  const SMAX_TOOLKIT_VERSION = '2.78';
   const SMAX_TENANT_ID = '213963628';
   console.log('%c[SMAX Toolkit] v' + SMAX_TOOLKIT_VERSION + ' carregado', 'color:#60a5fa;font-weight:bold;font-size:13px;');
 
@@ -597,7 +597,7 @@
 /* ============================================================
    TRIAGE HUD
    ============================================================ */
-#smax-triage-hud-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:999997; display:flex; align-items:stretch; justify-content:stretch; overflow:hidden; }
+#smax-triage-hud-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:999997; display:none; align-items:stretch; justify-content:stretch; overflow:hidden; }
 #smax-triage-hud { position:relative; width:100%; height:100%; max-width:none; max-height:none; border-radius:0; padding:0; background:var(--sp-bg); color:var(--sp-text); box-shadow:var(--sp-shadow); font-family:'Metric-Regular','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:13px; display:flex; gap:0; align-items:stretch; overflow:hidden; }
 #smax-triage-hud-main { display:flex; flex-direction:column; gap:12px; flex:1; min-width:0; }
 
@@ -656,6 +656,14 @@
 .smax-global-input[data-state="pending"] { border-color:var(--sp-pending); background:var(--sp-pending-bg); color:var(--sp-text); }
 
 /* Custom dropdowns (team/worker/status) */
+.smax-custom-dropdown-wrapper { position:relative; }
+.smax-custom-dropdown-menu { display:none; position:absolute; top:calc(100% + 4px); left:0; right:0; background:var(--sp-surface); border:1px solid var(--sp-border); border-radius:var(--sp-r-md); box-shadow:var(--sp-shadow); z-index:10; max-height:220px; overflow-y:auto; }
+.smax-custom-dropdown-wrapper[data-open="true"] .smax-custom-dropdown-menu { display:block; }
+.smax-custom-dropdown-options { display:flex; flex-direction:column; }
+.smax-custom-dropdown-item { padding:7px 10px; font-size:12px; color:var(--sp-text); cursor:pointer; transition:background .1s; border-bottom:1px solid var(--sp-border); }
+.smax-custom-dropdown-item:last-child { border-bottom:none; }
+.smax-custom-dropdown-item:hover { background:var(--sp-primary-hover); color:var(--sp-accent); }
+.smax-custom-dropdown-item[data-selected="true"] { background:var(--sp-primary-bg); color:var(--sp-accent); font-weight:600; }
 .smax-custom-dropdown-display { width:100%; border-radius:var(--sp-r-md); border:1px solid var(--sp-input-border); background:var(--sp-input-bg); color:var(--sp-input-text); font-size:12px; min-height:32px; padding:6px 12px; text-align:left; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:8px; transition:all .15s; }
 .smax-custom-dropdown-display:hover { border-color:var(--sp-accent); }
 .smax-custom-chevron { font-size:11px; color:var(--sp-text-muted); }
@@ -748,7 +756,7 @@
 /* ============================================================
    RESPONSE HUD
    ============================================================ */
-#smax-resp-hud-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:999997; display:flex; align-items:stretch; justify-content:stretch; overflow:hidden; }
+#smax-resp-hud-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:999997; display:none; align-items:stretch; justify-content:stretch; overflow:hidden; }
 #smax-resp-hud { position:relative; width:100%; height:100%; max-width:none; max-height:none; border-radius:0; background:var(--sp-bg); color:var(--sp-text); box-shadow:var(--sp-shadow); font-family:'Metric-Regular','Helvetica Neue',Helvetica,Arial,sans-serif; font-size:14px; display:flex; overflow:hidden; }
 #smax-resp-hud-list { width:270px; flex-shrink:0; display:flex; flex-direction:column; border-right:1px solid var(--sp-border); background:var(--sp-surface-2); overflow:hidden; }
 #smax-resp-hud-main { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; background:var(--sp-bg); }
@@ -845,7 +853,7 @@
 #smax-resp-hud-footer { padding:10px 16px; border-top:1px solid var(--sp-border); display:flex; align-items:center; justify-content:space-between; gap:10px; flex-shrink:0; background:var(--sp-surface); }
 
 /* Field pickers */
-.smax-resp-field-picker { position:relative; z-index:999999; background:var(--sp-surface); border:1px solid var(--sp-border); border-radius:var(--sp-r-md); box-shadow:var(--sp-shadow); overflow:hidden; width:380px; }
+.smax-resp-field-picker { display:none; position:absolute; z-index:999999; background:var(--sp-surface); border:1px solid var(--sp-border); border-radius:var(--sp-r-md); box-shadow:var(--sp-shadow); overflow:hidden; width:380px; }
 .smax-resp-field-picker-search { display:block; width:100%; box-sizing:border-box; background:var(--sp-input-bg); border:none; border-bottom:1px solid var(--sp-border); padding:9px 12px; color:var(--sp-text); font-size:12px; outline:none; font-family:inherit; }
 .smax-resp-field-picker-list { max-height:230px; overflow-y:auto; }
 .smax-resp-field-picker-item { padding:7px 12px; cursor:pointer; border-bottom:1px solid var(--sp-border); font-size:12px; color:var(--sp-text); transition:background .1s; display:flex; align-items:center; gap:7px; }
@@ -857,7 +865,7 @@
 #smax-gse-fwd-editor:empty:before { content:attr(data-placeholder); color:var(--sp-text-muted); pointer-events:none; }
 
 /* Discussion modal */
-#smax-disc-modal { position:relative; z-index:20; background:var(--sp-surface); border-radius:inherit; flex-direction:column; overflow:hidden; color:var(--sp-text); }
+#smax-disc-modal { display:none; position:absolute; inset:0; z-index:20; background:var(--sp-surface); border-radius:inherit; flex-direction:column; overflow:hidden; color:var(--sp-text); }
 #smax-disc-modal-header { display:flex; align-items:flex-start; gap:10px; padding:12px 16px; border-bottom:1px solid var(--sp-border); flex-shrink:0; }
 #smax-disc-modal-author { font-size:13px; font-weight:700; color:var(--sp-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 #smax-disc-modal-date { font-size:10px; color:var(--sp-text-muted); margin-top:2px; }

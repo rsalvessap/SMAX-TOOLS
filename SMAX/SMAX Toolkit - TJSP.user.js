@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SMAX Toolkit - TJSP
 // @namespace    https://github.com/rsalvessap/SMAX-TOOLS
-// @version      2.82
+// @version      2.83
 // @description  Conjunto de ferramentas para o SMAX TJSP: triagem, respostas em lote, scripts, discussões e consulta de processos no eProc
 // @author       rsalvessap
 // @match        https://suporte.tjsp.jus.br/saw/*
@@ -47,7 +47,7 @@
   const SMAX_SB_URL = 'https://rlcbmrjkojopipiwpktf.supabase.co';
   const SMAX_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Jtcmprb2pvcGlwaXdwa3RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MzI0MTksImV4cCI6MjA5NDMwODQxOX0.Ha4xRbFvbgb2yO64ga3dV8KrNGRgbV7zWFXc5bYHdeQ';
 
-  const SMAX_TOOLKIT_VERSION = '2.82';
+  const SMAX_TOOLKIT_VERSION = '2.83';
   const SMAX_TENANT_ID = '213963628';
   console.log('%c[SMAX Toolkit] v' + SMAX_TOOLKIT_VERSION + ' carregado', 'color:#60a5fa;font-weight:bold;font-size:13px;');
 
@@ -7168,7 +7168,14 @@
       if (value === null) delete batchPending[field];
       else batchPending[field] = value;
     };
-    const clearBatchPending = () => { batchPending = {}; };
+    const clearBatchPending = () => {
+      batchPending = {};
+      // Reset visual dos botões toggle (Seguir / Recebimento)
+      const sfBtn = backdrop?.querySelector('#smax-resp-selffollow-btn');
+      if (sfBtn) sfBtn.classList.remove('dirty');
+      const ackBtn = backdrop?.querySelector('#smax-resp-ack-btn');
+      if (ackBtn) ackBtn.classList.remove('dirty');
+    };
 
     const close = () => {
       if (backdrop) backdrop.style.display = 'none';
@@ -9290,6 +9297,17 @@
         chipBtn.title = hasPending ? `Adicionar: ${pendingAdd.map(f => f.name).join(', ')}` : 'Adicionar seguidor';
       }
       chipBtn.classList.toggle('dirty', hasPending);
+      updateSelfFollowBtn();
+    };
+
+    // Sincroniza o estado visual do botão "Seguir" com batchPending.followers
+    const updateSelfFollowBtn = () => {
+      const btn = backdrop?.querySelector('#smax-resp-selffollow-btn');
+      if (!btn || !prefs.myPersonId) return;
+      const pending = getBatchPending();
+      const myId = String(prefs.myPersonId);
+      const isActive = (pending.followers || []).some(f => String(f.id) === myId);
+      btn.classList.toggle('dirty', isActive);
     };
 
     // ── Follower (Seguidor) picker ─────────────────────────────────
@@ -10119,17 +10137,14 @@
         const current = pending.followers || [];
         const myId = String(prefs.myPersonId);
         const alreadyAdded = current.some(f => String(f.id) === myId);
-        const selfFollowBtn = backdrop.querySelector('#smax-resp-selffollow-btn');
         if (alreadyAdded) {
           const filtered = current.filter(f => String(f.id) !== myId);
           setBatchPending('followers', filtered.length ? filtered : null);
-          if (selfFollowBtn) selfFollowBtn.classList.remove('dirty');
         } else {
           const updated = [...current, { id: prefs.myPersonId, name: prefs.myPersonName || 'Eu' }];
           setBatchPending('followers', updated);
-          if (selfFollowBtn) selfFollowBtn.classList.add('dirty');
         }
-        updateFollowerChip(activeTicketId);
+        updateFollowerChip(activeTicketId); // já chama updateSelfFollowBtn() internamente
         updateSendButton();
       });
       // Comunicar recebimento (toggle — efetiva no Atualizar)

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SMAX Toolkit - TJSP
 // @namespace    https://github.com/rsalvessap/SMAX-TOOLS
-// @version      2.86
+// @version      2.87
 // @description  Conjunto de ferramentas para o SMAX TJSP: triagem, respostas em lote, scripts, discussões e consulta de processos no eProc
 // @author       rsalvessap
 // @match        https://suporte.tjsp.jus.br/saw/*
@@ -47,7 +47,7 @@
   const SMAX_SB_URL = 'https://rlcbmrjkojopipiwpktf.supabase.co';
   const SMAX_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Jtcmprb2pvcGlwaXdwa3RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MzI0MTksImV4cCI6MjA5NDMwODQxOX0.Ha4xRbFvbgb2yO64ga3dV8KrNGRgbV7zWFXc5bYHdeQ';
 
-  const SMAX_TOOLKIT_VERSION = '2.86';
+  const SMAX_TOOLKIT_VERSION = '2.87';
   const SMAX_TENANT_ID = '213963628';
   console.log('%c[SMAX Toolkit] v' + SMAX_TOOLKIT_VERSION + ' carregado', 'color:#60a5fa;font-weight:bold;font-size:13px;');
 
@@ -4355,10 +4355,10 @@
           <input id="smax-tpl-sp-title" type="text" placeholder="Título do script..." style="padding:8px 10px;border-radius:6px;font-size:13px;width:100%;box-sizing:border-box;">
           <div class="smax-sp-muted">Conteúdo (aceita HTML. Cole diretamente do OneNote, Word ou qualquer editor rico):</div>
           <textarea id="smax-tpl-sp-body" placeholder="Cole o conteúdo aqui ou escreva HTML..." style="min-height:140px;resize:vertical;padding:8px 10px;border-radius:6px;font-size:12px;font-family:'Segoe UI',system-ui,sans-serif;width:100%;box-sizing:border-box;line-height:1.5;"></textarea>
-          <div id="smax-tpl-sp-disc-fields" style="display:none;gap:8px;flex-wrap:wrap;">
-            <div style="flex:1;min-width:180px;">
+          <div id="smax-tpl-sp-disc-fields" style="display:none;flex-direction:column;gap:8px;">
+            <div>
               <label style="font-size:11px;color:var(--sp-text-muted);display:block;margin-bottom:4px;">Para (opcional)</label>
-              <select id="smax-tpl-sp-commentTo" style="width:100%;padding:6px 8px;border-radius:6px;font-size:12px;box-sizing:border-box;min-width:0;">
+              <select id="smax-tpl-sp-commentTo" style="width:100%;padding:6px 8px;border-radius:6px;font-size:12px;box-sizing:border-box;">
                 <option value="">(Não definido)</option>
                 <option value="Agent">Agente</option>
                 <option value="User">Usuário</option>
@@ -4367,9 +4367,9 @@
                 <option value="Stakeholder">Participantes</option>
               </select>
             </div>
-            <div style="flex:1;min-width:180px;">
+            <div>
               <label style="font-size:11px;color:var(--sp-text-muted);display:block;margin-bottom:4px;">Objetivo (opcional)</label>
-              <select id="smax-tpl-sp-purposeCode" style="width:100%;padding:6px 8px;border-radius:6px;font-size:12px;box-sizing:border-box;min-width:0;">
+              <select id="smax-tpl-sp-purposeCode" style="width:100%;padding:6px 8px;border-radius:6px;font-size:12px;box-sizing:border-box;">
                 <option value="">(Não definido)</option>
                 <option value="StatusUpdate">Atualização de status</option>
                 <option value="FollowUp">Acompanhamento</option>
@@ -4733,71 +4733,98 @@
       const detInputRow = container.querySelector('#smax-det-input-row');
       const detSearch   = container.querySelector('#smax-det-search');
       const detResults  = container.querySelector('#smax-det-search-results');
-      if (detAddBtn) detAddBtn.addEventListener('click', () => {
-        detInputRow.style.display = 'block';
-        detSearch?.focus();
-      });
       if (detSearch && detResults) {
         let detSearchTimeout = null;
-        let detSearchSeq = 0;
-        const searchPeopleApi = async (q) => {
-          const mySeq = ++detSearchSeq;
-          if (!q || q.length < 2) { detResults.style.display = 'none'; return; }
-          detResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Buscando...</div>';
-          detResults.style.display = 'block';
-          try {
-            const safeQ = q.replace(/'/g, "''");
-            const data = await ApiClient.request('ems/Person', {
-              method: 'GET',
-              searchParams: {
-                filter: `Name like '${safeQ}'`,
-                layout: 'Id,Name,Upn,Email',
-                size: '15',
-                order: 'Name asc',
-              },
-              includeTenantParam: true,
-              timeout: 10000,
-            });
-            if (mySeq !== detSearchSeq) return; // busca obsoleta
-            const entities = data?.entities || [];
-            const existingIds = new Set((personal.myDestaque || []).map(d => d.id).filter(Boolean));
-            const matches = entities
-              .map(e => {
-                const props = e?.entity?.properties || e?.properties || {};
-                const id = String(e?.entity?.Id || props.Id || '');
-                return { id, name: (props.Name || '').trim(), upn: (props.Upn || '').trim() };
-              })
-              .filter(p => p.id && p.name && !existingIds.has(p.id));
-            if (!matches.length) {
-              detResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Nenhuma pessoa encontrada.</div>';
-            } else {
-              detResults.innerHTML = matches.map(p => `
-                <div class="smax-det-result" data-id="${Utils.escapeHtml(p.id)}" data-name="${Utils.escapeHtml(p.name)}"
-                  style="padding:6px 10px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--sp-border);color:var(--sp-text);transition:background .1s;">
-                  ${Utils.escapeHtml(p.name)}${p.upn ? ` <span style="font-size:10px;color:var(--sp-text-dim);">(${Utils.escapeHtml(p.upn)})</span>` : ''}
-                </div>`).join('');
-              detResults.querySelectorAll('.smax-det-result').forEach(item => {
-                item.addEventListener('mouseenter', () => { item.style.background = 'var(--sp-primary-bg)'; });
-                item.addEventListener('mouseleave', () => { item.style.background = ''; });
-                item.addEventListener('click', () => {
-                  if (!Array.isArray(personal.myDestaque)) personal.myDestaque = [];
-                  personal.myDestaque.push({ id: item.dataset.id, name: item.dataset.name });
-                  savePersonal();
-                  renderPanel();
+        // Cache local de TODAS as pessoas (sem filtro de grupo) — carregado 1x sob demanda
+        let allPeopleCache = null;
+        let allPeopleLoading = null;
+        const ensureAllPeople = () => {
+          if (allPeopleCache) return Promise.resolve(allPeopleCache);
+          if (allPeopleLoading) return allPeopleLoading;
+          allPeopleLoading = (async () => {
+            const map = new Map();
+            let skip = 0;
+            const pageSize = 200;
+            let total = Infinity;
+            while (skip < total) {
+              try {
+                const data = await ApiClient.request('ems/Person', {
+                  method: 'GET',
+                  searchParams: { layout: 'Id,Name,Upn,Email', size: String(pageSize), skip: String(skip), order: 'Name asc', meta: 'totalCount' },
+                  includeTenantParam: true,
                 });
-              });
+                const entities = data?.entities || [];
+                if (data?.meta?.total_count != null) total = data.meta.total_count;
+                else if (!entities.length) break;
+                for (const e of entities) {
+                  const props = e?.entity?.properties || e?.properties || {};
+                  const id = String(e?.entity?.Id || props.Id || '');
+                  if (!id) continue;
+                  map.set(id, { id, name: (props.Name || '').trim(), upn: (props.Upn || '').trim() });
+                }
+                skip += pageSize;
+                if (entities.length < pageSize) break;
+              } catch (err) {
+                console.warn('[SMAX] Destaque allPeople page error:', err);
+                break;
+              }
             }
+            allPeopleCache = map;
+            console.log('[SMAX] Destaque allPeopleCache loaded:', map.size);
+            return map;
+          })();
+          allPeopleLoading.finally(() => { allPeopleLoading = null; });
+          return allPeopleLoading;
+        };
+        // Botão "Adicionar" — mostra input e inicia pré-carregamento
+        if (detAddBtn) detAddBtn.addEventListener('click', () => {
+          detInputRow.style.display = 'block';
+          detSearch?.focus();
+          ensureAllPeople();
+        });
+        const renderSearchResults = () => {
+          const q = (detSearch.value || '').trim().toLowerCase();
+          if (!q || q.length < 2) { detResults.style.display = 'none'; return; }
+          if (!allPeopleCache) {
+            detResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Carregando lista de pessoas...</div>';
             detResults.style.display = 'block';
-          } catch (err) {
-            if (mySeq !== detSearchSeq) return;
-            detResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Erro na busca.</div>';
-            detResults.style.display = 'block';
-            console.warn('[SMAX] Destaque search error:', err);
+            return;
           }
+          const existingIds = new Set((personal.myDestaque || []).map(d => d.id).filter(Boolean));
+          const matches = [...allPeopleCache.values()]
+            .filter(p => !existingIds.has(p.id) && ((p.name || '').toLowerCase().includes(q) || (p.upn || '').toLowerCase().includes(q)))
+            .slice(0, 12);
+          if (!matches.length) {
+            detResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Nenhuma pessoa encontrada.</div>';
+          } else {
+            detResults.innerHTML = matches.map(p => `
+              <div class="smax-det-result" data-id="${Utils.escapeHtml(p.id)}" data-name="${Utils.escapeHtml(p.name)}"
+                style="padding:6px 10px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--sp-border);color:var(--sp-text);transition:background .1s;">
+                ${Utils.escapeHtml(p.name)}${p.upn ? ` <span style="font-size:10px;color:var(--sp-text-dim);">(${Utils.escapeHtml(p.upn)})</span>` : ''}
+              </div>`).join('');
+            detResults.querySelectorAll('.smax-det-result').forEach(item => {
+              item.addEventListener('mouseenter', () => { item.style.background = 'var(--sp-primary-bg)'; });
+              item.addEventListener('mouseleave', () => { item.style.background = ''; });
+              item.addEventListener('click', () => {
+                if (!Array.isArray(personal.myDestaque)) personal.myDestaque = [];
+                personal.myDestaque.push({ id: item.dataset.id, name: item.dataset.name });
+                savePersonal();
+                renderPanel();
+              });
+            });
+          }
+          detResults.style.display = 'block';
         };
         detSearch.addEventListener('input', () => {
           clearTimeout(detSearchTimeout);
-          detSearchTimeout = setTimeout(() => searchPeopleApi((detSearch.value || '').trim()), 350);
+          detSearchTimeout = setTimeout(() => {
+            if (!allPeopleCache) {
+              renderSearchResults(); // mostra "Carregando..."
+              ensureAllPeople().then(renderSearchResults);
+            } else {
+              renderSearchResults();
+            }
+          }, 200);
         });
         detSearch.addEventListener('blur', () => setTimeout(() => { detResults.style.display = 'none'; }, 250));
       }
@@ -7274,11 +7301,13 @@
     };
     const clearBatchPending = () => {
       batchPending = {};
-      // Reset visual dos botões toggle (Seguir / Recebimento)
+      // Reset visual dos botões toggle (Seguir / Recebimento / Escalar)
       const sfBtn = backdrop?.querySelector('#smax-resp-selffollow-btn');
       if (sfBtn) sfBtn.classList.remove('dirty');
       const ackBtn = backdrop?.querySelector('#smax-resp-ack-btn');
       if (ackBtn) ackBtn.classList.remove('dirty');
+      const escBtn = backdrop?.querySelector('#smax-resp-escalate-btn');
+      if (escBtn) escBtn.classList.remove('dirty');
     };
 
     const close = () => {
@@ -8757,17 +8786,18 @@
 
       const followerWillChange = !!(pending.followers?.length);
       const ackWillSend = !!pending.ackMessage;
+      const escalateWillSend = !!pending.escalate;
 
       return { hasSolution, curGseId, gseWillChange, curAssigneeId, assigneeWillChange,
-               statusWillChange, statusSCCDWillChange, followerWillChange, ackWillSend, effectivePendingStatus, effectivePendingSccd,
-               willAct: hasSolution || gseWillChange || assigneeWillChange || statusWillChange || statusSCCDWillChange || followerWillChange || ackWillSend };
+               statusWillChange, statusSCCDWillChange, followerWillChange, ackWillSend, escalateWillSend, effectivePendingStatus, effectivePendingSccd,
+               willAct: hasSolution || gseWillChange || assigneeWillChange || statusWillChange || statusSCCDWillChange || followerWillChange || ackWillSend || escalateWillSend };
     };
 
     const commitTicket = async (id, solutionRaw, completionCode) => {
       if (!prefs.enableRealWrites) return { ok: false, msg: 'Escritas reais desativadas.' };
       const pending = getBatchPending();
       const { hasSolution, gseWillChange, assigneeWillChange, statusWillChange, statusSCCDWillChange,
-              followerWillChange, ackWillSend, effectivePendingStatus, effectivePendingSccd, willAct } = analyzeTicket(id, solutionRaw);
+              followerWillChange, ackWillSend, escalateWillSend, effectivePendingStatus, effectivePendingSccd, willAct } = analyzeTicket(id, solutionRaw);
       if (!willAct) return { skipped: true, msg: 'Sem alterações para este chamado.' };
 
       // Encaminhamento com GSE implica remoção do especialista designado
@@ -8775,7 +8805,7 @@
       const clearAssignee = gseWillChange && !!fwdHtml;
 
       // Determinar se há alterações de propriedades (excluindo seguidor, que é relationship)
-      const hasPropertyChanges = hasSolution || gseWillChange || assigneeWillChange || clearAssignee || statusWillChange || statusSCCDWillChange;
+      const hasPropertyChanges = hasSolution || gseWillChange || assigneeWillChange || clearAssignee || statusWillChange || statusSCCDWillChange || escalateWillSend;
 
       const props = { Id: id };
       if (hasSolution) {
@@ -8790,6 +8820,7 @@
       }
       if (statusWillChange && effectivePendingStatus?.key) props.Status = effectivePendingStatus.key;
       if (statusSCCDWillChange && effectivePendingSccd?.key) props.StatusSCCDSMAX_c = effectivePendingSccd.key;
+      if (escalateWillSend && !statusSCCDWillChange) props.StatusSCCDSMAX_c = 'Aguardando3Nivel_c';
 
       try {
         let outcome = { ok: true };
@@ -9952,6 +9983,9 @@
                     <button id="smax-resp-ack-btn" class="smax-resp-meta-chip" title="Comunicar recebimento">
                       📨 Recebimento
                     </button>
+                    <button id="smax-resp-escalate-btn" class="smax-resp-meta-chip" title="Escalar chamado (Aguardando 3º Nível)">
+                      ⬆️ Escalar
+                    </button>
                   </div>
                   <!-- Pickers fixos (posicionados via JS) -->
                   <div id="smax-resp-gse-picker" class="smax-resp-field-picker"></div>
@@ -10127,7 +10161,12 @@
 
       document.body.appendChild(backdrop);
 
-      // Restaura filtros da sessão anterior (ou aplica defaults na primeira vez)
+      // Filtros padrão — SEMPRE aplicados ao abrir.
+      // O usuário pode alterá-los durante a sessão; ao reabrir, defaults voltam.
+      selectedRequestStatuses.add('RequestStatusInProgress');
+      selectedStatuses.add('Aguardando Atendimento');
+      if (prefs.myPersonId) selectedAssignees.add(String(prefs.myPersonId));
+      // Restaura filtros extras da sessão anterior (complementa os defaults)
       try {
         const saved = JSON.parse(GM_getValue('smax_resp_filters', '{}'));
         if (saved._initialized) {
@@ -10141,11 +10180,6 @@
             if (tfInp) tfInp.value = textFilter;
             if (tfClr) tfClr.style.display = textFilter ? '' : 'none';
           }
-        } else {
-          // Primeira vez — filtros padrão
-          selectedRequestStatuses.add('RequestStatusInProgress');
-          selectedStatuses.add('Aguardando Atendimento');
-          if (prefs.myPersonId) selectedAssignees.add(String(prefs.myPersonId));
         }
       } catch {}
 
@@ -10421,6 +10455,20 @@
           if (!template.trim()) { setStatusMsg('Template de recebimento vazio. Configure em Settings.', '#fca5a5'); return; }
           setBatchPending('ackMessage', true);
           if (ackBtn) ackBtn.classList.add('dirty');
+        }
+        updateSendButton();
+      });
+      // Escalar chamado (toggle — efetiva no Atualizar)
+      backdrop.querySelector('#smax-resp-escalate-btn')?.addEventListener('click', () => {
+        const pending = getBatchPending();
+        const isActive = !!pending.escalate;
+        const escBtn = backdrop.querySelector('#smax-resp-escalate-btn');
+        if (isActive) {
+          setBatchPending('escalate', null);
+          if (escBtn) escBtn.classList.remove('dirty');
+        } else {
+          setBatchPending('escalate', true);
+          if (escBtn) escBtn.classList.add('dirty');
         }
         updateSendButton();
       });

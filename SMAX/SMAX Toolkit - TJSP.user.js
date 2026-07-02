@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SMAX Toolkit - TJSP
 // @namespace    https://github.com/rsalvessap/SMAX-TOOLS
-// @version      2.85
+// @version      2.86
 // @description  Conjunto de ferramentas para o SMAX TJSP: triagem, respostas em lote, scripts, discussões e consulta de processos no eProc
 // @author       rsalvessap
 // @match        https://suporte.tjsp.jus.br/saw/*
@@ -47,7 +47,7 @@
   const SMAX_SB_URL = 'https://rlcbmrjkojopipiwpktf.supabase.co';
   const SMAX_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Jtcmprb2pvcGlwaXdwa3RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MzI0MTksImV4cCI6MjA5NDMwODQxOX0.Ha4xRbFvbgb2yO64ga3dV8KrNGRgbV7zWFXc5bYHdeQ';
 
-  const SMAX_TOOLKIT_VERSION = '2.85';
+  const SMAX_TOOLKIT_VERSION = '2.86';
   const SMAX_TENANT_ID = '213963628';
   console.log('%c[SMAX Toolkit] v' + SMAX_TOOLKIT_VERSION + ' carregado', 'color:#60a5fa;font-weight:bold;font-size:13px;');
 
@@ -4355,10 +4355,10 @@
           <input id="smax-tpl-sp-title" type="text" placeholder="Título do script..." style="padding:8px 10px;border-radius:6px;font-size:13px;width:100%;box-sizing:border-box;">
           <div class="smax-sp-muted">Conteúdo (aceita HTML. Cole diretamente do OneNote, Word ou qualquer editor rico):</div>
           <textarea id="smax-tpl-sp-body" placeholder="Cole o conteúdo aqui ou escreva HTML..." style="min-height:140px;resize:vertical;padding:8px 10px;border-radius:6px;font-size:12px;font-family:'Segoe UI',system-ui,sans-serif;width:100%;box-sizing:border-box;line-height:1.5;"></textarea>
-          <div id="smax-tpl-sp-disc-fields" style="display:none;gap:8px;">
-            <div style="flex:1;">
+          <div id="smax-tpl-sp-disc-fields" style="display:none;gap:8px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:180px;">
               <label style="font-size:11px;color:var(--sp-text-muted);display:block;margin-bottom:4px;">Para (opcional)</label>
-              <select id="smax-tpl-sp-commentTo" style="width:100%;padding:6px 8px;border-radius:6px;font-size:12px;box-sizing:border-box;">
+              <select id="smax-tpl-sp-commentTo" style="width:100%;padding:6px 8px;border-radius:6px;font-size:12px;box-sizing:border-box;min-width:0;">
                 <option value="">(Não definido)</option>
                 <option value="Agent">Agente</option>
                 <option value="User">Usuário</option>
@@ -4367,9 +4367,9 @@
                 <option value="Stakeholder">Participantes</option>
               </select>
             </div>
-            <div style="flex:1;">
+            <div style="flex:1;min-width:180px;">
               <label style="font-size:11px;color:var(--sp-text-muted);display:block;margin-bottom:4px;">Objetivo (opcional)</label>
-              <select id="smax-tpl-sp-purposeCode" style="width:100%;padding:6px 8px;border-radius:6px;font-size:12px;box-sizing:border-box;">
+              <select id="smax-tpl-sp-purposeCode" style="width:100%;padding:6px 8px;border-radius:6px;font-size:12px;box-sizing:border-box;min-width:0;">
                 <option value="">(Não definido)</option>
                 <option value="StatusUpdate">Atualização de status</option>
                 <option value="FollowUp">Acompanhamento</option>
@@ -4739,24 +4739,34 @@
       });
       if (detSearch && detResults) {
         let detSearchTimeout = null;
-        let detSearchAbort = null;
+        let detSearchSeq = 0;
         const searchPeopleApi = async (q) => {
-          if (detSearchAbort) { detSearchAbort.abort(); detSearchAbort = null; }
+          const mySeq = ++detSearchSeq;
           if (!q || q.length < 2) { detResults.style.display = 'none'; return; }
           detResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Buscando...</div>';
           detResults.style.display = 'block';
           try {
-            detSearchAbort = new AbortController();
-            const tid = ApiClient.getTenantId() || SMAX_TENANT_ID;
-            const filter = `Name like '%${q.replace(/'/g, "''")}%'`;
-            const url = `/rest/${tid}/ems/Person?filter=${encodeURIComponent(filter)}&layout=Id,Name,Upn,Email&size=10&order=Name%20asc&TENANTID=${tid}`;
-            const resp = await fetch(url, { credentials: 'include', signal: detSearchAbort.signal });
-            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-            const data = await resp.json();
+            const safeQ = q.replace(/'/g, "''");
+            const data = await ApiClient.request('ems/Person', {
+              method: 'GET',
+              searchParams: {
+                filter: `Name like '${safeQ}'`,
+                layout: 'Id,Name,Upn,Email',
+                size: '15',
+                order: 'Name asc',
+              },
+              includeTenantParam: true,
+              timeout: 10000,
+            });
+            if (mySeq !== detSearchSeq) return; // busca obsoleta
             const entities = data?.entities || [];
             const existingIds = new Set((personal.myDestaque || []).map(d => d.id).filter(Boolean));
             const matches = entities
-              .map(e => ({ id: String(e.entity?.Id || ''), name: (e.entity?.properties?.Name || '').trim(), upn: (e.entity?.properties?.Upn || '').trim() }))
+              .map(e => {
+                const props = e?.entity?.properties || e?.properties || {};
+                const id = String(e?.entity?.Id || props.Id || '');
+                return { id, name: (props.Name || '').trim(), upn: (props.Upn || '').trim() };
+              })
               .filter(p => p.id && p.name && !existingIds.has(p.id));
             if (!matches.length) {
               detResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Nenhuma pessoa encontrada.</div>';
@@ -4779,7 +4789,7 @@
             }
             detResults.style.display = 'block';
           } catch (err) {
-            if (err.name === 'AbortError') return;
+            if (mySeq !== detSearchSeq) return;
             detResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Erro na busca.</div>';
             detResults.style.display = 'block';
             console.warn('[SMAX] Destaque search error:', err);
@@ -8120,6 +8130,7 @@
       (preset.requestStatuses || []).forEach(s => selectedRequestStatuses.add(s));
       selectedAssignees.clear();
       (preset.assignees       || []).forEach(a => selectedAssignees.add(a));
+      if (preset.useMyAssignee && prefs.myPersonId) selectedAssignees.add(String(prefs.myPersonId));
       // Texto
       textFilter = preset.text || '';
       const inp = backdrop?.querySelector('#smax-resp-text-filter');
@@ -8149,7 +8160,7 @@
     };
 
     const FIXED_PRESETS = [
-      { id: '__rejected__', name: '🔴 Rejeitados', statuses: ['Aguardando Atendimento'], requestStatuses: ['RequestStatusReady'], assignees: [], teams: [], text: '' },
+      { id: '__rejected__', name: '🔴 Rejeitados', statuses: ['Aguardando Atendimento'], requestStatuses: ['RequestStatusReady'], assignees: [], teams: [], text: '', useMyAssignee: true },
     ];
 
     const renderPresetPills = () => {
@@ -10134,6 +10145,7 @@
           // Primeira vez — filtros padrão
           selectedRequestStatuses.add('RequestStatusInProgress');
           selectedStatuses.add('Aguardando Atendimento');
+          if (prefs.myPersonId) selectedAssignees.add(String(prefs.myPersonId));
         }
       } catch {}
 

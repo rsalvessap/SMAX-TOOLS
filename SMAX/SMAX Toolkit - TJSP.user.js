@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SMAX Toolkit - TJSP
 // @namespace    https://github.com/rsalvessap/SMAX-TOOLS
-// @version      2.88
+// @version      2.89
 // @description  Conjunto de ferramentas para o SMAX TJSP: triagem, respostas em lote, scripts, discussões e consulta de processos no eProc
 // @author       rsalvessap
 // @match        https://suporte.tjsp.jus.br/saw/*
@@ -47,7 +47,7 @@
   const SMAX_SB_URL = 'https://rlcbmrjkojopipiwpktf.supabase.co';
   const SMAX_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Jtcmprb2pvcGlwaXdwa3RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MzI0MTksImV4cCI6MjA5NDMwODQxOX0.Ha4xRbFvbgb2yO64ga3dV8KrNGRgbV7zWFXc5bYHdeQ';
 
-  const SMAX_TOOLKIT_VERSION = '2.88';
+  const SMAX_TOOLKIT_VERSION = '2.89';
   const SMAX_TENANT_ID = '213963628';
   console.log('%c[SMAX Toolkit] v' + SMAX_TOOLKIT_VERSION + ' carregado', 'color:#60a5fa;font-weight:bold;font-size:13px;');
 
@@ -2868,6 +2868,20 @@
       harvest(response.errorDetails);
       pushMessage(meta.errorMessage || meta.error_message || meta.error);
       pushMessage(response.message || response.error);
+      // Extrair erros por entidade do entity_result_list (detalhe real que meta omite)
+      const entityResults = response.entity_result_list || response.entityResultList || [];
+      if (Array.isArray(entityResults)) {
+        entityResults.forEach(er => {
+          if (er && typeof er === 'object') {
+            harvest(er.errorDetails);
+            harvest(er.errorDetailsList);
+            harvest(er.error_details);
+            if (!messages.length && er.completion_status && er.completion_status !== 'OK') {
+              pushMessage(`Entity ${er.entity?.Id || ''}: ${er.completion_status}`);
+            }
+          }
+        });
+      }
       if (!messages.length && meta.completion_status && meta.completion_status !== 'OK') {
         pushMessage(`Status: ${meta.completion_status}`);
       }
@@ -2901,10 +2915,15 @@
       if (!prefs.enableRealWrites) return { skipped: true };
       if (!ticketId || !bodyHtml) return null;
 
-      // Não usamos LastUpdateTime: o SMAX aceita UPDATE de Comments sem ele,
-      // e quando há um update de propriedades antes (commitTicket), o LastUpdateTime
-      // avança no servidor, tornando o valor em cache obsoleto e fazendo o servidor
-      // descartar silenciosamente o comentário.
+      // Buscar LastUpdateTime fresco do servidor (necessário para UPDATE de Comments)
+      let lastUpdateTime = 0;
+      try {
+        await DataRepository.ensureRequestPayload(String(ticketId), { force: true });
+        const cached = DataRepository.triageCache.get(String(ticketId)) || {};
+        lastUpdateTime = cached.lastUpdateTime || 0;
+      } catch (err) {
+        console.warn('[SMAX] postDiscussion: falha ao buscar ticket:', err);
+      }
 
       // Gera CommentId no mesmo formato hex de 36 chars usado pelo SMAX
       const commentId = Array.from({ length: 36 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
@@ -2940,18 +2959,20 @@
       // Envia APENAS o novo comentário (não todos os existentes).
       // Re-enviar todos os comentários acumulados faz o JSON ultrapassar
       // o limite do campo Comments do SMAX, causando truncamento server-side.
+      const discProps = { Id: String(ticketId), Comments: JSON.stringify({ Comment: [newComment] }) };
+      if (lastUpdateTime) discProps.LastUpdateTime = lastUpdateTime;
       const body = {
-        entities: [{
-          entity_type: 'Request',
-          properties: {
-            Id: String(ticketId),
-            Comments: JSON.stringify({ Comment: [newComment] })
-          }
-        }],
+        entities: [{ entity_type: 'Request', properties: discProps }],
         operation: 'UPDATE'
       };
 
-      return ApiClient.ems.bulk(body).catch(err => {
+      return ApiClient.ems.bulk(body).then(res => {
+        if (res && res.meta && res.meta.completion_status !== 'OK') {
+          console.warn('[SMAX] postDiscussion resultado:', res.meta.completion_status,
+            'entity_result_list:', JSON.stringify(res.entity_result_list || []));
+        }
+        return res;
+      }).catch(err => {
         console.warn('[SMAX] postDiscussion failed:', err);
         return null;
       });
@@ -8820,6 +8841,21 @@
       if (statusSCCDWillChange && effectivePendingSccd?.key) props.StatusSCCDSMAX_c = effectivePendingSccd.key;
       // Escalação é tratada separadamente com abordagem de 2 passos (após o update principal)
 
+      // Mesclar texto de encaminhamento como Comments no MESMO request que as propriedades
+      // (evita problema de LastUpdateTime stale quando postDiscussion é chamado após property update)
+      if (gseWillChange && fwdHtml) {
+        const fwdCommentId = Array.from({ length: 36 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+        props.Comments = JSON.stringify({ Comment: [{
+          CommentId: fwdCommentId,
+          Submitter: prefs.myPersonId ? `Person/${prefs.myPersonId}` : '',
+          CreateTime: Date.now(), UpdateTime: 0,
+          IsSystem: false, ActualInterface: 'SAW', CommentMedia: 'UI',
+          CommentFrom: 'Agent', FunctionalPurpose: 'StatusUpdate',
+          PrivacyType: 'INTERNAL', CommentTo: 'Agent',
+          CommentBody: fwdHtml, DeltaCreateTime: 1, AttachmentIds: ''
+        }]});
+      }
+
       try {
         let outcome = { ok: true };
         // Atualizar propriedades do chamado (se houver)
@@ -8841,15 +8877,9 @@
               statusSCCD:          statusSCCDWillChange ? (effectivePendingSccd?.key  ?? entry.statusSCCD) : entry.statusSCCD,
             }));
           }
-          // Postar texto de encaminhamento como discussão (quando GSE muda com forwarding)
+          // Encaminhamento já incluso no mesmo request bulk (Comments nas props)
           if (gseWillChange && fwdHtml) {
-            const discRes = await Api.postDiscussion(id, { bodyHtml: fwdHtml, privacyRaw: 'INTERNAL' });
-            const discOutcome = Api.summarizeBulkOutcome(discRes);
-            if (discOutcome?.ok) {
-              console.info('[SMAX ResponseHUD] Discussão de encaminhamento postada:', id);
-            } else {
-              console.warn('[SMAX ResponseHUD] Falha ao postar discussão de encaminhamento:', id, discOutcome?.messages);
-            }
+            console.info('[SMAX ResponseHUD] Discussão de encaminhamento enviada junto com properties:', id);
           }
           // Adicionar seguidores (entity Follow separada do update de propriedades)
           if (followerWillChange) {

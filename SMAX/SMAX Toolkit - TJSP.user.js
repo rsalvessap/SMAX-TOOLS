@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SMAX Toolkit - TJSP
 // @namespace    https://github.com/rsalvessap/SMAX-TOOLS
-// @version      2.87
+// @version      2.88
 // @description  Conjunto de ferramentas para o SMAX TJSP: triagem, respostas em lote, scripts, discussões e consulta de processos no eProc
 // @author       rsalvessap
 // @match        https://suporte.tjsp.jus.br/saw/*
@@ -47,7 +47,7 @@
   const SMAX_SB_URL = 'https://rlcbmrjkojopipiwpktf.supabase.co';
   const SMAX_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Jtcmprb2pvcGlwaXdwa3RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MzI0MTksImV4cCI6MjA5NDMwODQxOX0.Ha4xRbFvbgb2yO64ga3dV8KrNGRgbV7zWFXc5bYHdeQ';
 
-  const SMAX_TOOLKIT_VERSION = '2.87';
+  const SMAX_TOOLKIT_VERSION = '2.88';
   const SMAX_TENANT_ID = '213963628';
   console.log('%c[SMAX Toolkit] v' + SMAX_TOOLKIT_VERSION + ' carregado', 'color:#60a5fa;font-weight:bold;font-size:13px;');
 
@@ -955,6 +955,7 @@
 #smax-settings .smax-sp-muted { font-size:12px; color:var(--sp-text-muted); }
 #smax-settings button { font-family:"Segoe UI",system-ui,sans-serif; }
 #smax-settings input[type="text"], #smax-settings input[type="number"], #smax-settings textarea, #smax-settings select { background:var(--sp-input-bg); color:var(--sp-text); border:1px solid var(--sp-input-border); }
+#smax-settings select { min-height:36px; padding:6px 8px; font-size:13px; line-height:1.4; }
 #smax-settings input[type="text"]:focus, #smax-settings textarea:focus, #smax-settings select:focus { border-color:var(--sp-accent); box-shadow:0 0 0 3px var(--sp-ring); outline:none; }
 #smax-settings select option { background:var(--sp-surface); color:var(--sp-text); }
 #smax-settings-sidebar { border-right:1px solid var(--sp-border) !important; }
@@ -2900,15 +2901,10 @@
       if (!prefs.enableRealWrites) return { skipped: true };
       if (!ticketId || !bodyHtml) return null;
 
-      // Buscar LastUpdateTime fresco (necessário para o UPDATE)
-      try {
-        await DataRepository.ensureRequestPayload(String(ticketId), { force: true });
-      } catch (err) {
-        console.warn('[SMAX] postDiscussion: falha ao buscar ticket:', err);
-        return null;
-      }
-      const cached = DataRepository.triageCache.get(String(ticketId)) || {};
-      const lastUpdateTime = cached.lastUpdateTime || 0;
+      // Não usamos LastUpdateTime: o SMAX aceita UPDATE de Comments sem ele,
+      // e quando há um update de propriedades antes (commitTicket), o LastUpdateTime
+      // avança no servidor, tornando o valor em cache obsoleto e fazendo o servidor
+      // descartar silenciosamente o comentário.
 
       // Gera CommentId no mesmo formato hex de 36 chars usado pelo SMAX
       const commentId = Array.from({ length: 36 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
@@ -2949,7 +2945,6 @@
           entity_type: 'Request',
           properties: {
             Id: String(ticketId),
-            LastUpdateTime: lastUpdateTime,
             Comments: JSON.stringify({ Comment: [newComment] })
           }
         }],
@@ -4358,7 +4353,7 @@
           <div id="smax-tpl-sp-disc-fields" style="display:none;flex-direction:column;gap:8px;">
             <div>
               <label style="font-size:11px;color:var(--sp-text-muted);display:block;margin-bottom:4px;">Para (opcional)</label>
-              <select id="smax-tpl-sp-commentTo" style="width:100%;padding:6px 8px;border-radius:6px;font-size:12px;box-sizing:border-box;">
+              <select id="smax-tpl-sp-commentTo" style="width:100%;padding:8px 10px;border-radius:6px;font-size:13px;box-sizing:border-box;min-height:38px;line-height:1.4;">
                 <option value="">(Não definido)</option>
                 <option value="Agent">Agente</option>
                 <option value="User">Usuário</option>
@@ -4369,7 +4364,7 @@
             </div>
             <div>
               <label style="font-size:11px;color:var(--sp-text-muted);display:block;margin-bottom:4px;">Objetivo (opcional)</label>
-              <select id="smax-tpl-sp-purposeCode" style="width:100%;padding:6px 8px;border-radius:6px;font-size:12px;box-sizing:border-box;">
+              <select id="smax-tpl-sp-purposeCode" style="width:100%;padding:8px 10px;border-radius:6px;font-size:13px;box-sizing:border-box;min-height:38px;line-height:1.4;">
                 <option value="">(Não definido)</option>
                 <option value="StatusUpdate">Atualização de status</option>
                 <option value="FollowUp">Acompanhamento</option>
@@ -4756,11 +4751,14 @@
                 const entities = data?.entities || [];
                 if (data?.meta?.total_count != null) total = data.meta.total_count;
                 else if (!entities.length) break;
-                for (const e of entities) {
-                  const props = e?.entity?.properties || e?.properties || {};
-                  const id = String(e?.entity?.Id || props.Id || '');
+                for (const ent of entities) {
+                  if (!ent || typeof ent !== 'object') continue;
+                  const props = ent.properties || {};
+                  const id = props.Id != null ? String(props.Id) : '';
                   if (!id) continue;
-                  map.set(id, { id, name: (props.Name || '').trim(), upn: (props.Upn || '').trim() });
+                  const name = (props.Name || '').toString().trim();
+                  if (!name) continue;
+                  map.set(id, { id, name, upn: (props.Upn || '').toString().trim() });
                 }
                 skip += pageSize;
                 if (entities.length < pageSize) break;
@@ -8805,7 +8803,7 @@
       const clearAssignee = gseWillChange && !!fwdHtml;
 
       // Determinar se há alterações de propriedades (excluindo seguidor, que é relationship)
-      const hasPropertyChanges = hasSolution || gseWillChange || assigneeWillChange || clearAssignee || statusWillChange || statusSCCDWillChange || escalateWillSend;
+      const hasPropertyChanges = hasSolution || gseWillChange || assigneeWillChange || clearAssignee || statusWillChange || statusSCCDWillChange;
 
       const props = { Id: id };
       if (hasSolution) {
@@ -8820,7 +8818,7 @@
       }
       if (statusWillChange && effectivePendingStatus?.key) props.Status = effectivePendingStatus.key;
       if (statusSCCDWillChange && effectivePendingSccd?.key) props.StatusSCCDSMAX_c = effectivePendingSccd.key;
-      if (escalateWillSend && !statusSCCDWillChange) props.StatusSCCDSMAX_c = 'Aguardando3Nivel_c';
+      // Escalação é tratada separadamente com abordagem de 2 passos (após o update principal)
 
       try {
         let outcome = { ok: true };
@@ -8864,6 +8862,15 @@
                 }
               } catch (fe) { console.warn('[SMAX ResponseHUD] addFollower HTTP error:', fe); }
             }
+          }
+          // Escalar chamado (abordagem 2 passos: PhaseId → delay → StatusSCCDSMAX_c)
+          if (escalateWillSend) {
+            try {
+              await Api.postUpdateRequest({ Id: id, PhaseId: 'Escalate', Status: 'RequestStatusSuspended' });
+              await new Promise(r => setTimeout(r, 2000));
+              await Api.postUpdateRequest({ Id: id, StatusSCCDSMAX_c: 'Aguardando3Nivel_c' });
+              console.info('[SMAX ResponseHUD] Chamado escalado com sucesso:', id);
+            } catch (escErr) { console.warn('[SMAX ResponseHUD] Falha ao escalar:', id, escErr); }
           }
           // Comunicar recebimento (discussão PUBLIC)
           if (ackWillSend) {

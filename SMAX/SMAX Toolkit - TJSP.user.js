@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SMAX Toolkit - TJSP
 // @namespace    https://github.com/rsalvessap/SMAX-TOOLS
-// @version      2.84
+// @version      2.85
 // @description  Conjunto de ferramentas para o SMAX TJSP: triagem, respostas em lote, scripts, discussões e consulta de processos no eProc
 // @author       rsalvessap
 // @match        https://suporte.tjsp.jus.br/saw/*
@@ -47,7 +47,7 @@
   const SMAX_SB_URL = 'https://rlcbmrjkojopipiwpktf.supabase.co';
   const SMAX_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Jtcmprb2pvcGlwaXdwa3RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MzI0MTksImV4cCI6MjA5NDMwODQxOX0.Ha4xRbFvbgb2yO64ga3dV8KrNGRgbV7zWFXc5bYHdeQ';
 
-  const SMAX_TOOLKIT_VERSION = '2.84';
+  const SMAX_TOOLKIT_VERSION = '2.85';
   const SMAX_TENANT_ID = '213963628';
   console.log('%c[SMAX Toolkit] v' + SMAX_TOOLKIT_VERSION + ' carregado', 'color:#60a5fa;font-weight:bold;font-size:13px;');
 
@@ -954,6 +954,9 @@
 #smax-settings .smax-sp-section-title { font-weight:600; font-size:13px; color:var(--sp-text); margin-bottom:8px; }
 #smax-settings .smax-sp-muted { font-size:12px; color:var(--sp-text-muted); }
 #smax-settings button { font-family:"Segoe UI",system-ui,sans-serif; }
+#smax-settings input[type="text"], #smax-settings input[type="number"], #smax-settings textarea, #smax-settings select { background:var(--sp-input-bg); color:var(--sp-text); border:1px solid var(--sp-input-border); }
+#smax-settings input[type="text"]:focus, #smax-settings textarea:focus, #smax-settings select:focus { border-color:var(--sp-accent); box-shadow:0 0 0 3px var(--sp-ring); outline:none; }
+#smax-settings select option { background:var(--sp-surface); color:var(--sp-text); }
 #smax-settings-sidebar { border-right:1px solid var(--sp-border) !important; }
 #smax-settings-sidebar .smax-sidebar-item { width:100%; text-align:left; padding:8px 10px; border-radius:var(--sp-r-sm); border:none; cursor:pointer; font-size:12px; background:transparent; color:var(--sp-sidebar-text); transition:all .15s ease; display:flex; align-items:center; gap:8px; }
 #smax-settings-sidebar .smax-sidebar-item:hover { background:var(--sp-primary-hover); color:var(--sp-primary); }
@@ -4733,48 +4736,60 @@
       if (detAddBtn) detAddBtn.addEventListener('click', () => {
         detInputRow.style.display = 'block';
         detSearch?.focus();
-        DataRepository.ensurePeopleLoaded();
       });
       if (detSearch && detResults) {
         let detSearchTimeout = null;
-        const renderResults = () => {
-          const q = (detSearch.value || '').trim().toLowerCase();
+        let detSearchAbort = null;
+        const searchPeopleApi = async (q) => {
+          if (detSearchAbort) { detSearchAbort.abort(); detSearchAbort = null; }
           if (!q || q.length < 2) { detResults.style.display = 'none'; return; }
-          if (!DataRepository.peopleCache.size) {
-            detResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Carregando...</div>';
-            detResults.style.display = 'block';
-            return;
-          }
-          const existingIds = new Set((personal.myDestaque || []).map(d => d.id).filter(Boolean));
-          const matches = [...DataRepository.peopleCache.values()]
-            .filter(p => !existingIds.has(p.id) && ((p.name || '').toLowerCase().includes(q) || (p.upn || '').toLowerCase().includes(q)))
-            .slice(0, 10);
-          if (!matches.length) {
-            detResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Nenhuma pessoa encontrada.</div>';
-          } else {
-            detResults.innerHTML = matches.map(p => `
-              <div class="smax-det-result" data-id="${Utils.escapeHtml(p.id)}" data-name="${Utils.escapeHtml(p.name || '')}"
-                style="padding:6px 10px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--sp-border);color:var(--sp-text);transition:background .1s;">
-                ${Utils.escapeHtml(p.name || p.id)}${p.upn ? ` <span style="font-size:10px;color:var(--sp-text-dim);">(${Utils.escapeHtml(p.upn)})</span>` : ''}
-              </div>`).join('');
-            detResults.querySelectorAll('.smax-det-result').forEach(item => {
-              item.addEventListener('mouseenter', () => { item.style.background = 'var(--sp-primary-bg)'; });
-              item.addEventListener('mouseleave', () => { item.style.background = ''; });
-              item.addEventListener('click', () => {
-                if (!Array.isArray(personal.myDestaque)) personal.myDestaque = [];
-                personal.myDestaque.push({ id: item.dataset.id, name: item.dataset.name });
-                savePersonal();
-                renderPanel();
-              });
-            });
-          }
+          detResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Buscando...</div>';
           detResults.style.display = 'block';
+          try {
+            detSearchAbort = new AbortController();
+            const tid = ApiClient.getTenantId() || SMAX_TENANT_ID;
+            const filter = `Name like '%${q.replace(/'/g, "''")}%'`;
+            const url = `/rest/${tid}/ems/Person?filter=${encodeURIComponent(filter)}&layout=Id,Name,Upn,Email&size=10&order=Name%20asc&TENANTID=${tid}`;
+            const resp = await fetch(url, { credentials: 'include', signal: detSearchAbort.signal });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const data = await resp.json();
+            const entities = data?.entities || [];
+            const existingIds = new Set((personal.myDestaque || []).map(d => d.id).filter(Boolean));
+            const matches = entities
+              .map(e => ({ id: String(e.entity?.Id || ''), name: (e.entity?.properties?.Name || '').trim(), upn: (e.entity?.properties?.Upn || '').trim() }))
+              .filter(p => p.id && p.name && !existingIds.has(p.id));
+            if (!matches.length) {
+              detResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Nenhuma pessoa encontrada.</div>';
+            } else {
+              detResults.innerHTML = matches.map(p => `
+                <div class="smax-det-result" data-id="${Utils.escapeHtml(p.id)}" data-name="${Utils.escapeHtml(p.name)}"
+                  style="padding:6px 10px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--sp-border);color:var(--sp-text);transition:background .1s;">
+                  ${Utils.escapeHtml(p.name)}${p.upn ? ` <span style="font-size:10px;color:var(--sp-text-dim);">(${Utils.escapeHtml(p.upn)})</span>` : ''}
+                </div>`).join('');
+              detResults.querySelectorAll('.smax-det-result').forEach(item => {
+                item.addEventListener('mouseenter', () => { item.style.background = 'var(--sp-primary-bg)'; });
+                item.addEventListener('mouseleave', () => { item.style.background = ''; });
+                item.addEventListener('click', () => {
+                  if (!Array.isArray(personal.myDestaque)) personal.myDestaque = [];
+                  personal.myDestaque.push({ id: item.dataset.id, name: item.dataset.name });
+                  savePersonal();
+                  renderPanel();
+                });
+              });
+            }
+            detResults.style.display = 'block';
+          } catch (err) {
+            if (err.name === 'AbortError') return;
+            detResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Erro na busca.</div>';
+            detResults.style.display = 'block';
+            console.warn('[SMAX] Destaque search error:', err);
+          }
         };
         detSearch.addEventListener('input', () => {
           clearTimeout(detSearchTimeout);
-          detSearchTimeout = setTimeout(renderResults, 200);
+          detSearchTimeout = setTimeout(() => searchPeopleApi((detSearch.value || '').trim()), 350);
         });
-        detSearch.addEventListener('blur', () => setTimeout(() => { detResults.style.display = 'none'; }, 200));
+        detSearch.addEventListener('blur', () => setTimeout(() => { detResults.style.display = 'none'; }, 250));
       }
       container.querySelectorAll('.smax-det-del').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -7777,16 +7792,25 @@
         }
       }
 
-      // Número do Processo
+      // Número do Processo — link clicável para eProc (mesmo padrão do TriageHUD)
       const processLabel = backdrop.querySelector('#smax-resp-process-label');
       if (processLabel) {
         const rawProc = (DataRepository.triageCache.get(tid)?.processNumber || '').trim();
         if (rawProc) {
-          processLabel.textContent = `📄 ${rawProc}`;
-          processLabel.title = `Nº Processo: ${rawProc}`;
+          const isCNJ = /^\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}$/.test(rawProc) || /^\d{20}$/.test(rawProc);
+          const displayProc = isCNJ ? Utils.normalizeCNJ(rawProc) : rawProc;
+          processLabel.innerHTML = isCNJ
+            ? `📄 <span data-smax-proc="${Utils.escapeHtml(displayProc)}" style="border-bottom:1px dotted currentColor;cursor:pointer;" title="Consultar processo no eProc: ${Utils.escapeHtml(displayProc)}">${Utils.escapeHtml(displayProc)}</span>`
+            : `📄 ${Utils.escapeHtml(rawProc)}`;
+          processLabel.title = `Nº Processo: ${displayProc}`;
           processLabel.style.display = '';
+          // Click handler para abrir no eProc
+          const procSpan = processLabel.querySelector('[data-smax-proc]');
+          if (procSpan) {
+            procSpan.onclick = (ev) => { ev.stopPropagation(); Utils.openEprocProcess(procSpan.dataset.smaxProc); };
+          }
         } else {
-          processLabel.textContent = '';
+          processLabel.innerHTML = '';
           processLabel.style.display = 'none';
         }
       }
@@ -8125,7 +8149,7 @@
     };
 
     const FIXED_PRESETS = [
-      { id: '__rejected__', name: '🔴 Rejeitados', statuses: ['AguardandoAtendimento_c'], requestStatuses: ['RequestStatusReady'], assignees: [], teams: [], text: '' },
+      { id: '__rejected__', name: '🔴 Rejeitados', statuses: ['Aguardando Atendimento'], requestStatuses: ['RequestStatusReady'], assignees: [], teams: [], text: '' },
     ];
 
     const renderPresetPills = () => {
@@ -10109,7 +10133,7 @@
         } else {
           // Primeira vez — filtros padrão
           selectedRequestStatuses.add('RequestStatusInProgress');
-          selectedStatuses.add('AguardandoAtendimento_c');
+          selectedStatuses.add('Aguardando Atendimento');
         }
       } catch {}
 

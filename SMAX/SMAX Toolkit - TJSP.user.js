@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SMAX Toolkit - TJSP
 // @namespace    https://github.com/rsalvessap/SMAX-TOOLS
-// @version      2.80
+// @version      2.81
 // @description  Conjunto de ferramentas para o SMAX TJSP: triagem, respostas em lote, scripts, discussões e consulta de processos no eProc
 // @author       rsalvessap
 // @match        https://suporte.tjsp.jus.br/saw/*
@@ -47,7 +47,7 @@
   const SMAX_SB_URL = 'https://rlcbmrjkojopipiwpktf.supabase.co';
   const SMAX_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Jtcmprb2pvcGlwaXdwa3RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MzI0MTksImV4cCI6MjA5NDMwODQxOX0.Ha4xRbFvbgb2yO64ga3dV8KrNGRgbV7zWFXc5bYHdeQ';
 
-  const SMAX_TOOLKIT_VERSION = '2.80';
+  const SMAX_TOOLKIT_VERSION = '2.81';
   const SMAX_TENANT_ID = '213963628';
   console.log('%c[SMAX Toolkit] v' + SMAX_TOOLKIT_VERSION + ' carregado', 'color:#60a5fa;font-weight:bold;font-size:13px;');
 
@@ -94,6 +94,7 @@
         }
       ]),
       teamSignaturesRaw: '{}',
+      ackMessageTemplate: '<p>Prezado(a) {nome},</p><p>Informamos que a solicitação foi recebida e está sendo analisada com a devida prioridade.</p><p>As atualizações serão comunicadas por este canal.</p>',
     };
 
     const state = JSON.parse(JSON.stringify(defaults));
@@ -202,8 +203,13 @@
       });
       return list;
     },
+    _ensureBr(html) {
+      if (!/<(p|br|div|li|ul|ol|h[1-6])\b/i.test(html)) return html.replace(/\n/g, '<br>');
+      return html;
+    },
     appendToContenteditable(editor, sigHtml) {
       if (!editor || !sigHtml) return;
+      sigHtml = this._ensureBr(sigHtml);
       const sigText = sigHtml.replace(/<[^>]+>/g, '').trim().slice(0, 60);
       if (sigText && (editor.textContent || '').includes(sigText)) return;
       editor.focus();
@@ -217,6 +223,7 @@
     },
     appendToCKEditor(instance, sigHtml) {
       if (!instance || !sigHtml) return;
+      sigHtml = this._ensureBr(sigHtml);
       const current = instance.getData() || '';
       const sigText = sigHtml.replace(/<[^>]+>/g, '').trim().slice(0, 60);
       if (sigText && current.includes(sigText)) return;
@@ -754,7 +761,11 @@
 #smax-attachment-modal { position:fixed; inset:0; z-index:9999999; background:rgba(0,0,0,.85); display:none; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
 #smax-attachment-modal[data-visible="true"] { display:flex; }
 #smax-attachment-modal img { max-width:90vw; max-height:80vh; border-radius:8px; object-fit:contain; box-shadow:0 8px 32px rgba(0,0,0,.5); }
-#smax-attachment-modal button { position:absolute; top:16px; right:16px; border:none; width:40px; height:40px; border-radius:50%; background:var(--sp-surface); color:var(--sp-text); font-size:22px; cursor:pointer; z-index:1; }
+#smax-attachment-modal > button:first-of-type { position:absolute; top:16px; right:16px; border:none; width:40px; height:40px; border-radius:50%; background:var(--sp-surface); color:var(--sp-text); font-size:22px; cursor:pointer; z-index:1; }
+.smax-attachment-nav { position:absolute; top:50%; transform:translateY(-50%); border:none; width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,.15); color:#fff; font-size:28px; cursor:pointer; z-index:1; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); transition:background .15s; }
+.smax-attachment-nav:hover { background:rgba(255,255,255,.3); }
+.smax-attachment-nav-prev { left:16px; }
+.smax-attachment-nav-next { right:16px; }
 .smax-attachment-caption { color:#fff; font-size:13px; text-align:center; max-width:80vw; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 /* ============================================================
@@ -3341,11 +3352,10 @@
     };
 
     const AttachmentPreviewer = (() => {
-      let modal;
-      let img;
-      let caption;
-      let closeBtn;
+      let modal, img, caption, closeBtn, prevBtn, nextBtn;
       let activeObjectUrl = '';
+      let currentList = [];
+      let currentIndex = -1;
 
       const ensureModal = () => {
         if (modal) return;
@@ -3358,13 +3368,40 @@
         closeBtn.type = 'button';
         closeBtn.textContent = '✖';
         closeBtn.addEventListener('click', hideModal);
+        // Nav buttons
+        prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'smax-attachment-nav smax-attachment-nav-prev';
+        prevBtn.textContent = '‹';
+        prevBtn.addEventListener('click', (e) => { e.stopPropagation(); navigate(-1); });
+        nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'smax-attachment-nav smax-attachment-nav-next';
+        nextBtn.textContent = '›';
+        nextBtn.addEventListener('click', (e) => { e.stopPropagation(); navigate(1); });
         modal.appendChild(closeBtn);
+        modal.appendChild(prevBtn);
         modal.appendChild(img);
+        modal.appendChild(nextBtn);
         modal.appendChild(caption);
         modal.addEventListener('click', (evt) => {
           if (evt.target === modal) hideModal();
         });
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+          if (!modal || modal.dataset.visible !== 'true') return;
+          if (e.key === 'ArrowLeft') navigate(-1);
+          else if (e.key === 'ArrowRight') navigate(1);
+          else if (e.key === 'Escape') hideModal();
+        });
         document.body.appendChild(modal);
+      };
+
+      const updateNavState = () => {
+        if (!prevBtn || !nextBtn) return;
+        const hasNav = currentList.length > 1;
+        prevBtn.style.display = hasNav ? '' : 'none';
+        nextBtn.style.display = hasNav ? '' : 'none';
       };
 
       const hideModal = () => {
@@ -3374,14 +3411,32 @@
           URL.revokeObjectURL(activeObjectUrl);
           activeObjectUrl = '';
         }
+        currentList = [];
+        currentIndex = -1;
       };
 
       const showImage = (objectUrl, title) => {
         ensureModal();
+        if (activeObjectUrl) URL.revokeObjectURL(activeObjectUrl);
         activeObjectUrl = objectUrl;
         img.src = objectUrl;
-        caption.textContent = title || '';
+        const indexLabel = currentList.length > 1 ? `${currentIndex + 1}/${currentList.length} — ` : '';
+        caption.textContent = indexLabel + (title || '');
         modal.dataset.visible = 'true';
+        updateNavState();
+      };
+
+      const navigate = async (delta) => {
+        if (currentList.length < 2) return;
+        const newIdx = (currentIndex + delta + currentList.length) % currentList.length;
+        currentIndex = newIdx;
+        const att = currentList[newIdx];
+        try {
+          const { objectUrl } = await fetchBlobUrl(att);
+          showImage(objectUrl, att.name);
+        } catch (err) {
+          caption.textContent = 'Erro ao carregar: ' + err.message;
+        }
       };
 
       const openPdf = async (blobUrl) => {
@@ -3422,10 +3477,19 @@
         throw lastError || new Error('Não consegui baixar este anexo.');
       };
 
-      const open = async (attachment) => {
+      const open = async (attachment, list) => {
         if (!attachment || (!attachment.downloadUrl && !attachment.downloadCandidates)) {
           alert('Não consegui localizar o arquivo deste anexo.');
           return;
+        }
+        // Set up list navigation for images
+        if (list && list.length > 0 && attachment.isImage) {
+          currentList = list.filter(a => a.isImage);
+          currentIndex = currentList.findIndex(a => a === attachment || a.name === attachment.name);
+          if (currentIndex < 0) currentIndex = 0;
+        } else {
+          currentList = [];
+          currentIndex = -1;
         }
         try {
           if (attachment.isImage) {
@@ -3448,7 +3512,7 @@
       return { open };
     })();
 
-    const preview = (attachment) => AttachmentPreviewer.open(attachment);
+    const preview = (attachment, list) => AttachmentPreviewer.open(attachment, list);
 
     return { fetchList, preview };
   })();
@@ -4177,6 +4241,17 @@
           <div id="smax-shared-status" style="font-size:11px;color:var(--sp-text-muted);min-height:16px;"></div>
         </div>
         <div class="smax-sp-card">
+          <div class="smax-sp-section-title">📨 Mensagem de Recebimento</div>
+          <div class="smax-sp-muted" style="margin-bottom:10px;">Template HTML enviado ao clicar em "Recebimento". Use <code>{nome}</code> para o primeiro nome do solicitante.</div>
+          <textarea id="smax-ack-template-textarea" spellcheck="false"
+            style="width:100%;min-height:100px;max-height:200px;resize:vertical;padding:10px 12px;border-radius:8px;font-size:12px;font-family:'Cascadia Code','Fira Code','Consolas',monospace;line-height:1.5;box-sizing:border-box;">${Utils.escapeHtml(prefs.ackMessageTemplate || '')}</textarea>
+          <div style="display:flex;gap:8px;margin-top:8px;">
+            <button type="button" id="smax-ack-template-save-btn" style="padding:7px 14px;border:none;border-radius:7px;background:var(--sp-primary);color:var(--sp-on-accent);font-size:12px;font-weight:600;cursor:pointer;">Salvar</button>
+            <button type="button" id="smax-ack-template-reset-btn" style="padding:7px 14px;border:1px solid var(--sp-border);border-radius:7px;background:var(--sp-surface-2);color:var(--sp-text);font-size:11px;cursor:pointer;">↺ Restaurar padrão</button>
+          </div>
+          <div id="smax-ack-template-status" style="font-size:11px;color:var(--sp-text-muted);min-height:16px;margin-top:6px;"></div>
+        </div>
+        <div class="smax-sp-card">
           <div class="smax-sp-section-title">🔧 Exportar / Importar Configuração</div>
           <div class="smax-sp-muted" style="margin-bottom:10px;">JSON com todas as configurações, incluindo equipes. Copie para compartilhar ou cole para restaurar.</div>
           <textarea id="smax-config-io-textarea" spellcheck="false"
@@ -4556,6 +4631,22 @@
         if (sharedStatusEl) sharedStatusEl.textContent = '⏳ Buscando...';
         await SharedConfig.refresh(true);
         showSharedStatus();
+      });
+
+      // Ack template
+      const ackTextarea = container.querySelector('#smax-ack-template-textarea');
+      const ackStatusEl = container.querySelector('#smax-ack-template-status');
+      container.querySelector('#smax-ack-template-save-btn')?.addEventListener('click', () => {
+        prefs.ackMessageTemplate = ackTextarea?.value || '';
+        savePrefs();
+        if (ackStatusEl) ackStatusEl.textContent = 'Template salvo.';
+      });
+      container.querySelector('#smax-ack-template-reset-btn')?.addEventListener('click', () => {
+        const def = PrefStore.defaults.ackMessageTemplate;
+        if (ackTextarea) ackTextarea.value = def;
+        prefs.ackMessageTemplate = def;
+        savePrefs();
+        if (ackStatusEl) ackStatusEl.textContent = 'Restaurado ao padrão.';
       });
 
       // Exportar / Importar Configuração JSON
@@ -6924,7 +7015,7 @@
           if (!chip) return;
           const attachment = currentAttachmentList.find((item) => item.id === chip.dataset.attachmentId);
           if (!attachment) return;
-          AttachmentService.preview(attachment);
+          AttachmentService.preview(attachment, currentAttachmentList);
         });
       }
       const gseDisplay = backdrop.querySelector('#smax-triage-gse-display');
@@ -7201,7 +7292,7 @@
       list.querySelectorAll('.smax-attachment-chip').forEach(chip => {
         chip.addEventListener('click', () => {
           const att = items.find(a => a.id === chip.dataset.attId);
-          if (att) AttachmentService.preview(att);
+          if (att) AttachmentService.preview(att, items);
         });
       });
     };
@@ -9570,6 +9661,12 @@
                     <button id="smax-resp-follower-btn" class="smax-resp-meta-chip" title="Adicionar seguidor">
                       👁️ <span id="smax-resp-follower-chip-name">Seguidor</span><span class="chip-edit">✎</span>
                     </button>
+                    <button id="smax-resp-selffollow-btn" class="smax-resp-meta-chip" title="Seguir este chamado">
+                      👤 Seguir
+                    </button>
+                    <button id="smax-resp-ack-btn" class="smax-resp-meta-chip" title="Comunicar recebimento">
+                      📨 Recebimento
+                    </button>
                   </div>
                   <!-- Pickers fixos (posicionados via JS) -->
                   <div id="smax-resp-gse-picker" class="smax-resp-field-picker"></div>
@@ -9614,6 +9711,8 @@
                         </select>
                         <label class="smax-resp-tb-label" title="Cor do texto">A <input type="color" class="smax-resp-tb-color" id="smax-resp-tb-fgcolor" value="#000000"></label>
                         <label class="smax-resp-tb-label" title="Cor de fundo">🖌 <input type="color" class="smax-resp-tb-color" id="smax-resp-tb-bgcolor" value="#ffff00"></label>
+                        <span class="smax-resp-tb-sep"></span>
+                        <button type="button" class="smax-resp-tb-btn" data-action="autoformat" title="Formatar texto e imagens">🧹</button>
                       </div>
                       <div id="smax-resp-solution-editor" contenteditable="true" data-placeholder="Digite aqui a solução do chamado..."></div>
                       <div id="smax-resp-script-picker"></div>
@@ -9883,6 +9982,54 @@
         });
       });
 
+      // ── Auto-format helper ──
+      const autoFormatEditor = (editor) => {
+        if (!editor) return;
+        // 1. Remove empty p/div (keep elements with images, tables etc.)
+        editor.querySelectorAll('p, div').forEach(el => {
+          const text = (el.textContent || '').replace(/\u00A0/g, ' ').trim();
+          if (!text && !el.querySelector('img, table, video, canvas, svg, iframe')) el.remove();
+        });
+        // 2. Normalize paragraph spacing
+        editor.querySelectorAll('p, div').forEach(el => {
+          el.style.marginTop = '0'; el.style.marginBottom = '10px';
+          el.style.paddingTop = '0'; el.style.paddingBottom = '0';
+          el.style.lineHeight = '1.35';
+        });
+        editor.querySelectorAll('li').forEach(el => {
+          el.style.marginTop = '0'; el.style.marginBottom = '4px';
+          el.style.paddingTop = '0'; el.style.paddingBottom = '0';
+          el.style.lineHeight = '1.35';
+        });
+        // 3. Clean HTML: collapse excessive <br>, remove nbsp, strip empty blocks
+        let html = editor.innerHTML || '';
+        html = html
+          .replace(/&nbsp;/gi, ' ')
+          .replace(/(<br\s*\/?>\s*){3,}/gi, '<br><br>')
+          .replace(/<(p|div)([^>]*)>\s*<br\s*\/?>\s*<\/\1>/gi, '')
+          .replace(/<(p|div)([^>]*)>\s*<\/\1>/gi, '')
+          .replace(/^(\s|<br\s*\/?>)+/gi, '')
+          .replace(/(\s|<br\s*\/?>)+$/gi, '');
+        editor.innerHTML = html;
+        // Re-apply spacing after innerHTML reset
+        editor.querySelectorAll('p, div').forEach(el => {
+          el.style.marginTop = '0'; el.style.marginBottom = '10px';
+          el.style.paddingTop = '0'; el.style.paddingBottom = '0';
+          el.style.lineHeight = '1.35';
+        });
+        // 4. Format images: border + radius
+        editor.querySelectorAll('img').forEach(img => {
+          img.style.border = '4px solid #004b8d';
+          img.style.borderRadius = '4px';
+          img.style.boxSizing = 'border-box';
+          img.style.padding = '0';
+          img.style.marginTop = '10px';
+          img.style.marginBottom = '10px';
+          img.style.outline = 'none';
+          img.style.boxShadow = 'none';
+        });
+      };
+
       // ── Toolbar do editor de solução (contenteditable) ──
       const solEditor = backdrop.querySelector('#smax-resp-solution-editor');
       if (solEditor) {
@@ -9927,6 +10074,10 @@
         if (bgColor) {
           bgColor.addEventListener('input', () => { restoreSelection(); document.execCommand('hiliteColor', false, bgColor.value); });
         }
+        // Auto-format
+        backdrop.querySelector('#smax-resp-solution-toolbar [data-action="autoformat"]')?.addEventListener('click', () => {
+          autoFormatEditor(solEditor);
+        });
       }
 
       // Scripts picker
@@ -9944,6 +10095,51 @@
       backdrop.querySelector('#smax-resp-statussccd-btn')?.addEventListener('click', openStatusSCCDPicker);
       // Seguidor picker
       backdrop.querySelector('#smax-resp-follower-btn')?.addEventListener('click', openFollowerPicker);
+      // Self-follow (toggle)
+      backdrop.querySelector('#smax-resp-selffollow-btn')?.addEventListener('click', () => {
+        if (!prefs.myPersonId) { alert('Configure "Quem é você?" em Settings antes de usar esta função.'); return; }
+        const pending = getBatchPending();
+        const current = pending.followers || [];
+        const alreadyAdded = current.some(f => f.id === prefs.myPersonId);
+        const selfFollowBtn = backdrop.querySelector('#smax-resp-selffollow-btn');
+        if (alreadyAdded) {
+          const filtered = current.filter(f => f.id !== prefs.myPersonId);
+          setBatchPending('followers', filtered.length ? filtered : null);
+          if (selfFollowBtn) selfFollowBtn.classList.remove('dirty');
+        } else {
+          const updated = [...current, { id: prefs.myPersonId, name: prefs.myPersonName || 'Eu' }];
+          setBatchPending('followers', updated);
+          if (selfFollowBtn) selfFollowBtn.classList.add('dirty');
+        }
+        updateFollowerChip(activeTicketId);
+        updateSendButton();
+      });
+      // Comunicar recebimento
+      backdrop.querySelector('#smax-resp-ack-btn')?.addEventListener('click', async () => {
+        if (!prefs.enableRealWrites) { setStatusMsg('Escritas reais desabilitadas.', '#fca5a5'); return; }
+        const template = prefs.ackMessageTemplate || '';
+        if (!template.trim()) { setStatusMsg('Template de recebimento vazio. Configure em Settings.', '#fca5a5'); return; }
+        const targets = selectedTicketIds.size > 0
+          ? [...selectedTicketIds].map(id => allFetchedEntries.find(e => String(e.id) === String(id))).filter(Boolean)
+          : activeTicketId ? [allFetchedEntries.find(e => String(e.id) === String(activeTicketId))].filter(Boolean) : [];
+        if (!targets.length) { setStatusMsg('Nenhum chamado selecionado.', '#fca5a5'); return; }
+        const ackBtn = backdrop.querySelector('#smax-resp-ack-btn');
+        if (ackBtn) ackBtn.disabled = true;
+        let ok = 0, fail = 0;
+        for (let i = 0; i < targets.length; i++) {
+          const entry = targets[i];
+          const firstName = (entry.requestedForName || '').split(/\s/)[0] || 'Solicitante';
+          const bodyHtml = template.replace(/\{nome\}/gi, firstName);
+          setStatusMsg(`Enviando recebimento ${i + 1}/${targets.length}...`, '#93c5fd');
+          try {
+            const res = await Api.postDiscussion(entry.id, { bodyHtml, purposeCode: 'StatusUpdate', privacyRaw: 'PUBLIC', commentTo: 'User' });
+            if (res && !res.skipped) ok++; else fail++;
+          } catch { fail++; }
+        }
+        if (ackBtn) ackBtn.disabled = false;
+        if (fail === 0) setStatusMsg(`Recebimento enviado (${ok} chamado${ok > 1 ? 's' : ''}).`, '#86efac');
+        else setStatusMsg(`Recebimento: ${ok} ok, ${fail} falha${fail > 1 ? 's' : ''}.`, '#fca5a5');
+      });
       // Assinatura picker
       backdrop.querySelector('#smax-resp-sig-btn')?.addEventListener('click', openSignaturePicker);
 
@@ -10680,557 +10876,6 @@
   })();
 
   /* =========================================================
-   * AuditQueryPanel — consulta de chamados por ação/especialista
-   * =======================================================*/
-  const AuditQueryPanel = (() => {
-    const CONCURRENCY = 8;
-    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-
-    const ACTIONS = [
-      { key: 'ANY',    label: 'Qualquer alteração',         fields: null },
-      { key: 'COMMENT',label: 'Incluiu comentário',         fields: ['Comments'] },
-      { key: 'EXPERT', label: 'Alterou especialista',       fields: ['ExpertAssignee'] },
-      { key: 'GROUP',  label: 'Alterou grupo (GSE)',        fields: ['AssignedToGroup'] },
-      { key: 'STSCCD', label: 'Alterou status operacional', fields: ['StatusSCCDSMAX_c'] },
-      { key: 'STATUS', label: 'Alterou status',             fields: ['Status'] },
-      { key: 'PHASE',  label: 'Alterou fase',               fields: ['PhaseId'] },
-      { key: 'GLOBAL',     label: 'Alterou GSE Global',  fields: ['GlobalId_c'] },
-      { key: 'GLOBALLINK', label: 'Vinculou global',      fields: ['GlobalId_c'], linkOnly: true },
-    ];
-
-    let backdropEl   = null;
-    let isOpen       = false;
-    let abortFlag    = false;
-    let running      = false;
-    let currentMatches = [];
-    let currentPersonName = '';
-
-    const fmtTs = (ts) => {
-      if (!ts) return '';
-      return new Date(ts).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' });
-    };
-
-    const weekRange = () => {
-      const now = new Date();
-      const dow = now.getDay();
-      const mon = new Date(now);
-      mon.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
-      mon.setHours(0, 0, 0, 0);
-      const sun = new Date(mon);
-      sun.setDate(mon.getDate() + 6);
-      sun.setHours(23, 59, 59, 999);
-      return [mon, sun];
-    };
-
-    const toDateInput = (d) => d.toISOString().slice(0, 10);
-
-    const PILL_ON  = 'background:var(--sp-accent);color:var(--sp-on-accent);border:1px solid var(--sp-accent);border-radius:5px;padding:5px 11px;cursor:pointer;font-size:11px;white-space:nowrap;font-weight:500;';
-    const PILL_OFF = 'background:transparent;color:var(--sp-text-muted);border:1px solid var(--sp-border);border-radius:5px;padding:5px 11px;cursor:pointer;font-size:11px;white-space:nowrap;';
-
-    const buildHtml = () => {
-      const [wStart, wEnd] = weekRange();
-      const actionPills = ACTIONS.map(a =>
-        `<button class="aqp-pill" data-key="${a.key}" data-on="${a.key === 'ANY' ? '1' : '0'}" style="${a.key === 'ANY' ? PILL_ON : PILL_OFF}">${a.label}</button>`
-      ).join('');
-
-      return `
-<div id="aqp-backdrop" style="position:fixed;inset:0;z-index:999998;display:none;align-items:center;justify-content:center;padding:8px;background:linear-gradient(180deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.6) 100%);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);">
-  <div id="aqp-card" style="position:relative;background:var(--sp-bg);color:var(--sp-text);border-radius:12px;width:100%;max-width:1400px;height:calc(100vh - 16px);display:flex;overflow:hidden;font:13px/1.5 sans-serif;box-shadow:0 24px 64px rgba(0,0,0,.7);">
-
-    <!-- COLUNA ESQUERDA — filtros -->
-    <div id="aqp-left" style="width:280px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--sp-border);background:var(--sp-surface-2);">
-      <div style="padding:14px 16px 12px;border-bottom:1px solid var(--sp-border);display:flex;align-items:center;justify-content:space-between;">
-        <span style="font-size:14px;font-weight:700;letter-spacing:.2px;">🔍 Consulta por Ação</span>
-        <button id="aqp-x" style="background:none;border:none;color:var(--sp-text-muted);font-size:20px;cursor:pointer;line-height:1;padding:0 2px;" title="Fechar">×</button>
-      </div>
-      <div style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:14px;">
-
-        <div>
-          <div style="font-size:10px;color:var(--sp-text-muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;">Especialista</div>
-          <div style="position:relative;">
-            <input id="aqp-person" type="text" placeholder="Digite o nome..." autocomplete="off"
-              style="width:100%;box-sizing:border-box;padding:8px 10px;background:var(--sp-surface);color:inherit;border:1px solid var(--sp-border);border-radius:7px;font-size:13px;outline:none;">
-            <div id="aqp-dd" style="display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;z-index:10;background:var(--sp-surface);border:1px solid var(--sp-border);border-radius:7px;max-height:150px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.5);"></div>
-          </div>
-          <div id="aqp-ok" style="display:none;margin-top:5px;font-size:11px;color:var(--sp-success);"></div>
-        </div>
-
-        <div>
-          <div style="font-size:10px;color:var(--sp-text-muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px;">Tipo de Ação</div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;">${actionPills}</div>
-        </div>
-
-        <div>
-          <div style="font-size:10px;color:var(--sp-text-muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;">Período</div>
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            <div>
-              <div style="font-size:10px;color:var(--sp-text-dim);margin-bottom:3px;">De</div>
-              <input id="aqp-from" type="date" value="${toDateInput(wStart)}"
-                style="width:100%;box-sizing:border-box;padding:7px 8px;background:var(--sp-surface);color:inherit;border:1px solid var(--sp-border);border-radius:7px;font-size:13px;outline:none;">
-            </div>
-            <div>
-              <div style="font-size:10px;color:var(--sp-text-dim);margin-bottom:3px;">Até</div>
-              <input id="aqp-to" type="date" value="${toDateInput(wEnd)}"
-                style="width:100%;box-sizing:border-box;padding:7px 8px;background:var(--sp-surface);color:inherit;border:1px solid var(--sp-border);border-radius:7px;font-size:13px;outline:none;">
-            </div>
-          </div>
-        </div>
-
-        <button id="aqp-run" style="padding:10px;background:var(--sp-accent);color:var(--sp-on-accent);border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;margin-top:4px;">Buscar</button>
-
-        <div id="aqp-prog" style="display:none;">
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--sp-text-muted);margin-bottom:5px;">
-            <span id="aqp-prog-txt">Aguardando...</span>
-            <button id="aqp-cancel" style="background:none;border:none;color:var(--sp-danger);cursor:pointer;font-size:11px;padding:0;">Cancelar</button>
-          </div>
-          <div style="background:var(--sp-surface);border-radius:4px;height:5px;overflow:hidden;">
-            <div id="aqp-prog-bar" style="background:var(--sp-accent);height:100%;width:0%;transition:width .2s;"></div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- COLUNA DIREITA — resultados -->
-    <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
-      <div id="aqp-res-hdr" style="padding:12px 18px;border-bottom:1px solid var(--sp-border);display:flex;align-items:center;gap:12px;flex-shrink:0;">
-        <span id="aqp-res-count" style="font-size:12px;color:var(--sp-text-muted);">—</span>
-        <div style="flex:1;"></div>
-        <button id="aqp-export" style="display:none;padding:6px 14px;background:transparent;border:1px solid var(--sp-border);border-radius:6px;color:var(--sp-text-muted);cursor:pointer;font-size:12px;" title="Exportar para Excel (CSV)">⬇ Exportar CSV</button>
-      </div>
-      <div id="aqp-results" style="flex:1;overflow-y:auto;padding:14px 18px;"></div>
-    </div>
-
-  </div>
-</div>`;
-    };
-
-    // Busca IDs de chamados dia-a-dia para evitar o limite de 10k da API
-    const fetchIds = async (startTs, endTs, onProgress) => {
-      const base = ApiClient.restUrl('ems/Request');
-      const seen = new Set();
-      let dayStart = startTs;
-      let dayIdx = 0;
-      const totalDays = Math.max(1, Math.ceil((endTs - startTs) / ONE_DAY_MS));
-
-      while (dayStart <= endTs) {
-        if (abortFlag) break;
-        const dayEnd = Math.min(dayStart + ONE_DAY_MS - 1, endTs);
-        if (onProgress) onProgress(dayIdx, totalDays);
-        let skip = 0;
-        const size = 500;
-        for (;;) {
-          if (abortFlag) break;
-          const url = `${base}?layout=Id&filter=LastUpdateTime%20btw%20(${dayStart}%2C${dayEnd})&order=LastUpdateTime%20desc&size=${size}&skip=${skip}`;
-          const resp = await pageWindow.fetch(url);
-          if (!resp.ok) break;
-          const data = await resp.json();
-          const ents = data.entities || [];
-          ents.forEach(e => seen.add(String(e.properties.Id)));
-          if (ents.length < size) break;
-          skip += size;
-        }
-        dayStart += ONE_DAY_MS;
-        dayIdx++;
-      }
-      return [...seen];
-    };
-
-    // Busca o histórico de auditoria de um chamado
-    const fetchAudit = async (id) => {
-      const tid = ApiClient.getTenantId() || SMAX_TENANT_ID;
-      const url = `/rest/${tid}/audit/ems-history-service/Request?changeType=ALL&entityId=${id}&order=time%20desc&size=250&skip=0`;
-      try {
-        const resp = await pageWindow.fetch(url);
-        if (!resp.ok) return [];
-        const data = await resp.json();
-        return data.results || [];
-      } catch { return []; }
-    };
-
-    const isGlobalLink = (props) => {
-      if (!('GlobalId_c' in props)) return false;
-      const old = props.GlobalId_c.oldValue;
-      return !old || old === '' || old === 'null' || old === null;
-    };
-
-    const matchActions = (entry, keys) => {
-      if (keys.has('ANY')) return true;
-      const props = entry.changeProperties || {};
-      return ACTIONS.some(a => {
-        if (!a.fields || !keys.has(a.key)) return false;
-        if (!a.fields.some(f => f in props)) return false;
-        if (a.linkOnly) return isGlobalLink(props);
-        return true;
-      });
-    };
-
-    const resolveStatus = (raw) => STATUS_SCCD_LABELS[raw] || humanReadableStatus(raw) || raw || '—';
-
-    // Retorna array de {field, label, oldVal, newVal} para exibição rica
-    const describeRich = (entry) => {
-      const props = entry.changeProperties || {};
-      const grpMap = new Map(DataRepository.getSupportGroupsSnapshot().map(g => [String(g.id), g.name || g.id]));
-      const resolvePerson = (id) => (id ? DataRepository.resolveName(id) || String(id) : '—');
-      const resolveGrp = (id) => (id ? grpMap.get(String(id)) || String(id) : '—');
-      const rows = [];
-
-      if ('Comments' in props)
-        rows.push({ field: 'Comments', label: 'Comentário', oldVal: null, newVal: 'Incluiu comentário' });
-      if ('ExpertAssignee' in props)
-        rows.push({ field: 'ExpertAssignee', label: 'Especialista',
-          oldVal: resolvePerson(props.ExpertAssignee.oldValue),
-          newVal: resolvePerson(props.ExpertAssignee.newValue) });
-      if ('AssignedToGroup' in props)
-        rows.push({ field: 'AssignedToGroup', label: 'Grupo (GSE)',
-          oldVal: resolveGrp(props.AssignedToGroup.oldValue),
-          newVal: resolveGrp(props.AssignedToGroup.newValue) });
-      if ('StatusSCCDSMAX_c' in props)
-        rows.push({ field: 'StatusSCCDSMAX_c', label: 'Status Operacional',
-          oldVal: resolveStatus(props.StatusSCCDSMAX_c.oldValue),
-          newVal: resolveStatus(props.StatusSCCDSMAX_c.newValue) });
-      if ('Status' in props)
-        rows.push({ field: 'Status', label: 'Status',
-          oldVal: humanReadableStatus(props.Status.oldValue) || props.Status.oldValue || '—',
-          newVal: humanReadableStatus(props.Status.newValue) || props.Status.newValue || '—' });
-      if ('PhaseId' in props)
-        rows.push({ field: 'PhaseId', label: 'Fase',
-          oldVal: props.PhaseId.oldValue || '—',
-          newVal: props.PhaseId.newValue || '—' });
-      if ('GlobalId_c' in props) {
-        const gOld = props.GlobalId_c.oldValue;
-        const gNew = props.GlobalId_c.newValue;
-        const isLink = !gOld || gOld === '' || gOld === 'null';
-        rows.push({ field: 'GlobalId_c',
-          label: isLink ? 'Vinculou Global' : 'GSE Global',
-          oldVal: isLink ? null : (gOld ? String(gOld) : '—'),
-          newVal: gNew ? String(gNew) : '—' });
-      }
-
-      if (!rows.length) {
-        const changed = Object.keys(props).filter(k => k !== 'LastUpdateTime');
-        if (changed.length)
-          rows.push({ field: '_other', label: 'Alterou', oldVal: null, newVal: changed.join(', ') });
-      }
-      return rows;
-    };
-
-    const renderTicketCard = (m) => {
-      const eventsHtml = m.actions.map(a => {
-        const rowsHtml = a.rows.map(r => {
-          if (r.oldVal === null) {
-            return `<div style="display:flex;align-items:baseline;gap:6px;padding:3px 0;">
-              <span style="font-size:11px;color:var(--sp-text-muted);min-width:120px;flex-shrink:0;">${Utils.escapeHtml(r.label)}</span>
-              <span style="font-size:12px;color:var(--sp-success);">${Utils.escapeHtml(r.newVal)}</span>
-            </div>`;
-          }
-          return `<div style="display:flex;align-items:baseline;gap:6px;padding:3px 0;">
-            <span style="font-size:11px;color:var(--sp-text-muted);min-width:120px;flex-shrink:0;">${Utils.escapeHtml(r.label)}</span>
-            <span style="font-size:12px;color:var(--sp-danger);text-decoration:line-through;opacity:.8;">${Utils.escapeHtml(r.oldVal)}</span>
-            <span style="font-size:11px;color:var(--sp-text-dim);">→</span>
-            <span style="font-size:12px;color:var(--sp-success);">${Utils.escapeHtml(r.newVal)}</span>
-          </div>`;
-        }).join('');
-        return `<div style="padding:8px 10px;border-left:2px solid var(--sp-border);margin-bottom:6px;">
-          <div style="font-size:11px;color:var(--sp-text-dim);margin-bottom:5px;">${fmtTs(a.time)}</div>
-          ${rowsHtml}
-        </div>`;
-      }).join('');
-
-      return `<div style="background:var(--sp-surface);border:1px solid var(--sp-border);border-radius:9px;padding:12px 14px;margin-bottom:10px;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-          <a href="/saw/Request/${m.id}" target="_blank"
-            style="color:var(--sp-accent);font-weight:700;font-size:14px;text-decoration:none;">#${m.id}</a>
-          <span style="font-size:11px;color:var(--sp-text-dim);">${m.actions.length} alteraç${m.actions.length === 1 ? 'ão' : 'ões'}</span>
-        </div>
-        ${eventsHtml}
-      </div>`;
-    };
-
-    let _aqpRenderedCount = 0;
-    const renderResults = (incremental = false) => {
-      const resultsEl = backdropEl.querySelector('#aqp-results');
-      const countEl   = backdropEl.querySelector('#aqp-res-count');
-      const exportBtn = backdropEl.querySelector('#aqp-export');
-      const n = currentMatches.length;
-      countEl.textContent = n ? `${n} chamado${n !== 1 ? 's' : ''} encontrado${n !== 1 ? 's' : ''}` : '—';
-      exportBtn.style.display = n ? 'block' : 'none';
-      if (incremental && _aqpRenderedCount < n) {
-        // Append somente os novos itens (evita O(n²) de reconstruir tudo)
-        const fragment = document.createDocumentFragment();
-        for (let i = _aqpRenderedCount; i < n; i++) {
-          const tmp = document.createElement('div');
-          tmp.innerHTML = renderTicketCard(currentMatches[i]);
-          if (tmp.firstElementChild) fragment.appendChild(tmp.firstElementChild);
-        }
-        resultsEl.appendChild(fragment);
-      } else {
-        resultsEl.innerHTML = currentMatches.map(renderTicketCard).join('');
-      }
-      _aqpRenderedCount = n;
-    };
-
-    const exportCsv = () => {
-      // Cabeçalho
-      const rows = [['Chamado', 'Especialista', 'Data/Hora', 'Ação', 'Valor Anterior', 'Valor Novo']];
-
-      currentMatches.forEach((m, mi) => {
-        // Linha em branco entre chamados (exceto antes do primeiro)
-        if (mi > 0) rows.push(['', '', '', '', '', '']);
-
-        // Linha de cabeçalho do chamado
-        rows.push([`#${m.id}`, currentPersonName, '', '', '', '']);
-
-        // Linhas de detalhe: ID e especialista só na primeira linha de detalhe
-        m.actions.forEach(a => {
-          a.rows.forEach((r, ri) => {
-            rows.push([
-              '',                               // ID já apareceu na linha de cabeçalho
-              '',
-              ri === 0 ? fmtTs(a.time) : '',   // data só na primeira linha do evento
-              r.label,
-              r.oldVal !== null ? r.oldVal : '',
-              r.newVal,
-            ]);
-          });
-        });
-      });
-
-      const esc = (v) => `"${String(v).replace(/"/g, '""')}"`;
-      const csv = '\uFEFF' + rows.map(r => r.map(esc).join(';')).join('\r\n');
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `auditoria_${currentPersonName.replace(/\s+/g, '_')}_${toDateInput(new Date())}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 2000);
-    };
-
-    // Busca pessoas pela API como fallback quando não estão no cache local
-    const searchPersonApi = async (q) => {
-      const tid = ApiClient.getTenantId() || SMAX_TENANT_ID;
-      try {
-        const resp = await pageWindow.fetch(
-          `/rest/${tid}/ems/Person?filter=Name%20like%20'${encodeURIComponent(q)}%25'&layout=Id,Name,Upn&size=8`
-        );
-        if (!resp.ok) return [];
-        const data = await resp.json();
-        return (data.entities || []).map(e => ({
-          id: String(e.properties.Id),
-          name: e.properties.Name || '',
-          upn:  e.properties.Upn  || '',
-        }));
-      } catch { return []; }
-    };
-
-    // Autocomplete de pessoa (cache local → fallback API)
-    const wirePersonSearch = () => {
-      const input = backdropEl.querySelector('#aqp-person');
-      const dd    = backdropEl.querySelector('#aqp-dd');
-      const ok    = backdropEl.querySelector('#aqp-ok');
-      let t;
-
-      const showDropdown = (results) => {
-        if (!results.length) { dd.style.display = 'none'; return; }
-        dd.innerHTML = results.map(p =>
-          `<div class="aqp-po" data-id="${Utils.escapeHtml(p.id)}" data-name="${Utils.escapeHtml(p.name)}" data-upn="${Utils.escapeHtml(p.upn)}"` +
-          ` style="padding:8px 12px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--sp-border);">` +
-          `${Utils.escapeHtml(p.name)}${p.upn ? ` <span style="color:var(--sp-text-dim);">(${Utils.escapeHtml(p.upn)})</span>` : ''}</div>`
-        ).join('');
-        dd.style.display = 'block';
-      };
-
-      input.addEventListener('input', () => {
-        ok.style.display = 'none';
-        ok.dataset.id = '';
-        clearTimeout(t);
-        const q = input.value.trim();
-        if (q.length < 2) { dd.style.display = 'none'; return; }
-        t = setTimeout(async () => {
-          await DataRepository.ensurePeopleLoaded();
-          const target = Utils.normalizeText(q);
-          const fromCache = [];
-          for (const [id, p] of DataRepository.peopleCache) {
-            if (fromCache.length >= 8) break;
-            if (Utils.normalizeText(p.name || '').includes(target)) fromCache.push({ id, name: p.name, upn: p.upn || '' });
-          }
-          if (fromCache.length) { showDropdown(fromCache); return; }
-          showDropdown(await searchPersonApi(q));
-        }, 250);
-      });
-
-      dd.addEventListener('click', e => {
-        const opt = e.target.closest('.aqp-po');
-        if (!opt) return;
-        input.value = opt.dataset.name;
-        dd.style.display = 'none';
-        ok.textContent = `✓ ${opt.dataset.name}${opt.dataset.upn ? ' · ' + opt.dataset.upn : ''} (ID: ${opt.dataset.id})`;
-        ok.dataset.id = opt.dataset.id;
-        ok.style.display = 'block';
-        currentPersonName = opt.dataset.name;
-      });
-
-      document.addEventListener('click', e => {
-        if (backdropEl && !dd.contains(e.target) && e.target !== input) dd.style.display = 'none';
-      });
-    };
-
-    // Pills de tipo de ação: ANY é exclusivo com os demais
-    const wireActionPills = () => {
-      const pills = [...backdropEl.querySelectorAll('.aqp-pill')];
-      const anyPill = pills.find(p => p.dataset.key === 'ANY');
-      const applyStyle = (p) => { p.style.cssText = p.dataset.on === '1' ? PILL_ON : PILL_OFF; };
-      pills.forEach(pill => pill.addEventListener('click', () => {
-        if (pill === anyPill) {
-          pills.forEach(p => { p.dataset.on = p === anyPill ? '1' : '0'; applyStyle(p); });
-        } else {
-          pill.dataset.on = pill.dataset.on === '1' ? '0' : '1';
-          anyPill.dataset.on = '0';
-          applyStyle(pill);
-          applyStyle(anyPill);
-          if (!pills.some(p => p.dataset.on === '1')) { anyPill.dataset.on = '1'; applyStyle(anyPill); }
-        }
-      }));
-    };
-
-    // Executa a busca principal
-    const runSearch = async () => {
-      if (running) return;
-      running = true;
-      abortFlag = false;
-      currentMatches = [];
-      _aqpRenderedCount = 0;
-
-      const okEl    = backdropEl.querySelector('#aqp-ok');
-      const personId = okEl.dataset.id || '';
-      const runBtn  = backdropEl.querySelector('#aqp-run');
-      const prog    = backdropEl.querySelector('#aqp-prog');
-      const progBar = backdropEl.querySelector('#aqp-prog-bar');
-      const progTxt = backdropEl.querySelector('#aqp-prog-txt');
-      const countEl = backdropEl.querySelector('#aqp-res-count');
-      const resultsEl = backdropEl.querySelector('#aqp-results');
-      const exportBtn = backdropEl.querySelector('#aqp-export');
-
-      if (!personId) {
-        resultsEl.innerHTML = '<div style="color:var(--sp-danger);font-size:13px;margin-top:20px;">Selecione um especialista.</div>';
-        running = false;
-        return;
-      }
-
-      const fromVal = backdropEl.querySelector('#aqp-from').value;
-      const toVal   = backdropEl.querySelector('#aqp-to').value;
-      if (!fromVal || !toVal) {
-        resultsEl.innerHTML = '<div style="color:var(--sp-danger);font-size:13px;margin-top:20px;">Defina o período.</div>';
-        running = false;
-        return;
-      }
-
-      const startTs = new Date(fromVal + 'T00:00:00').getTime();
-      const endTs   = new Date(toVal   + 'T23:59:59').getTime();
-      const keys = new Set();
-      backdropEl.querySelectorAll('.aqp-pill[data-on="1"]').forEach(p => keys.add(p.dataset.key));
-
-      runBtn.disabled = true;
-      runBtn.textContent = 'Buscando...';
-      prog.style.display = 'block';
-      progTxt.textContent = 'Obtendo lista de chamados...';
-      progBar.style.width = '0%';
-      resultsEl.innerHTML = '';
-      countEl.textContent = '—';
-      exportBtn.style.display = 'none';
-
-      try {
-        const totalDays = Math.max(1, Math.ceil((endTs - startTs) / ONE_DAY_MS));
-        const ids = await fetchIds(startTs, endTs, (dayIdx, total) => {
-          progTxt.textContent = `Coletando chamados: dia ${dayIdx + 1} / ${total}...`;
-          progBar.style.width = Math.round(dayIdx / total * 30) + '%';
-        });
-
-        if (abortFlag) { finishSearch(runBtn); return; }
-
-        if (!ids.length) {
-          resultsEl.innerHTML = '<div style="color:var(--sp-text-muted);font-size:13px;margin-top:20px;">Nenhum chamado no período.</div>';
-          finishSearch(runBtn);
-          return;
-        }
-
-        let doneCount = 0;
-
-        for (let i = 0; i < ids.length; i += CONCURRENCY) {
-          if (abortFlag) break;
-          const batch = ids.slice(i, i + CONCURRENCY);
-          await Promise.all(batch.map(async (id) => {
-            if (abortFlag) return;
-            const entries = await fetchAudit(id);
-            const userEntries = entries.filter(e => String(e.userId) === String(personId));
-            const matched = userEntries.filter(e => matchActions(e, keys));
-            if (matched.length) {
-              currentMatches.push({ id, actions: matched.map(e => ({ time: e.time, rows: describeRich(e) })) });
-              renderResults(true);
-            }
-          }));
-          doneCount = Math.min(i + CONCURRENCY, ids.length);
-          progBar.style.width = Math.round(30 + doneCount / ids.length * 70) + '%';
-          progTxt.textContent = `Auditando: ${doneCount} / ${ids.length} chamados`;
-        }
-
-        if (!currentMatches.length)
-          resultsEl.innerHTML = '<div style="color:var(--sp-text-muted);font-size:13px;margin-top:20px;">Nenhum chamado encontrado com essa ação.</div>';
-        progTxt.textContent = `Concluído — ${doneCount}/${ids.length} verificados, ${currentMatches.length} encontrado${currentMatches.length !== 1 ? 's' : ''}.`;
-      } catch (err) {
-        resultsEl.innerHTML = `<div style="color:var(--sp-danger);font-size:13px;margin-top:20px;">Erro: ${Utils.escapeHtml(err.message)}</div>`;
-      }
-
-      finishSearch(runBtn);
-    };
-
-    const finishSearch = (btn) => {
-      running = false;
-      btn.disabled = false;
-      btn.textContent = 'Buscar';
-    };
-
-    const open = () => {
-      if (!backdropEl) {
-        const wrap = document.createElement('div');
-        wrap.innerHTML = buildHtml().trim();
-        backdropEl = wrap.firstElementChild;
-        document.body.appendChild(backdropEl);
-        wirePersonSearch();
-        wireActionPills();
-        backdropEl.querySelector('#aqp-x').addEventListener('click', close);
-        backdropEl.querySelector('#aqp-run').addEventListener('click', runSearch);
-        backdropEl.querySelector('#aqp-cancel').addEventListener('click', () => { abortFlag = true; });
-        backdropEl.querySelector('#aqp-export').addEventListener('click', exportCsv);
-        // Fechar ao clicar no fundo do backdrop
-        backdropEl.addEventListener('click', (e) => { if (e.target === backdropEl) close(); });
-      }
-      backdropEl.style.display = 'flex';
-      isOpen = true;
-    };
-
-    const close = () => {
-      if (backdropEl) backdropEl.style.display = 'none';
-      isOpen = false;
-    };
-
-    const init = () => {
-      const btn = document.createElement('button');
-      btn.id = 'smax-aqp-btn';
-      btn.title = 'Consulta por Ação';
-      btn.textContent = '🔍';
-      btn.style.cssText = 'position:fixed;bottom:110px;right:16px;z-index:99998;width:36px;height:36px;border-radius:50%;border:none;background:var(--sp-accent);color:var(--sp-on-accent);cursor:pointer;font-size:15px;box-shadow:0 2px 8px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;';
-      btn.addEventListener('click', () => (isOpen ? close() : open()));
-      document.body.appendChild(btn);
-    };
-
-    return { init, open, close };
-  })();
-
-  /* =========================================================
    * Boot
    * =======================================================*/
   const boot = () => {
@@ -11240,7 +10885,6 @@
     ResponseHUD.init();
     Templates.init();
     SharedConfig.init();
-    AuditQueryPanel.init();
     DataRepository.refreshQueueFromApi().catch(() => { });
     DataRepository.ensureSupportGroups().catch(() => { });
   };

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SMAX Toolkit - TJSP
 // @namespace    https://github.com/rsalvessap/SMAX-TOOLS
-// @version      2.81
+// @version      2.82
 // @description  Conjunto de ferramentas para o SMAX TJSP: triagem, respostas em lote, scripts, discussões e consulta de processos no eProc
 // @author       rsalvessap
 // @match        https://suporte.tjsp.jus.br/saw/*
@@ -47,7 +47,7 @@
   const SMAX_SB_URL = 'https://rlcbmrjkojopipiwpktf.supabase.co';
   const SMAX_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Jtcmprb2pvcGlwaXdwa3RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MzI0MTksImV4cCI6MjA5NDMwODQxOX0.Ha4xRbFvbgb2yO64ga3dV8KrNGRgbV7zWFXc5bYHdeQ';
 
-  const SMAX_TOOLKIT_VERSION = '2.81';
+  const SMAX_TOOLKIT_VERSION = '2.82';
   const SMAX_TENANT_ID = '213963628';
   console.log('%c[SMAX Toolkit] v' + SMAX_TOOLKIT_VERSION + ' carregado', 'color:#60a5fa;font-weight:bold;font-size:13px;');
 
@@ -7210,7 +7210,7 @@
       const count = selectedTicketIds.size;
       const hasSolution = !!getRespSolutionText() && !!getSelectedCompletionCode();
       const pending = getBatchPending();
-      const hasPending = !!(pending.gse || pending.assignee || pending.followers?.length || pendingStatusByTicket[activeTicketId] || pendingStatusSCCDByTicket[activeTicketId]);
+      const hasPending = !!(pending.gse || pending.assignee || pending.followers?.length || pending.ackMessage || pendingStatusByTicket[activeTicketId] || pendingStatusSCCDByTicket[activeTicketId]);
       if (count > 1) {
         btn.textContent = hasSolution ? `Enviar em lote (${count})` : `Atualizar em lote (${count})`;
         btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
@@ -8500,17 +8500,18 @@
         && effectivePendingSccd.key !== (cache.statusSCCD || '');
 
       const followerWillChange = !!(pending.followers?.length);
+      const ackWillSend = !!pending.ackMessage;
 
       return { hasSolution, curGseId, gseWillChange, curAssigneeId, assigneeWillChange,
-               statusWillChange, statusSCCDWillChange, followerWillChange, effectivePendingStatus, effectivePendingSccd,
-               willAct: hasSolution || gseWillChange || assigneeWillChange || statusWillChange || statusSCCDWillChange || followerWillChange };
+               statusWillChange, statusSCCDWillChange, followerWillChange, ackWillSend, effectivePendingStatus, effectivePendingSccd,
+               willAct: hasSolution || gseWillChange || assigneeWillChange || statusWillChange || statusSCCDWillChange || followerWillChange || ackWillSend };
     };
 
     const commitTicket = async (id, solutionRaw, completionCode) => {
       if (!prefs.enableRealWrites) return { ok: false, msg: 'Escritas reais desativadas.' };
       const pending = getBatchPending();
       const { hasSolution, gseWillChange, assigneeWillChange, statusWillChange, statusSCCDWillChange,
-              followerWillChange, effectivePendingStatus, effectivePendingSccd, willAct } = analyzeTicket(id, solutionRaw);
+              followerWillChange, ackWillSend, effectivePendingStatus, effectivePendingSccd, willAct } = analyzeTicket(id, solutionRaw);
       if (!willAct) return { skipped: true, msg: 'Sem alterações para este chamado.' };
 
       // Encaminhamento com GSE implica remoção do especialista designado
@@ -8576,6 +8577,22 @@
                 }
               } catch (fe) { console.warn('[SMAX ResponseHUD] addFollower HTTP error:', fe); }
             }
+          }
+          // Comunicar recebimento (discussão PUBLIC)
+          if (ackWillSend) {
+            try {
+              const template = prefs.ackMessageTemplate || '';
+              const entry = allFetchedEntries.find(e => String(e.id) === String(id));
+              const firstName = ((entry?.requestedForName || '').split(/\s/)[0]) || 'Solicitante';
+              const bodyHtml = template.replace(/\{nome\}/gi, firstName);
+              const ackRes = await Api.postDiscussion(id, { bodyHtml, purposeCode: 'StatusUpdate', privacyRaw: 'PUBLIC', commentTo: 'User' });
+              const ackOutcome = Api.summarizeBulkOutcome(ackRes);
+              if (ackOutcome?.ok) {
+                console.info('[SMAX ResponseHUD] Recebimento postado:', id);
+              } else {
+                console.warn('[SMAX ResponseHUD] Falha ao postar recebimento:', id, ackOutcome?.messages);
+              }
+            } catch (ae) { console.warn('[SMAX ResponseHUD] ackMessage HTTP error:', ae); }
           }
         }
         // Registrar no ActivityLog — garante que ações do ResponseHUD apareçam no relatório
@@ -10100,10 +10117,11 @@
         if (!prefs.myPersonId) { alert('Configure "Quem é você?" em Settings antes de usar esta função.'); return; }
         const pending = getBatchPending();
         const current = pending.followers || [];
-        const alreadyAdded = current.some(f => f.id === prefs.myPersonId);
+        const myId = String(prefs.myPersonId);
+        const alreadyAdded = current.some(f => String(f.id) === myId);
         const selfFollowBtn = backdrop.querySelector('#smax-resp-selffollow-btn');
         if (alreadyAdded) {
-          const filtered = current.filter(f => f.id !== prefs.myPersonId);
+          const filtered = current.filter(f => String(f.id) !== myId);
           setBatchPending('followers', filtered.length ? filtered : null);
           if (selfFollowBtn) selfFollowBtn.classList.remove('dirty');
         } else {
@@ -10114,31 +10132,21 @@
         updateFollowerChip(activeTicketId);
         updateSendButton();
       });
-      // Comunicar recebimento
-      backdrop.querySelector('#smax-resp-ack-btn')?.addEventListener('click', async () => {
-        if (!prefs.enableRealWrites) { setStatusMsg('Escritas reais desabilitadas.', '#fca5a5'); return; }
-        const template = prefs.ackMessageTemplate || '';
-        if (!template.trim()) { setStatusMsg('Template de recebimento vazio. Configure em Settings.', '#fca5a5'); return; }
-        const targets = selectedTicketIds.size > 0
-          ? [...selectedTicketIds].map(id => allFetchedEntries.find(e => String(e.id) === String(id))).filter(Boolean)
-          : activeTicketId ? [allFetchedEntries.find(e => String(e.id) === String(activeTicketId))].filter(Boolean) : [];
-        if (!targets.length) { setStatusMsg('Nenhum chamado selecionado.', '#fca5a5'); return; }
+      // Comunicar recebimento (toggle — efetiva no Atualizar)
+      backdrop.querySelector('#smax-resp-ack-btn')?.addEventListener('click', () => {
+        const pending = getBatchPending();
+        const isActive = !!pending.ackMessage;
         const ackBtn = backdrop.querySelector('#smax-resp-ack-btn');
-        if (ackBtn) ackBtn.disabled = true;
-        let ok = 0, fail = 0;
-        for (let i = 0; i < targets.length; i++) {
-          const entry = targets[i];
-          const firstName = (entry.requestedForName || '').split(/\s/)[0] || 'Solicitante';
-          const bodyHtml = template.replace(/\{nome\}/gi, firstName);
-          setStatusMsg(`Enviando recebimento ${i + 1}/${targets.length}...`, '#93c5fd');
-          try {
-            const res = await Api.postDiscussion(entry.id, { bodyHtml, purposeCode: 'StatusUpdate', privacyRaw: 'PUBLIC', commentTo: 'User' });
-            if (res && !res.skipped) ok++; else fail++;
-          } catch { fail++; }
+        if (isActive) {
+          setBatchPending('ackMessage', null);
+          if (ackBtn) ackBtn.classList.remove('dirty');
+        } else {
+          const template = prefs.ackMessageTemplate || '';
+          if (!template.trim()) { setStatusMsg('Template de recebimento vazio. Configure em Settings.', '#fca5a5'); return; }
+          setBatchPending('ackMessage', true);
+          if (ackBtn) ackBtn.classList.add('dirty');
         }
-        if (ackBtn) ackBtn.disabled = false;
-        if (fail === 0) setStatusMsg(`Recebimento enviado (${ok} chamado${ok > 1 ? 's' : ''}).`, '#86efac');
-        else setStatusMsg(`Recebimento: ${ok} ok, ${fail} falha${fail > 1 ? 's' : ''}.`, '#fca5a5');
+        updateSendButton();
       });
       // Assinatura picker
       backdrop.querySelector('#smax-resp-sig-btn')?.addEventListener('click', openSignaturePicker);

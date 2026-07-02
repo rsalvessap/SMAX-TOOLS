@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SMAX Toolkit - TJSP
 // @namespace    https://github.com/rsalvessap/SMAX-TOOLS
-// @version      2.83
+// @version      2.84
 // @description  Conjunto de ferramentas para o SMAX TJSP: triagem, respostas em lote, scripts, discussões e consulta de processos no eProc
 // @author       rsalvessap
 // @match        https://suporte.tjsp.jus.br/saw/*
@@ -47,7 +47,7 @@
   const SMAX_SB_URL = 'https://rlcbmrjkojopipiwpktf.supabase.co';
   const SMAX_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Jtcmprb2pvcGlwaXdwa3RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MzI0MTksImV4cCI6MjA5NDMwODQxOX0.Ha4xRbFvbgb2yO64ga3dV8KrNGRgbV7zWFXc5bYHdeQ';
 
-  const SMAX_TOOLKIT_VERSION = '2.83';
+  const SMAX_TOOLKIT_VERSION = '2.84';
   const SMAX_TENANT_ID = '213963628';
   console.log('%c[SMAX Toolkit] v' + SMAX_TOOLKIT_VERSION + ' carregado', 'color:#60a5fa;font-weight:bold;font-size:13px;');
 
@@ -136,7 +136,7 @@
   const PersonalStore = (() => {
     const STORAGE_KEY = 'smax_personal_prefs';
     const defaults = {
-      myDestaque:  [],  // ["NOME NORMALIZADO", ...] — usuários em destaque (pessoal)
+      myDestaque:  [],  // [{ id, name }] — usuários em destaque (pessoal)
       themeMode:   'dark', // 'dark' | 'light'
       personalSignatures: [],  // [{ name: string, html: string }]
     };
@@ -152,6 +152,10 @@
         if (Array.isArray(parsed.myDetratores) && !parsed.myDestaque) {
           parsed.myDestaque = parsed.myDetratores;
           delete parsed.myDetratores;
+        }
+        // Migration: string[] → [{id, name}]
+        if (Array.isArray(parsed.myDestaque) && parsed.myDestaque.length > 0 && typeof parsed.myDestaque[0] === 'string') {
+          parsed.myDestaque = parsed.myDestaque.map(name => ({ id: '', name }));
         }
         Object.assign(state, defaults, parsed || {});
       } catch (err) {
@@ -4309,17 +4313,16 @@
         <div id="smax-det-list" style="display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto;margin-bottom:4px;">
           ${(personal.myDestaque || []).length === 0
             ? `<div style="font-size:12px;color:var(--sp-text-dim);text-align:center;padding:24px;">Nenhum usuário destaque cadastrado.</div>`
-            : (personal.myDestaque || []).map((name, i) => `
+            : (personal.myDestaque || []).map((d, i) => `
               <div class="smax-det-item">
-                <span>⭐ ${Utils.escapeHtml(name)}</span>
+                <span>⭐ ${Utils.escapeHtml(typeof d === 'string' ? d : d.name || '')}${d.id ? ` <span style="font-size:9px;color:var(--sp-text-dim);">(${Utils.escapeHtml(d.id)})</span>` : ''}</span>
                 <button class="smax-det-del" data-idx="${i}">✕</button>
               </div>`).join('')
           }
         </div>
-        <div id="smax-det-input-row" style="display:none;margin-top:8px;gap:6px;">
-          <input type="text" id="smax-det-input" placeholder="Nome completo do usuário" style="flex:1;padding:7px 10px;border-radius:6px;font-size:12px;min-width:0;">
-          <button type="button" id="smax-det-confirm" style="padding:7px 14px;border-radius:6px;border:none;background:var(--sp-primary);color:var(--sp-on-accent);font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;">Salvar</button>
-          <button type="button" id="smax-det-cancel" style="padding:7px 10px;border-radius:6px;border:1px solid var(--sp-border);background:var(--sp-surface);color:var(--sp-text-muted);font-size:12px;cursor:pointer;flex-shrink:0;">✕</button>
+        <div id="smax-det-input-row" style="display:none;margin-top:8px;position:relative;">
+          <input type="text" id="smax-det-search" placeholder="Buscar por nome..." style="width:100%;padding:7px 10px;border-radius:6px;font-size:12px;box-sizing:border-box;">
+          <div id="smax-det-search-results" style="display:none;position:absolute;top:100%;left:0;right:0;max-height:200px;overflow-y:auto;background:var(--sp-surface-2);border:1px solid var(--sp-input-border);border-top:none;border-radius:0 0 8px 8px;z-index:200;box-shadow:0 12px 24px rgba(0,0,0,.5);"></div>
         </div>
       </div>`;
 
@@ -4349,6 +4352,32 @@
           <input id="smax-tpl-sp-title" type="text" placeholder="Título do script..." style="padding:8px 10px;border-radius:6px;font-size:13px;width:100%;box-sizing:border-box;">
           <div class="smax-sp-muted">Conteúdo (aceita HTML. Cole diretamente do OneNote, Word ou qualquer editor rico):</div>
           <textarea id="smax-tpl-sp-body" placeholder="Cole o conteúdo aqui ou escreva HTML..." style="min-height:140px;resize:vertical;padding:8px 10px;border-radius:6px;font-size:12px;font-family:'Segoe UI',system-ui,sans-serif;width:100%;box-sizing:border-box;line-height:1.5;"></textarea>
+          <div id="smax-tpl-sp-disc-fields" style="display:none;gap:8px;">
+            <div style="flex:1;">
+              <label style="font-size:11px;color:var(--sp-text-muted);display:block;margin-bottom:4px;">Para (opcional)</label>
+              <select id="smax-tpl-sp-commentTo" style="width:100%;padding:6px 8px;border-radius:6px;font-size:12px;box-sizing:border-box;">
+                <option value="">(Não definido)</option>
+                <option value="Agent">Agente</option>
+                <option value="User">Usuário</option>
+                <option value="Vendor">Fornecedor</option>
+                <option value="ExternalServiceDesk">Central Externa</option>
+                <option value="Stakeholder">Participantes</option>
+              </select>
+            </div>
+            <div style="flex:1;">
+              <label style="font-size:11px;color:var(--sp-text-muted);display:block;margin-bottom:4px;">Objetivo (opcional)</label>
+              <select id="smax-tpl-sp-purposeCode" style="width:100%;padding:6px 8px;border-radius:6px;font-size:12px;box-sizing:border-box;">
+                <option value="">(Não definido)</option>
+                <option value="StatusUpdate">Atualização de status</option>
+                <option value="FollowUp">Acompanhamento</option>
+                <option value="Resolution">Resolução</option>
+                <option value="RequestMoreInformation">Solicitar mais informações</option>
+                <option value="ProvideInformation">Fornecer informações</option>
+                <option value="Diagnosis">Diagnóstico</option>
+                <option value="SCCDComment_c">Comentário para SCCD</option>
+              </select>
+            </div>
+          </div>
           <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
             <button id="smax-tpl-sp-cancel" style="padding:7px 14px;border-radius:6px;border:1px solid var(--sp-border);background:var(--sp-surface);color:var(--sp-text-muted);font-size:12px;cursor:pointer;">Cancelar</button>
             <button id="smax-tpl-sp-save" style="padding:7px 18px;border-radius:6px;border:none;background:var(--sp-primary);color:var(--sp-on-accent);font-size:12px;font-weight:600;cursor:pointer;">Salvar script</button>
@@ -4699,20 +4728,54 @@
       if (!container) return;
       const detAddBtn   = container.querySelector('#smax-det-add-btn');
       const detInputRow = container.querySelector('#smax-det-input-row');
-      const detInput    = container.querySelector('#smax-det-input');
-      const detConfirm  = container.querySelector('#smax-det-confirm');
-      const detCancel   = container.querySelector('#smax-det-cancel');
-      if (detAddBtn) detAddBtn.addEventListener('click', () => { detInputRow.style.display = 'flex'; detInput?.focus(); });
-      if (detCancel) detCancel.addEventListener('click', () => { detInputRow.style.display = 'none'; if (detInput) detInput.value = ''; });
-      if (detConfirm) detConfirm.addEventListener('click', () => {
-        const name = (detInput?.value || '').trim();
-        if (!name) return;
-        if (!Array.isArray(personal.myDestaque)) personal.myDestaque = [];
-        if (!personal.myDestaque.includes(name)) personal.myDestaque.push(name);
-        savePersonal();
-        renderPanel();
+      const detSearch   = container.querySelector('#smax-det-search');
+      const detResults  = container.querySelector('#smax-det-search-results');
+      if (detAddBtn) detAddBtn.addEventListener('click', () => {
+        detInputRow.style.display = 'block';
+        detSearch?.focus();
+        DataRepository.ensurePeopleLoaded();
       });
-      if (detInput) detInput.addEventListener('keydown', e => { if (e.key === 'Enter') detConfirm?.click(); });
+      if (detSearch && detResults) {
+        let detSearchTimeout = null;
+        const renderResults = () => {
+          const q = (detSearch.value || '').trim().toLowerCase();
+          if (!q || q.length < 2) { detResults.style.display = 'none'; return; }
+          if (!DataRepository.peopleCache.size) {
+            detResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Carregando...</div>';
+            detResults.style.display = 'block';
+            return;
+          }
+          const existingIds = new Set((personal.myDestaque || []).map(d => d.id).filter(Boolean));
+          const matches = [...DataRepository.peopleCache.values()]
+            .filter(p => !existingIds.has(p.id) && ((p.name || '').toLowerCase().includes(q) || (p.upn || '').toLowerCase().includes(q)))
+            .slice(0, 10);
+          if (!matches.length) {
+            detResults.innerHTML = '<div style="padding:8px;color:var(--sp-text-muted);font-size:11px;">Nenhuma pessoa encontrada.</div>';
+          } else {
+            detResults.innerHTML = matches.map(p => `
+              <div class="smax-det-result" data-id="${Utils.escapeHtml(p.id)}" data-name="${Utils.escapeHtml(p.name || '')}"
+                style="padding:6px 10px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--sp-border);color:var(--sp-text);transition:background .1s;">
+                ${Utils.escapeHtml(p.name || p.id)}${p.upn ? ` <span style="font-size:10px;color:var(--sp-text-dim);">(${Utils.escapeHtml(p.upn)})</span>` : ''}
+              </div>`).join('');
+            detResults.querySelectorAll('.smax-det-result').forEach(item => {
+              item.addEventListener('mouseenter', () => { item.style.background = 'var(--sp-primary-bg)'; });
+              item.addEventListener('mouseleave', () => { item.style.background = ''; });
+              item.addEventListener('click', () => {
+                if (!Array.isArray(personal.myDestaque)) personal.myDestaque = [];
+                personal.myDestaque.push({ id: item.dataset.id, name: item.dataset.name });
+                savePersonal();
+                renderPanel();
+              });
+            });
+          }
+          detResults.style.display = 'block';
+        };
+        detSearch.addEventListener('input', () => {
+          clearTimeout(detSearchTimeout);
+          detSearchTimeout = setTimeout(renderResults, 200);
+        });
+        detSearch.addEventListener('blur', () => setTimeout(() => { detResults.style.display = 'none'; }, 200));
+      }
       container.querySelectorAll('.smax-det-del').forEach(btn => {
         btn.addEventListener('click', () => {
           const idx = parseInt(btn.dataset.idx, 10);
@@ -4808,6 +4871,15 @@
         formEl.querySelector('#smax-tpl-sp-form-title-lbl').textContent = idx !== null ? 'Editar script' : 'Novo script';
         formEl.querySelector('#smax-tpl-sp-title').value = tpl?.title || '';
         formEl.querySelector('#smax-tpl-sp-body').value  = tpl?.html  || '';
+        // Campos extras de discussão
+        const discFields = formEl.querySelector('#smax-tpl-sp-disc-fields');
+        if (discFields) {
+          discFields.style.display = tplActiveDisc ? 'flex' : 'none';
+          const commentToSel = formEl.querySelector('#smax-tpl-sp-commentTo');
+          const purposeSel = formEl.querySelector('#smax-tpl-sp-purposeCode');
+          if (commentToSel) commentToSel.value = tpl?.commentTo || '';
+          if (purposeSel) purposeSel.value = tpl?.purposeCode || '';
+        }
         formEl.style.display = 'flex';
         formEl.querySelector('#smax-tpl-sp-title').focus();
         // Hide import area
@@ -4824,9 +4896,16 @@
         const title = (formEl.querySelector('#smax-tpl-sp-title').value || '').trim();
         const html  = (formEl.querySelector('#smax-tpl-sp-body').value  || '').trim();
         if (!title) { alert('Informe um título para o script.'); return; }
+        const entry = { title, html };
+        if (tplActiveDisc) {
+          const commentTo = formEl.querySelector('#smax-tpl-sp-commentTo')?.value || '';
+          const purposeCode = formEl.querySelector('#smax-tpl-sp-purposeCode')?.value || '';
+          if (commentTo) entry.commentTo = commentTo;
+          if (purposeCode) entry.purposeCode = purposeCode;
+        }
         const arr = Templates.load(tplActiveDisc);
-        if (tplEditingIdx !== null) arr[tplEditingIdx] = { title, html };
-        else arr.push({ title, html });
+        if (tplEditingIdx !== null) arr[tplEditingIdx] = entry;
+        else arr.push(entry);
         Templates.save(tplActiveDisc, arr);
         closeTplForm();
         renderTplList();
@@ -7698,6 +7777,20 @@
         }
       }
 
+      // Número do Processo
+      const processLabel = backdrop.querySelector('#smax-resp-process-label');
+      if (processLabel) {
+        const rawProc = (DataRepository.triageCache.get(tid)?.processNumber || '').trim();
+        if (rawProc) {
+          processLabel.textContent = `📄 ${rawProc}`;
+          processLabel.title = `Nº Processo: ${rawProc}`;
+          processLabel.style.display = '';
+        } else {
+          processLabel.textContent = '';
+          processLabel.style.display = 'none';
+        }
+      }
+
       // Meta-bar: GSE chip (mostra batchPending — aplica-se a todos os selecionados)
       const pending = getBatchPending();
       const gseChipName = backdrop.querySelector('#smax-resp-gse-chip-name');
@@ -8031,22 +8124,35 @@
       }
     };
 
+    const FIXED_PRESETS = [
+      { id: '__rejected__', name: '🔴 Rejeitados', statuses: ['AguardandoAtendimento_c'], requestStatuses: ['RequestStatusReady'], assignees: [], teams: [], text: '' },
+    ];
+
     const renderPresetPills = () => {
       const el = backdrop?.querySelector('#smax-resp-preset-pills');
       if (!el) return;
       const presets = loadPresets();
-      if (!presets.length) {
-        el.innerHTML = '<span style="font-size:10px;color:var(--sp-text-dim);font-style:italic;">Nenhum preset</span>';
-        return;
-      }
-      el.innerHTML = presets.map(p => `
+      // Preset fixo (não deletável)
+      const fixedHtml = FIXED_PRESETS.map(fp => `
+        <span class="smax-resp-preset-pill smax-resp-preset-fixed" data-preset-id="${fp.id}"
+          style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:12px;border:1px solid var(--sp-danger-border);background:var(--sp-danger-bg);color:var(--sp-danger-text);font-size:10px;cursor:pointer;white-space:nowrap;transition:all .12s;user-select:none;">
+          ${fp.name}
+        </span>`).join('');
+      const userHtml = presets.map(p => `
         <span class="smax-resp-preset-pill" data-preset-id="${Utils.escapeHtml(p.id)}"
           style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:12px;border:1px solid var(--sp-border);background:var(--sp-surface-2);color:var(--sp-text);font-size:10px;cursor:pointer;white-space:nowrap;transition:all .12s;user-select:none;">
           ${Utils.escapeHtml(p.name)}
           <button class="smax-resp-preset-del" data-preset-id="${Utils.escapeHtml(p.id)}"
             style="background:none;border:none;color:var(--sp-text-dim);cursor:pointer;font-size:10px;padding:0;line-height:1;margin-left:2px;" title="Excluir preset">✕</button>
         </span>`).join('');
-      el.querySelectorAll('.smax-resp-preset-pill').forEach(pill => {
+      el.innerHTML = fixedHtml + userHtml;
+      // Wiring: presets fixos
+      el.querySelectorAll('.smax-resp-preset-fixed').forEach(pill => {
+        const fp = FIXED_PRESETS.find(f => f.id === pill.dataset.presetId);
+        if (fp) pill.addEventListener('click', () => applyPreset(fp));
+      });
+      // Wiring: presets do usuário
+      el.querySelectorAll('.smax-resp-preset-pill:not(.smax-resp-preset-fixed)').forEach(pill => {
         pill.addEventListener('click', e => {
           if (e.target.closest('.smax-resp-preset-del')) return;
           const p = loadPresets().find(p => p.id === pill.dataset.presetId);
@@ -8108,7 +8214,7 @@
       if (clearBtn) clearBtn.style.display = (selectedStatuses.size > 0 || selectedRequestStatuses.size > 0 || selectedAssignees.size > 0) ? '' : 'none';
       setStatusMsg('', '');
       // Persiste filtros para próxima sessão
-      try { GM_setValue('smax_resp_filters', JSON.stringify({ statuses: [...selectedStatuses], requestStatuses: [...selectedRequestStatuses], assignees: [...selectedAssignees], text: textFilter })); } catch {}
+      try { GM_setValue('smax_resp_filters', JSON.stringify({ _initialized: true, statuses: [...selectedStatuses], requestStatuses: [...selectedRequestStatuses], assignees: [...selectedAssignees], text: textFilter })); } catch {}
       renderTicketList();
       updateBatchBar();
       if (ticketList.length && !activeTicketId) loadTicket(ticketList[0].id);
@@ -8474,6 +8580,114 @@
       closeBtn.onclick = closePicker;
 
       // Click-outside-to-close persistente (não usa {once:true} que quebrava após clique interno)
+      if (modal._smaxOutsideHandler) document.removeEventListener('mousedown', modal._smaxOutsideHandler);
+      modal._smaxOutsideHandler = (e) => {
+        const box = modal.querySelector('#smax-resp-script-box');
+        if (box && !box.contains(e.target) && modal.dataset.open === 'true') closePicker();
+      };
+      setTimeout(() => document.addEventListener('mousedown', modal._smaxOutsideHandler), 0);
+    };
+
+    // Picker de scripts de DISCUSSÃO — reutiliza o mesmo modal #smax-resp-script-modal
+    const openDiscScriptPicker = async () => {
+      const modal = backdrop?.querySelector('#smax-resp-script-modal');
+      if (!modal) return;
+
+      if (modal.dataset.open === 'true') { modal.dataset.open = 'false'; return; }
+      modal.dataset.open = 'true';
+
+      const listCol    = modal.querySelector('#smax-resp-script-list-col');
+      const previewCol = modal.querySelector('#smax-resp-script-preview-col');
+      const searchInp  = modal.querySelector('#smax-resp-script-search-inp');
+      const countEl    = modal.querySelector('#smax-resp-script-count');
+      const useBtn     = modal.querySelector('#smax-resp-script-use-btn');
+      const closeBtn   = modal.querySelector('#smax-resp-script-modal-close');
+
+      let selectedScript = null;
+      let allScripts     = [];
+
+      const selectScript = (s) => {
+        selectedScript = s;
+        useBtn.disabled = false;
+        previewCol.innerHTML = Utils.sanitizeRichText(s.html) || '<em>Sem conteúdo.</em>';
+        listCol.querySelectorAll('.smax-resp-script-row').forEach(r => {
+          r.classList.toggle('selected', r.dataset.idx === String(allScripts.indexOf(s)));
+        });
+      };
+
+      const renderList = (filtered) => {
+        if (!filtered.length) {
+          listCol.innerHTML = '<div style="padding:16px;color:var(--sp-text-muted);font-size:12px;text-align:center;">Nenhum script de discussão encontrado.</div>';
+          return;
+        }
+        listCol.innerHTML = filtered.map((s) => {
+          const stripped = (s.html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+          const badge = s._shared
+            ? `<span style="font-size:9px;padding:1px 4px;border-radius:999px;background:var(--sp-primary-bg);color:var(--sp-accent);border:1px solid var(--sp-accent);">☁️</span>`
+            : '';
+          const origIdx = allScripts.indexOf(s);
+          return `<div class="smax-resp-script-row${selectedScript === s ? ' selected' : ''}" data-idx="${origIdx}">
+            <div class="smax-resp-script-row-title">${Utils.escapeHtml(s.title)} ${badge}</div>
+            <div class="smax-resp-script-row-preview">${Utils.escapeHtml(stripped.slice(0, 80))}</div>
+          </div>`;
+        }).join('');
+        listCol.querySelectorAll('.smax-resp-script-row').forEach((row, rowI) => {
+          row.addEventListener('click', () => selectScript(filtered[rowI]));
+        });
+      };
+
+      const applyFilter = (q) => {
+        if (!q) { countEl.textContent = `${allScripts.length} scripts`; renderList(allScripts); return; }
+        const ql = q.toLowerCase();
+        const filtered = allScripts.filter(s =>
+          (s.title || '').toLowerCase().includes(ql) ||
+          (s.html || '').replace(/<[^>]+>/g, ' ').toLowerCase().includes(ql)
+        );
+        countEl.textContent = `${filtered.length} de ${allScripts.length}`;
+        renderList(filtered);
+      };
+
+      // Load
+      listCol.innerHTML = '<div style="padding:16px;color:var(--sp-text-muted);font-size:12px;">Carregando scripts de discussão...</div>';
+      previewCol.innerHTML = '<div id="smax-resp-script-preview-empty">Selecione um script para ver o conteúdo.</div>';
+      useBtn.disabled = true;
+      selectedScript = null;
+      searchInp.value = '';
+
+      allScripts = Templates.loadAll(true);
+      countEl.textContent = `${allScripts.length} scripts`;
+      renderList(allScripts);
+      searchInp.focus();
+
+      if (searchInp._smaxFilterHandler) searchInp.removeEventListener('input', searchInp._smaxFilterHandler);
+      searchInp._smaxFilterHandler = () => applyFilter(searchInp.value.trim());
+      searchInp.addEventListener('input', searchInp._smaxFilterHandler);
+
+      useBtn.onclick = () => {
+        if (!selectedScript) return;
+        const discEditor = backdrop?.querySelector('#smax-resp-new-disc-editor');
+        if (discEditor) {
+          discEditor.innerHTML = Utils.sanitizeRichText(selectedScript.html) || '';
+        }
+        // Preencher selects "Para" e "Objetivo" se o script tiver valores definidos
+        if (selectedScript.commentTo) {
+          const toSelect = backdrop?.querySelector('#smax-resp-new-disc-to');
+          if (toSelect) toSelect.value = selectedScript.commentTo;
+        }
+        if (selectedScript.purposeCode) {
+          const purposeSelect = backdrop?.querySelector('#smax-resp-new-disc-purpose');
+          if (purposeSelect) purposeSelect.value = selectedScript.purposeCode;
+        }
+        closePicker();
+      };
+
+      const closePicker = () => {
+        modal.dataset.open = 'false';
+        if (modal._smaxOutsideHandler) { document.removeEventListener('mousedown', modal._smaxOutsideHandler); modal._smaxOutsideHandler = null; }
+      };
+
+      closeBtn.onclick = closePicker;
+
       if (modal._smaxOutsideHandler) document.removeEventListener('mousedown', modal._smaxOutsideHandler);
       modal._smaxOutsideHandler = (e) => {
         const box = modal.querySelector('#smax-resp-script-box');
@@ -9661,6 +9875,7 @@
                 <span id="smax-resp-opener" style="font-size:13px;color:var(--sp-header-fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;max-width:280px;"></span>
                 <span id="smax-resp-requester-title" style="display:none;font-size:13px;color:var(--sp-header-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;min-width:0;max-width:240px;font-style:italic;"></span>
                 <span id="smax-resp-location-label" style="display:none;font-size:13px;color:var(--sp-header-fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;cursor:pointer;" title="Clique para ver nome completo"></span>
+                <span id="smax-resp-process-label" style="display:none;font-size:12px;color:var(--sp-accent);font-family:monospace;font-weight:600;white-space:nowrap;flex-shrink:0;"></span>
                 <span id="smax-resp-created-label" style="display:none;font-size:12px;color:var(--sp-header-sub);white-space:nowrap;flex-shrink:0;margin-left:auto;"></span>
               </div>
               <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
@@ -9771,7 +9986,10 @@
                 <div style="font-size:10px;font-weight:600;color:var(--sp-text-muted);text-transform:uppercase;letter-spacing:.07em;padding:10px 12px 8px;border-bottom:1px solid var(--sp-border);flex-shrink:0;">💬 Discussões</div>
                 <div id="smax-resp-discussions-list"></div>
                 <div id="smax-resp-new-disc-panel">
-                  <div id="smax-resp-new-disc-label">Nova discussão</div>
+                  <div id="smax-resp-new-disc-label" style="display:flex;align-items:center;justify-content:space-between;">
+                    <span>Nova discussão</span>
+                    <button id="smax-resp-disc-scripts-btn" type="button" style="font-size:10px;padding:2px 8px;border-radius:5px;border:1px solid var(--sp-border);background:var(--sp-surface-2);color:var(--sp-text);cursor:pointer;">📋 Scripts</button>
+                  </div>
                   <div id="smax-resp-new-disc-editor" contenteditable="true" spellcheck="false" data-placeholder="Escreva a nova discussão..."></div>
                   <div class="smax-resp-new-disc-footer">
                     <span id="smax-resp-new-disc-status"></span>
@@ -9874,17 +10092,24 @@
 
       document.body.appendChild(backdrop);
 
-      // Restaura filtros da sessão anterior
+      // Restaura filtros da sessão anterior (ou aplica defaults na primeira vez)
       try {
         const saved = JSON.parse(GM_getValue('smax_resp_filters', '{}'));
-        if (saved.statuses?.length) saved.statuses.forEach(s => selectedStatuses.add(s));
-        if (saved.assignees?.length) saved.assignees.forEach(a => selectedAssignees.add(a));
-        if (saved.text) {
-          textFilter = saved.text;
-          const tfInp = backdrop.querySelector('#smax-resp-text-filter');
-          const tfClr = backdrop.querySelector('#smax-resp-text-filter-clear');
-          if (tfInp) tfInp.value = textFilter;
-          if (tfClr) tfClr.style.display = textFilter ? '' : 'none';
+        if (saved._initialized) {
+          if (saved.statuses?.length) saved.statuses.forEach(s => selectedStatuses.add(s));
+          if (saved.requestStatuses?.length) saved.requestStatuses.forEach(s => selectedRequestStatuses.add(s));
+          if (saved.assignees?.length) saved.assignees.forEach(a => selectedAssignees.add(a));
+          if (saved.text) {
+            textFilter = saved.text;
+            const tfInp = backdrop.querySelector('#smax-resp-text-filter');
+            const tfClr = backdrop.querySelector('#smax-resp-text-filter-clear');
+            if (tfInp) tfInp.value = textFilter;
+            if (tfClr) tfClr.style.display = textFilter ? '' : 'none';
+          }
+        } else {
+          // Primeira vez — filtros padrão
+          selectedRequestStatuses.add('RequestStatusInProgress');
+          selectedStatuses.add('AguardandoAtendimento_c');
         }
       } catch {}
 
@@ -10537,6 +10762,9 @@
           }
         });
       }
+
+      // Botão de scripts de discussão
+      backdrop.querySelector('#smax-resp-disc-scripts-btn')?.addEventListener('click', openDiscScriptPicker);
     };
 
     return { init, open, close };
@@ -10562,6 +10790,8 @@
     const normalize = (arr) => arr.map(t => ({
       title: t.title || '',
       html: t.html || t.content || '',
+      commentTo: t.commentTo || '',
+      purposeCode: t.purposeCode || '',
       _shared: t._shared || false,
     }));
 

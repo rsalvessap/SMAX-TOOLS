@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SMAX Toolkit - TJSP
 // @namespace    https://github.com/rsalvessap/SMAX-TOOLS
-// @version      2.90
+// @version      2.91
 // @description  Conjunto de ferramentas para o SMAX TJSP: triagem, respostas em lote, scripts, discussões e consulta de processos no eProc
 // @author       rsalvessap
 // @match        https://suporte.tjsp.jus.br/saw/*
@@ -47,7 +47,7 @@
   const SMAX_SB_URL = 'https://rlcbmrjkojopipiwpktf.supabase.co';
   const SMAX_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Jtcmprb2pvcGlwaXdwa3RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MzI0MTksImV4cCI6MjA5NDMwODQxOX0.Ha4xRbFvbgb2yO64ga3dV8KrNGRgbV7zWFXc5bYHdeQ';
 
-  const SMAX_TOOLKIT_VERSION = '2.90';
+  const SMAX_TOOLKIT_VERSION = '2.91';
   const SMAX_TENANT_ID = '213963628';
   console.log('%c[SMAX Toolkit] v' + SMAX_TOOLKIT_VERSION + ' carregado', 'color:#60a5fa;font-weight:bold;font-size:13px;');
 
@@ -94,7 +94,7 @@
         }
       ]),
       teamSignaturesRaw: '{}',
-      ackMessageTemplate: '<p>Prezado(a) {nome},</p><p>Informamos que a solicitação foi recebida e está sendo analisada com a devida prioridade.</p><p>As atualizações serão comunicadas por este canal.</p>',
+      ackMessageTemplate: 'Prezado(a) Solicitante,\nInformamos que a solicitação foi recebida e está sendo analisada com a devida prioridade.\nAs atualizações serão comunicadas por este canal.',
     };
 
     const state = JSON.parse(JSON.stringify(defaults));
@@ -105,6 +105,16 @@
         if (!saved) return;
         const parsed = JSON.parse(saved);
         Object.assign(state, defaults, parsed || {});
+        // Migrar ackMessageTemplate de HTML para texto puro (versões ≤2.90)
+        if (state.ackMessageTemplate && /<[^>]+>/.test(state.ackMessageTemplate)) {
+          state.ackMessageTemplate = state.ackMessageTemplate
+            .replace(/<br\s*\/?>/gi, '\n')
+            .replace(/<\/p>\s*<p[^>]*>/gi, '\n')
+            .replace(/<[^>]+>/g, '')
+            .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+            .replace(/\{nome\}/gi, 'Solicitante')
+            .trim();
+        }
         console.log('[SMAX] Preferences loaded:', state);
       } catch (err) {
         console.warn('[SMAX] Failed to load preferences:', err);
@@ -4269,9 +4279,9 @@
         </div>
         <div class="smax-sp-card">
           <div class="smax-sp-section-title">📨 Mensagem de Recebimento</div>
-          <div class="smax-sp-muted" style="margin-bottom:10px;">Template HTML enviado ao clicar em "Recebimento". Use <code>{nome}</code> para o primeiro nome do solicitante.</div>
+          <div class="smax-sp-muted" style="margin-bottom:10px;">Texto enviado como discussão pública ao clicar em "Recebimento". Cada linha vira um parágrafo.</div>
           <textarea id="smax-ack-template-textarea" spellcheck="false"
-            style="width:100%;min-height:100px;max-height:200px;resize:vertical;padding:10px 12px;border-radius:8px;font-size:12px;font-family:'Cascadia Code','Fira Code','Consolas',monospace;line-height:1.5;box-sizing:border-box;">${Utils.escapeHtml(prefs.ackMessageTemplate || '')}</textarea>
+            style="width:100%;min-height:100px;max-height:200px;resize:vertical;padding:10px 12px;border-radius:8px;font-size:13px;font-family:'Segoe UI',system-ui,sans-serif;line-height:1.5;box-sizing:border-box;">${Utils.escapeHtml(prefs.ackMessageTemplate || '')}</textarea>
           <div style="display:flex;gap:8px;margin-top:8px;">
             <button type="button" id="smax-ack-template-save-btn" style="padding:7px 14px;border:none;border-radius:7px;background:var(--sp-primary);color:var(--sp-on-accent);font-size:12px;font-weight:600;cursor:pointer;">Salvar</button>
             <button type="button" id="smax-ack-template-reset-btn" style="padding:7px 14px;border:1px solid var(--sp-border);border-radius:7px;background:var(--sp-surface-2);color:var(--sp-text);font-size:11px;cursor:pointer;">↺ Restaurar padrão</button>
@@ -8894,13 +8904,12 @@
             }
           }
           // Escalação já inclusa nas propriedades (Status + StatusSCCD)
-          // Comunicar recebimento (discussão PUBLIC)
+          // Comunicar recebimento (discussão PUBLIC para o usuário)
           if (ackWillSend) {
             try {
-              const template = prefs.ackMessageTemplate || '';
-              const entry = allFetchedEntries.find(e => String(e.id) === String(id));
-              const firstName = ((entry?.requestedForName || '').split(/\s/)[0]) || 'Solicitante';
-              const bodyHtml = template.replace(/\{nome\}/gi, firstName);
+              const template = (prefs.ackMessageTemplate || '').trim();
+              // Converte texto puro em HTML: cada linha vira <p>
+              const bodyHtml = template.split(/\n/).map(l => `<p>${Utils.escapeHtml(l)}</p>`).join('');
               const ackRes = await Api.postDiscussion(id, { bodyHtml, purposeCode: 'StatusUpdate', privacyRaw: 'PUBLIC', commentTo: 'User' });
               const ackOutcome = Api.summarizeBulkOutcome(ackRes);
               if (ackOutcome?.ok) {

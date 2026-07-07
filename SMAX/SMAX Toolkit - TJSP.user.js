@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SMAX Toolkit - TJSP
 // @namespace    https://github.com/rsalvessap/SMAX-TOOLS
-// @version      2.92
+// @version      2.93
 // @description  Conjunto de ferramentas para o SMAX TJSP: triagem, respostas em lote, scripts, discussões e consulta de processos no eProc
 // @author       rsalvessap
 // @match        https://suporte.tjsp.jus.br/saw/*
@@ -47,7 +47,7 @@
   const SMAX_SB_URL = 'https://rlcbmrjkojopipiwpktf.supabase.co';
   const SMAX_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsY2Jtcmprb2pvcGlwaXdwa3RmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3MzI0MTksImV4cCI6MjA5NDMwODQxOX0.Ha4xRbFvbgb2yO64ga3dV8KrNGRgbV7zWFXc5bYHdeQ';
 
-  const SMAX_TOOLKIT_VERSION = '2.92';
+  const SMAX_TOOLKIT_VERSION = '2.93';
   const SMAX_TENANT_ID = '213963628';
   console.log('%c[SMAX Toolkit] v' + SMAX_TOOLKIT_VERSION + ' carregado', 'color:#60a5fa;font-weight:bold;font-size:13px;');
 
@@ -7416,7 +7416,34 @@
       div.innerHTML = html;
       return (div.textContent || div.innerText || '').trim();
     };
-    // Adiciona suporte a colar imagem (base64 inline) em qualquer editor contenteditable
+    // Comprime uma imagem via canvas para evitar payloads gigantes de base64.
+    // Sem compressão, um screenshot 1080p pode gerar ~5MB de base64.
+    // O SMAX converte campos rich-text grandes em links/referências server-side,
+    // truncando o conteúdo visível. Comprimindo (max 1200px, JPEG 75%) ficamos em ~30-80KB.
+    const compressImageToDataUrl = (dataUrl) => new Promise((resolve) => {
+      const MAX_DIM = 1200;
+      const QUALITY = 0.75;
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > MAX_DIM || height > MAX_DIM) {
+          const scale = Math.min(MAX_DIM / width, MAX_DIM / height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', QUALITY));
+      };
+      img.onerror = () => resolve(dataUrl); // fallback: usa original se falhar
+      img.src = dataUrl;
+    });
+
+    // Adiciona suporte a colar imagem (base64 inline) em qualquer editor contenteditable.
+    // Imagens são comprimidas via canvas antes de inserir para evitar payloads enormes.
     const addImagePasteHandler = (editor, onInput) => {
       if (!editor) return;
       editor.addEventListener('paste', e => {
@@ -7428,8 +7455,9 @@
             const file = item.getAsFile();
             if (!file) continue;
             const reader = new FileReader();
-            reader.onload = ev => {
-              document.execCommand('insertImage', false, ev.target.result);
+            reader.onload = async (ev) => {
+              const compressed = await compressImageToDataUrl(ev.target.result);
+              document.execCommand('insertImage', false, compressed);
               if (onInput) onInput();
             };
             reader.readAsDataURL(file);
@@ -8833,7 +8861,9 @@
               followerWillChange, ackWillSend, escalateWillSend, effectivePendingStatus, effectivePendingSccd, willAct } = analyzeTicket(id, solutionRaw);
       if (!willAct) return { skipped: true, msg: 'Sem alterações para este chamado.' };
 
-      // Encaminhamento com GSE implica remoção do especialista designado
+      // Encaminhamento com GSE implica remoção do especialista designado.
+      // A limpeza é feita em UPDATE separado APÓS a mudança de GSE para evitar que
+      // o servidor re-designe automaticamente ao processar ambos na mesma operação.
       const fwdHtml = pending.forwarding?.text || '';
       const clearAssignee = gseWillChange && !!fwdHtml;
 
@@ -8850,9 +8880,9 @@
         props.CompletionCode = completionCode || 'CompletionCodeFulfilled';
       }
       if (gseWillChange) props.ExpertGroup = pending.gse.id;
-      if (clearAssignee) {
-        props.ExpertAssignee = '';
-      } else if (assigneeWillChange) {
+      // Quando clearAssignee, NÃO incluir ExpertAssignee no mesmo UPDATE que muda ExpertGroup.
+      // A limpeza é feita em UPDATE separado após o primeiro suceder (ver abaixo).
+      if (!clearAssignee && assigneeWillChange) {
         props.ExpertAssignee = pending.assignee.id;
       }
       if (statusWillChange && effectivePendingStatus?.key) props.Status = effectivePendingStatus.key;
@@ -8884,6 +8914,20 @@
               status:              statusWillChange     ? (effectivePendingStatus?.key ?? entry.status)  : entry.status,
               statusSCCD:          statusSCCDWillChange ? (effectivePendingSccd?.key  ?? entry.statusSCCD) : entry.statusSCCD,
             }));
+          }
+          // Limpar especialista em UPDATE separado após mudança de GSE.
+          // Feito antes da discussão para que o chamado já esteja sem especialista quando o texto chegar.
+          if (clearAssignee) {
+            try {
+              const clearBody = { entities: [{ entity_type: 'Request', properties: { Id: id, ExpertAssignee: '' } }], operation: 'UPDATE' };
+              const clearResult = await ApiClient.ems.bulk(clearBody);
+              const clearOutcome = Api.summarizeBulkOutcome(clearResult);
+              if (clearOutcome?.ok) {
+                console.info('[SMAX ResponseHUD] Especialista removido:', id);
+              } else {
+                console.warn('[SMAX ResponseHUD] Falha ao remover especialista:', id, clearOutcome?.messages);
+              }
+            } catch (ce) { console.warn('[SMAX ResponseHUD] clearAssignee HTTP error:', ce); }
           }
           // Postar texto de encaminhamento como discussão interna
           if (gseWillChange && fwdHtml) {

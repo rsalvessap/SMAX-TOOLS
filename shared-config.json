@@ -1,5 +1,5 @@
 {
-  "_version": 6,
+  "_version": 7,
   "_updatedAt": "2026-07-28",
   "_description": "Configuracao compartilhada SMAX Toolkit TJSP. Edite para distribuir equipes e scripts para toda a equipe automaticamente.",
   "nameGroups": {
@@ -149,7 +149,7 @@
     {
       "id": "2.2.2",
       "name": "2.2.2",
-      "priority": 0,
+      "priority": 10,
       "matchers": [
         {
           "type": "regex",
@@ -178,25 +178,39 @@
       ],
       "workers": [
         {
-          "name": "DIEGO DE JESUS LEITE"
+          "name": "DIEGO DE JESUS LEITE",
+          "digits": "00-12",
+          "isAbsent": false
         },
         {
-          "name": "FABIO ROBERTO YOSHIMOTO MENDES"
+          "name": "FABIO ROBERTO YOSHIMOTO MENDES",
+          "digits": "13-25",
+          "isAbsent": false
         },
         {
-          "name": "ISABELLA DA SILVA SANTOS"
+          "name": "ISABELLA DA SILVA SANTOS",
+          "digits": "26-38",
+          "isAbsent": false
         },
         {
-          "name": "JEAN HENRIQUE SANTOS"
+          "name": "JEAN HENRIQUE SANTOS",
+          "digits": "39-51",
+          "isAbsent": false
         },
         {
-          "name": "MARCELO APARECIDO DOS SANTOS LAZARO"
+          "name": "MARCELO APARECIDO DOS SANTOS LAZARO",
+          "digits": "52-64",
+          "isAbsent": false
         },
         {
-          "name": "ROBSON SOUZA ALVES"
+          "name": "ROBSON SOUZA ALVES",
+          "digits": "65-77",
+          "isAbsent": false
         },
         {
-          "name": "THAIS HELENA FERREIRA JULIO"
+          "name": "THAIS HELENA FERREIRA JULIO",
+          "digits": "87-99",
+          "isAbsent": false
         }
       ],
       "gseRules": [
@@ -278,6 +292,16 @@
           "isAbsent": false
         },
         {
+          "name": "FELIPE FONTES DO NASCIMENTO",
+          "digits": "76-81",
+          "isAbsent": false
+        },
+        {
+          "name": "FERNANDA SANTOS DE JESUS",
+          "digits": "82-87",
+          "isAbsent": false
+        },
+        {
           "name": "IONE CHINA",
           "digits": "21-27",
           "isAbsent": false
@@ -313,23 +337,13 @@
           "isAbsent": false
         },
         {
-          "name": "YVES JERONIMO DA SILVA MESQUITA",
-          "digits": "70-75",
-          "isAbsent": false
-        },
-        {
-          "name": "FELIPE FONTES DO NASCIMENTO",
-          "digits": "76-81",
-          "isAbsent": false
-        },
-        {
-          "name": "FERNANDA SANTOS DE JESUS",
-          "digits": "82-87",
-          "isAbsent": false
-        },
-        {
           "name": "WEBSTER VINICIUS DE MOITINHO",
           "digits": "88-93",
+          "isAbsent": false
+        },
+        {
+          "name": "YVES JERONIMO DA SILVA MESQUITA",
+          "digits": "70-75",
           "isAbsent": false
         }
       ],

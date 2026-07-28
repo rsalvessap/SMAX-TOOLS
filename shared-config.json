@@ -1,5 +1,5 @@
 {
-  "_version": 7,
+  "_version": 8,
   "_updatedAt": "2026-07-28",
   "_description": "Configuracao compartilhada SMAX Toolkit TJSP. Edite para distribuir equipes e scripts para toda a equipe automaticamente.",
   "nameGroups": {
@@ -155,25 +155,29 @@
           "type": "regex",
           "pattern": "JEC",
           "scope": "location",
-          "_displayText": "JEC"
+          "_displayText": "JEC",
+          "_regex": {}
         },
         {
           "type": "regex",
           "pattern": "JUIZADO ESPECIAL CÍVEL",
           "scope": "location",
-          "_displayText": "JUIZADO ESPECIAL CÍVEL"
+          "_displayText": "JUIZADO ESPECIAL CÍVEL",
+          "_regex": {}
         },
         {
           "type": "regex",
           "pattern": "SEÇÃO ADMINISTRATIVA DE DISTRIBUIÇÃO DE MANDADOS",
           "scope": "location",
-          "_displayText": "SEÇÃO ADMINISTRATIVA DE DISTRIBUIÇÃO DE MANDADOS"
+          "_displayText": "SEÇÃO ADMINISTRATIVA DE DISTRIBUIÇÃO DE MANDADOS",
+          "_regex": {}
         },
         {
           "type": "regex",
           "pattern": "CENTRO JUDICIÁRIO DE SOLUÇÃO DE CONFLITOS E CIDADANIA",
           "scope": "location",
-          "_displayText": "CENTRO JUDICIÁRIO DE SOLUÇÃO DE CONFLITOS E CIDADANIA"
+          "_displayText": "CENTRO JUDICIÁRIO DE SOLUÇÃO DE CONFLITOS E CIDADANIA",
+          "_regex": {}
         }
       ],
       "workers": [
@@ -350,11 +354,6 @@
       "matchers": []
     }
   ],
-  "teamSignatures": {
-    "2.2.2": "Agradecemos seu contato e permanecemos à disposição.\nAtenciosamente,\nSGS 2.2.2 - SERVIÇO DE SUPORTE - 1ª INSTÂNCIA",
-    "2.2.1": "Agradecemos seu contato e permanecemos à disposição.\nAtenciosamente,\nSGS 2.2.1 - SERVIÇO DE SUPORTE - 1ª INSTÂNCIA"
-  },
-  "ackMessageTemplate": "Prezado(a) Solicitante,\nInformamos que a solicitação foi recebida e está sendo analisada com a devida prioridade.\nAs atualizações serão comunicadas por este canaAgradecemos seu contato e permanecemos à disposição.\nAtenciosamente,\nSGS 2 - SERVIÇO DE SUPORTE - 1ª INSTÂNCIA",
   "scripts": {
     "sol": [],
     "disc": []

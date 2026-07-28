@@ -245,6 +245,15 @@
       ]
     },
     {
+      "id": "geral",
+      "name": "geral",
+      "priority": 1,
+      "isDefault": true,
+      "matchers": [],
+      "workers": [],
+      "gseRules": []
+    },
+    {
       "id": "2.2.1",
       "name": "2.2.1",
       "priority": 0,
@@ -283,6 +292,16 @@
           "isAbsent": false
         },
         {
+          "name": "FELIPE FONTES DO NASCIMENTO",
+          "digits": "76-81",
+          "isAbsent": false
+        },
+        {
+          "name": "FERNANDA SANTOS DE JESUS",
+          "digits": "82-87",
+          "isAbsent": false
+        },
+        {
           "name": "IONE CHINA",
           "digits": "21-27",
           "isAbsent": false
@@ -318,43 +337,19 @@
           "isAbsent": false
         },
         {
-          "name": "YVES JERONIMO DA SILVA MESQUITA",
-          "digits": "70-75",
-          "isAbsent": false
-        },
-        {
-          "name": "FELIPE FONTES DO NASCIMENTO",
-          "digits": "76-81",
-          "isAbsent": false
-        },
-        {
-          "name": "FERNANDA SANTOS DE JESUS",
-          "digits": "82-87",
-          "isAbsent": false
-        },
-        {
           "name": "WEBSTER VINICIUS DE MOITINHO",
           "digits": "88-93",
+          "isAbsent": false
+        },
+        {
+          "name": "YVES JERONIMO DA SILVA MESQUITA",
+          "digits": "70-75",
           "isAbsent": false
         }
       ],
       "matchers": []
-    },
-    {
-      "id": "geral",
-      "name": "geral",
-      "priority": 1,
-      "isDefault": true,
-      "matchers": [],
-      "workers": [],
-      "gseRules": []
     }
   ],
-  "teamSignatures": {
-    "2.2.2": "Agradecemos seu contato e permanecemos à disposição.\nAtenciosamente,\nSGS 2.2.2 - SERVIÇO DE SUPORTE - 1ª INSTÂNCIA",
-    "2.2.1": "Agradecemos seu contato e permanecemos à disposição.\nAtenciosamente,\nSGS 2.2.1 - SERVIÇO DE SUPORTE - 1ª INSTÂNCIA"
-  },
-  "ackMessageTemplate": "Prezado(a) Solicitante,\nInformamos que a solicitação foi recebida e está sendo analisada com a devida prioridade.\nAs atualizações serão comunicadas por este canaAgradecemos seu contato e permanecemos à disposição.\nAtenciosamente,\nSGS 2 - SERVIÇO DE SUPORTE - 1ª INSTÂNCIA",
   "scripts": {
     "sol": [],
     "disc": []

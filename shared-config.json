@@ -1,6 +1,6 @@
 {
-  "_version": 8,
-  "_updatedAt": "2026-07-28",
+  "_version": 9,
+  "_updatedAt": "2026-08-04",
   "_description": "Configuracao compartilhada SMAX Toolkit TJSP. Edite para distribuir equipes e scripts para toda a equipe automaticamente.",
   "nameGroups": {
     "DANIEL CAMPOS LEAL": [
@@ -149,72 +149,54 @@
     {
       "id": "2.2.2",
       "name": "2.2.2",
-      "priority": 10,
+      "priority": 0,
       "matchers": [
         {
           "type": "regex",
           "pattern": "JEC",
           "scope": "location",
-          "_displayText": "JEC",
-          "_regex": {}
+          "_displayText": "JEC"
         },
         {
           "type": "regex",
           "pattern": "JUIZADO ESPECIAL CÍVEL",
           "scope": "location",
-          "_displayText": "JUIZADO ESPECIAL CÍVEL",
-          "_regex": {}
+          "_displayText": "JUIZADO ESPECIAL CÍVEL"
         },
         {
           "type": "regex",
           "pattern": "SEÇÃO ADMINISTRATIVA DE DISTRIBUIÇÃO DE MANDADOS",
           "scope": "location",
-          "_displayText": "SEÇÃO ADMINISTRATIVA DE DISTRIBUIÇÃO DE MANDADOS",
-          "_regex": {}
+          "_displayText": "SEÇÃO ADMINISTRATIVA DE DISTRIBUIÇÃO DE MANDADOS"
         },
         {
           "type": "regex",
           "pattern": "CENTRO JUDICIÁRIO DE SOLUÇÃO DE CONFLITOS E CIDADANIA",
           "scope": "location",
-          "_displayText": "CENTRO JUDICIÁRIO DE SOLUÇÃO DE CONFLITOS E CIDADANIA",
-          "_regex": {}
+          "_displayText": "CENTRO JUDICIÁRIO DE SOLUÇÃO DE CONFLITOS E CIDADANIA"
         }
       ],
       "workers": [
         {
-          "name": "DIEGO DE JESUS LEITE",
-          "digits": "00-12",
-          "isAbsent": false
+          "name": "DIEGO DE JESUS LEITE"
         },
         {
-          "name": "FABIO ROBERTO YOSHIMOTO MENDES",
-          "digits": "13-25",
-          "isAbsent": false
+          "name": "FABIO ROBERTO YOSHIMOTO MENDES"
         },
         {
-          "name": "ISABELLA DA SILVA SANTOS",
-          "digits": "26-38",
-          "isAbsent": false
+          "name": "ISABELLA DA SILVA SANTOS"
         },
         {
-          "name": "JEAN HENRIQUE SANTOS",
-          "digits": "39-51",
-          "isAbsent": false
+          "name": "JEAN HENRIQUE SANTOS"
         },
         {
-          "name": "MARCELO APARECIDO DOS SANTOS LAZARO",
-          "digits": "52-64",
-          "isAbsent": false
+          "name": "MARCELO APARECIDO DOS SANTOS LAZARO"
         },
         {
-          "name": "ROBSON SOUZA ALVES",
-          "digits": "65-77",
-          "isAbsent": false
+          "name": "ROBSON SOUZA ALVES"
         },
         {
-          "name": "THAIS HELENA FERREIRA JULIO",
-          "digits": "87-99",
-          "isAbsent": false
+          "name": "THAIS HELENA FERREIRA JULIO"
         }
       ],
       "gseRules": [
@@ -245,6 +227,10 @@
         {
           "id": "67109543",
           "name": "GSE - SGS - EPROC - HOMOLOGACAO"
+        },
+        {
+          "id": "51643437",
+          "name": "GSE - SGS - EPROC 1G - OAJUDS"
         }
       ]
     },
@@ -357,5 +343,10 @@
   "scripts": {
     "sol": [],
     "disc": []
-  }
+  },
+  "teamSignatures": {
+    "2.2.2": "Agradecemos seu contato e permanecemos à disposição.\nAtenciosamente,\nSGS 2.2.2 - SERVIÇO DE SUPORTE - 1ª INSTÂNCIA",
+    "2.2.1": "Agradecemos seu contato e permanecemos à disposição.\nAtenciosamente,\nSGS 2.2.1 - SERVIÇO DE SUPORTE - 1ª INSTÂNCIA"
+  },
+  "ackMessageTemplate": "Prezado(a) Solicitante,\nInformamos que a solicitação foi recebida e está sendo analisada com a devida prioridade.\nAs atualizações serão comunicadas por este canaAgradecemos seu contato e permanecemos à disposição.\nAtenciosamente,\nSGS 2 - SERVIÇO DE SUPORTE - 1ª INSTÂNCIA"
 }

@@ -1,6 +1,6 @@
 {
-  "_version": 11,
-  "_updatedAt": "2026-08-04",
+  "_version": 12,
+  "_updatedAt": "2026-08-24",
   "_description": "Configuracao compartilhada SMAX Toolkit TJSP. Edite para distribuir equipes e scripts para toda a equipe automaticamente.",
   "nameGroups": {
     "DANIEL CAMPOS LEAL": [
@@ -140,9 +140,7 @@
       88
     ]
   },
-  "ausentes": [
-    "IONE CHINA"
-  ],
+  "ausentes": [],
   "enableRealWrites": true,
   "defaultGlobalChangeId": "",
   "teams": [

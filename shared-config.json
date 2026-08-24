@@ -1,5 +1,5 @@
 {
-  "_version": 12,
+  "_version": 13,
   "_updatedAt": "2026-08-24",
   "_description": "Configuracao compartilhada SMAX Toolkit TJSP. Edite para distribuir equipes e scripts para toda a equipe automaticamente.",
   "nameGroups": {
@@ -145,6 +145,15 @@
   "defaultGlobalChangeId": "",
   "teams": [
     {
+      "id": "geral",
+      "name": "geral",
+      "priority": 1,
+      "isDefault": true,
+      "matchers": [],
+      "workers": [],
+      "gseRules": []
+    },
+    {
       "id": "2.2.2",
       "name": "2.2.2",
       "priority": 0,
@@ -153,25 +162,29 @@
           "type": "regex",
           "pattern": "JEC",
           "scope": "location",
-          "_displayText": "JEC"
+          "_displayText": "JEC",
+          "_regex": {}
         },
         {
           "type": "regex",
           "pattern": "JUIZADO ESPECIAL CÍVEL",
           "scope": "location",
-          "_displayText": "JUIZADO ESPECIAL CÍVEL"
+          "_displayText": "JUIZADO ESPECIAL CÍVEL",
+          "_regex": {}
         },
         {
           "type": "regex",
           "pattern": "SEÇÃO ADMINISTRATIVA DE DISTRIBUIÇÃO DE MANDADOS",
           "scope": "location",
-          "_displayText": "SEÇÃO ADMINISTRATIVA DE DISTRIBUIÇÃO DE MANDADOS"
+          "_displayText": "SEÇÃO ADMINISTRATIVA DE DISTRIBUIÇÃO DE MANDADOS",
+          "_regex": {}
         },
         {
           "type": "regex",
           "pattern": "CENTRO JUDICIÁRIO DE SOLUÇÃO DE CONFLITOS E CIDADANIA",
           "scope": "location",
-          "_displayText": "CENTRO JUDICIÁRIO DE SOLUÇÃO DE CONFLITOS E CIDADANIA"
+          "_displayText": "CENTRO JUDICIÁRIO DE SOLUÇÃO DE CONFLITOS E CIDADANIA",
+          "_regex": {}
         }
       ],
       "workers": [
@@ -231,15 +244,6 @@
           "name": "GSE - SGS - EPROC 1G - OAJUDS"
         }
       ]
-    },
-    {
-      "id": "geral",
-      "name": "geral",
-      "priority": 1,
-      "isDefault": true,
-      "matchers": [],
-      "workers": [],
-      "gseRules": []
     },
     {
       "id": "2.2.1",
@@ -333,6 +337,26 @@
           "name": "YVES JERONIMO DA SILVA MESQUITA",
           "digits": "70-75",
           "isAbsent": false
+        }
+      ],
+      "matchers": []
+    },
+    {
+      "id": "EXECUÇÃO FISCAL",
+      "name": "EXECUÇÃO FISCAL",
+      "priority": 0,
+      "gseRules": [
+        {
+          "id": "91806818",
+          "name": "GSE - SGS - EPROC 1G - AEXFISCAL"
+        }
+      ],
+      "workers": [
+        {
+          "name": "DANIEL CAMPOS LEAL"
+        },
+        {
+          "name": "DIEGO DE JESUS LEITE"
         }
       ],
       "matchers": []

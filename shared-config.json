@@ -1,5 +1,5 @@
 {
-  "_version": 13,
+  "_version": 14,
   "_updatedAt": "2026-08-24",
   "_description": "Configuracao compartilhada SMAX Toolkit TJSP. Edite para distribuir equipes e scripts para toda a equipe automaticamente.",
   "nameGroups": {
@@ -140,7 +140,10 @@
       88
     ]
   },
-  "ausentes": [],
+  "ausentes": [
+    "JEAN HENRIQUE SANTOS",
+    "MARCELO APARECIDO DOS SANTOS LAZARO"
+  ],
   "enableRealWrites": true,
   "defaultGlobalChangeId": "",
   "teams": [
@@ -162,52 +165,62 @@
           "type": "regex",
           "pattern": "JEC",
           "scope": "location",
-          "_displayText": "JEC",
-          "_regex": {}
+          "_displayText": "JEC"
         },
         {
           "type": "regex",
           "pattern": "JUIZADO ESPECIAL CÍVEL",
           "scope": "location",
-          "_displayText": "JUIZADO ESPECIAL CÍVEL",
-          "_regex": {}
+          "_displayText": "JUIZADO ESPECIAL CÍVEL"
         },
         {
           "type": "regex",
           "pattern": "SEÇÃO ADMINISTRATIVA DE DISTRIBUIÇÃO DE MANDADOS",
           "scope": "location",
-          "_displayText": "SEÇÃO ADMINISTRATIVA DE DISTRIBUIÇÃO DE MANDADOS",
-          "_regex": {}
+          "_displayText": "SEÇÃO ADMINISTRATIVA DE DISTRIBUIÇÃO DE MANDADOS"
         },
         {
           "type": "regex",
           "pattern": "CENTRO JUDICIÁRIO DE SOLUÇÃO DE CONFLITOS E CIDADANIA",
           "scope": "location",
-          "_displayText": "CENTRO JUDICIÁRIO DE SOLUÇÃO DE CONFLITOS E CIDADANIA",
-          "_regex": {}
+          "_displayText": "CENTRO JUDICIÁRIO DE SOLUÇÃO DE CONFLITOS E CIDADANIA"
         }
       ],
       "workers": [
         {
-          "name": "DIEGO DE JESUS LEITE"
+          "name": "DIEGO DE JESUS LEITE",
+          "digits": "00-12",
+          "isAbsent": false
         },
         {
-          "name": "FABIO ROBERTO YOSHIMOTO MENDES"
+          "name": "FABIO ROBERTO YOSHIMOTO MENDES",
+          "digits": "13-25",
+          "isAbsent": false
         },
         {
-          "name": "ISABELLA DA SILVA SANTOS"
+          "name": "ISABELLA DA SILVA SANTOS",
+          "digits": "26-38",
+          "isAbsent": false
         },
         {
-          "name": "JEAN HENRIQUE SANTOS"
+          "name": "JEAN HENRIQUE SANTOS",
+          "digits": "39-51",
+          "isAbsent": true
         },
         {
-          "name": "MARCELO APARECIDO DOS SANTOS LAZARO"
+          "name": "MARCELO APARECIDO DOS SANTOS LAZARO",
+          "digits": "52-64",
+          "isAbsent": true
         },
         {
-          "name": "ROBSON SOUZA ALVES"
+          "name": "ROBSON SOUZA ALVES",
+          "digits": "65-77",
+          "isAbsent": false
         },
         {
-          "name": "THAIS HELENA FERREIRA JULIO"
+          "name": "THAIS HELENA FERREIRA JULIO",
+          "digits": "87-99",
+          "isAbsent": false
         }
       ],
       "gseRules": [
@@ -270,72 +283,52 @@
       "workers": [
         {
           "name": "DANIEL CAMPOS LEAL",
-          "digits": "00-06",
+          "digits": "00-09",
           "isAbsent": false
         },
         {
           "name": "DOUGLAS MACHADO DA SILVA",
-          "digits": "07-13",
+          "digits": "10-19",
           "isAbsent": false
         },
         {
           "name": "DOUGLAS SUGAHARA",
-          "digits": "14-20",
-          "isAbsent": false
-        },
-        {
-          "name": "FELIPE FONTES DO NASCIMENTO",
-          "digits": "76-81",
-          "isAbsent": false
-        },
-        {
-          "name": "FERNANDA SANTOS DE JESUS",
-          "digits": "82-87",
+          "digits": "20-29",
           "isAbsent": false
         },
         {
           "name": "IONE CHINA",
-          "digits": "21-27",
+          "digits": "30-39",
           "isAbsent": false
         },
         {
           "name": "IVAN APARECIDO DOS SANTOS",
-          "digits": "28-34",
-          "isAbsent": false
-        },
-        {
-          "name": "LAIS MARTINS BARRETO NOVAIS",
-          "digits": "35-41",
+          "digits": "40-49",
           "isAbsent": false
         },
         {
           "name": "LEONARDO YAN DA SILVA FERNANDES",
-          "digits": "42-48",
+          "digits": "50-59",
           "isAbsent": false
         },
         {
           "name": "LUIS FELIPE NEVES",
-          "digits": "49-55",
+          "digits": "60-69",
           "isAbsent": false
         },
         {
           "name": "RODRIGO SALES ZIZUEL",
-          "digits": "56-62",
+          "digits": "70-79",
           "isAbsent": false
         },
         {
           "name": "SAMUEL RODRIGUES",
-          "digits": "63-69",
-          "isAbsent": false
-        },
-        {
-          "name": "WEBSTER VINICIUS DE MOITINHO",
-          "digits": "88-93",
+          "digits": "80-89",
           "isAbsent": false
         },
         {
           "name": "YVES JERONIMO DA SILVA MESQUITA",
-          "digits": "70-75",
+          "digits": "90-99",
           "isAbsent": false
         }
       ],
@@ -353,10 +346,84 @@
       ],
       "workers": [
         {
-          "name": "DANIEL CAMPOS LEAL"
+          "name": "DANIEL CAMPOS LEAL",
+          "digits": "00-04",
+          "isAbsent": false
         },
         {
-          "name": "DIEGO DE JESUS LEITE"
+          "name": "DIEGO DE JESUS LEITE",
+          "digits": "05-10",
+          "isAbsent": false
+        },
+        {
+          "name": "DOUGLAS MACHADO DA SILVA",
+          "digits": "11-15",
+          "isAbsent": false
+        },
+        {
+          "name": "DOUGLAS SUGAHARA",
+          "digits": "16-21",
+          "isAbsent": false
+        },
+        {
+          "name": "ERIC FIRMINO PRATES",
+          "digits": "22-26",
+          "isAbsent": false
+        },
+        {
+          "name": "FABIO ROBERTO YOSHIMOTO MENDES",
+          "digits": "27-32",
+          "isAbsent": false
+        },
+        {
+          "name": "IONE CHINA",
+          "digits": "33-37",
+          "isAbsent": false
+        },
+        {
+          "name": "ISABELLA DA SILVA SANTOS",
+          "digits": "38-43",
+          "isAbsent": false
+        },
+        {
+          "name": "IVAN APARECIDO DOS SANTOS",
+          "digits": "44-48",
+          "isAbsent": false
+        },
+        {
+          "name": "JEAN HENRIQUE SANTOS",
+          "digits": "49-54",
+          "isAbsent": true
+        },
+        {
+          "name": "LEONARDO YAN DA SILVA FERNANDES",
+          "digits": "55-59",
+          "isAbsent": false
+        },
+        {
+          "name": "LUIS FELIPE NEVES",
+          "digits": "60-65",
+          "isAbsent": false
+        },
+        {
+          "name": "MARCELO APARECIDO DOS SANTOS LAZARO",
+          "digits": "66-70",
+          "isAbsent": true
+        },
+        {
+          "name": "RODRIGO SALES ZIZUEL",
+          "digits": "77-81",
+          "isAbsent": false
+        },
+        {
+          "name": "SAMUEL RODRIGUES",
+          "digits": "89-93",
+          "isAbsent": false
+        },
+        {
+          "name": "YVES JERONIMO DA SILVA MESQUITA",
+          "digits": "94-99",
+          "isAbsent": false
         }
       ],
       "matchers": []

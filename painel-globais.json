@@ -1,12 +1,36 @@
 {
   "_schema": 1,
-  "_version": 1,
+  "_version": 2,
   "_updatedAt": "2026-10-09",
   "eixos": {
     "assunto": [
       {
         "id": "59556f",
         "nome": "Mandados"
+      },
+      {
+        "id": "c43c80",
+        "nome": "Migração"
+      },
+      {
+        "id": "bc9161",
+        "nome": "Acesso"
+      },
+      {
+        "id": "3ab9bd",
+        "nome": "ATP"
+      },
+      {
+        "id": "6a5cc4",
+        "nome": "Custas"
+      },
+      {
+        "id": "1dc2ba",
+        "nome": "Rotinas"
+      },
+      {
+        "id": "a4fff2",
+        "nome": "Distribuição"
       }
     ],
     "base": [
@@ -21,6 +45,10 @@
       {
         "id": "ed78fa",
         "nome": "UF"
+      },
+      {
+        "id": "14eebc",
+        "nome": "TJ"
       }
     ],
     "competencia": [
@@ -35,8 +63,221 @@
       {
         "id": "1cd795",
         "nome": "CEJUSC"
+      },
+      {
+        "id": "0fe754",
+        "nome": "Fazenda Pública"
       }
     ]
   },
-  "globais": []
+  "globais": [
+    {
+      "id": "86606075",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "87291509",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "87297520",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "87349630",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "87402363",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "78183158",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "87607519",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "88313043",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "88784252",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "90303352",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "93576592",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "94771954",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "95711850",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    }
+  ]
 }

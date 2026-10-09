@@ -1,0 +1,42 @@
+{
+  "_schema": 1,
+  "_version": 1,
+  "_updatedAt": "2026-10-09",
+  "eixos": {
+    "assunto": [
+      {
+        "id": "59556f",
+        "nome": "Mandados"
+      }
+    ],
+    "base": [
+      {
+        "id": "d887b8",
+        "nome": "SP"
+      },
+      {
+        "id": "57aa3b",
+        "nome": "CR"
+      },
+      {
+        "id": "ed78fa",
+        "nome": "UF"
+      }
+    ],
+    "competencia": [
+      {
+        "id": "514965",
+        "nome": "Cível"
+      },
+      {
+        "id": "af7ed7",
+        "nome": "Juizado Especial Cível"
+      },
+      {
+        "id": "1cd795",
+        "nome": "CEJUSC"
+      }
+    ]
+  },
+  "globais": []
+}

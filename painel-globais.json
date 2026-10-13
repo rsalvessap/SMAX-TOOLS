@@ -1,7 +1,7 @@
 {
   "_schema": 1,
-  "_version": 2,
-  "_updatedAt": "2026-10-09",
+  "_version": 3,
+  "_updatedAt": "2026-10-13",
   "eixos": {
     "assunto": [
       {
@@ -31,6 +31,14 @@
       {
         "id": "a4fff2",
         "nome": "Distribuição"
+      },
+      {
+        "id": "3c1d3f",
+        "nome": "INFRA/Lentidão"
+      },
+      {
+        "id": "65dd02",
+        "nome": "INFOJUD"
       }
     ],
     "base": [
@@ -101,7 +109,7 @@
         "af7ed7"
       ],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "87297520",
@@ -117,7 +125,7 @@
         "af7ed7"
       ],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "87349630",
@@ -133,7 +141,7 @@
         "af7ed7"
       ],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "87402363",
@@ -149,7 +157,7 @@
         "af7ed7"
       ],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "78183158",
@@ -181,7 +189,7 @@
         "af7ed7"
       ],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "88313043",
@@ -213,7 +221,7 @@
         "af7ed7"
       ],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "90303352",
@@ -229,7 +237,7 @@
         "af7ed7"
       ],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "93576592",
@@ -245,7 +253,7 @@
         "af7ed7"
       ],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "94771954",
@@ -278,6 +286,1899 @@
       ],
       "nota": "",
       "arquivado": false
+    },
+    {
+      "id": "82936536",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "a4fff2"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795"
+      ],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "65723179",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "a4fff2",
+        "59556f"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795"
+      ],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "81524912",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "a4fff2",
+        "59556f"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795"
+      ],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "81944367",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "a4fff2",
+        "59556f"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "94992510",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "a4fff2",
+        "59556f"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795"
+      ],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "94620435",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "6a5cc4"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "93728616",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "3c1d3f"
+      ],
+      "base": [
+        "d887b8",
+        "57aa3b",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "0fe754",
+        "1cd795"
+      ],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "94960276",
+      "incluidoEm": "2026-10-09",
+      "assunto": [
+        "3c1d3f"
+      ],
+      "base": [
+        "d887b8",
+        "57aa3b",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "0fe754",
+        "1cd795"
+      ],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "96000882",
+      "incluidoEm": "2026-10-10",
+      "assunto": [],
+      "base": [
+        "d887b8",
+        "ed78fa"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795",
+        "0fe754"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "95481405",
+      "incluidoEm": "2026-10-10",
+      "assunto": [],
+      "base": [
+        "d887b8",
+        "57aa3b",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "0fe754",
+        "1cd795"
+      ],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "94864744",
+      "incluidoEm": "2026-10-10",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "94752813",
+      "incluidoEm": "2026-10-10",
+      "assunto": [
+        "3c1d3f"
+      ],
+      "base": [
+        "d887b8",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795",
+        "0fe754"
+      ],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "94513177",
+      "incluidoEm": "2026-10-10",
+      "assunto": [],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "94245066",
+      "incluidoEm": "2026-10-10",
+      "assunto": [
+        "6a5cc4"
+      ],
+      "base": [
+        "14eebc",
+        "d887b8"
+      ],
+      "competencia": [
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "94245802",
+      "incluidoEm": "2026-10-10",
+      "assunto": [
+        "3c1d3f"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "94418889",
+      "incluidoEm": "2026-10-10",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "94164386",
+      "incluidoEm": "2026-10-10",
+      "assunto": [
+        "3c1d3f"
+      ],
+      "base": [
+        "d887b8",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795",
+        "0fe754"
+      ],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "96108243",
+      "incluidoEm": "2026-10-13",
+      "assunto": [
+        "1dc2ba"
+      ],
+      "base": [
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "95668443",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [
+        "d887b8",
+        "57aa3b",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795",
+        "0fe754"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "95359124",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "94839664",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "94390986",
+      "incluidoEm": "2026-10-13",
+      "assunto": [
+        "bc9161"
+      ],
+      "base": [
+        "d887b8",
+        "57aa3b",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "af7ed7",
+        "514965",
+        "1cd795",
+        "0fe754"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "93719416",
+      "incluidoEm": "2026-10-13",
+      "assunto": [
+        "bc9161"
+      ],
+      "base": [
+        "d887b8",
+        "57aa3b",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795",
+        "0fe754"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "93365644",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "93277996",
+      "incluidoEm": "2026-10-13",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "92839369",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "92221290",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [
+        "d887b8",
+        "57aa3b",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "0fe754",
+        "1cd795",
+        "af7ed7",
+        "514965"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "92065163",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "91770729",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "91643473",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "91112926",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "91073070",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "90920315",
+      "incluidoEm": "2026-10-13",
+      "assunto": [
+        "bc9161"
+      ],
+      "base": [
+        "d887b8",
+        "14eebc",
+        "ed78fa"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "0fe754"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "90301877",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "89988951",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "89956277",
+      "incluidoEm": "2026-10-13",
+      "assunto": [
+        "6a5cc4"
+      ],
+      "base": [
+        "d887b8",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795",
+        "0fe754"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "89843705",
+      "incluidoEm": "2026-10-13",
+      "assunto": [
+        "65dd02"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "89311313",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "88932631",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "88330523",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "87544332",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "87052332",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "86853638",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "86316825",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "86240374",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "85718879",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "85666243",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "85633301",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "85623381",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "85600719",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "85390630",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "85317648",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "85232895",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "85136327",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "85081319",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "85012935",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "84342452",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "84324273",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "83994028",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "83920229",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "83462131",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "82793476",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "82634207",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "82305607",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "82104687",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "81972037",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "81937311",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "81509803",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "81252469",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "81063989",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "81060990",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "80822564",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "80753682",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "79832134",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "79723192",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "79659705",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "79389527",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "79296813",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "79113244",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "78767206",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "78450543",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "76839503",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "76748522",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "76695248",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "76298271",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "76198867",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "76161676",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "75928494",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "75767412",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "75673249",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "75201534",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "75114305",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "75078904",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "74647760",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "74502478",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "74498232",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "74414003",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "74347970",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "74028752",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "72790904",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "72788468",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "72409572",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "72189614",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "72109968",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "72052740",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "71776980",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "71598233",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "71400699",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "71336249",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "71047683",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "70884075",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "70787156",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "70607728",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "70577627",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "70290200",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "70167178",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "70041241",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "69966356",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "69845710",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "69738536",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "69734075",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "69590292",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "69562506",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "69506519",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "69501719",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "69468460",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "69457629",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "69451564",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "69401134",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "69322480",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "68499028",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "68331666",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "67374955",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "67329825",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "66658908",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "66447008",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "66244546",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "66215506",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "65520413",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "65402286",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "65374336",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "65325395",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "65320001",
+      "incluidoEm": "2026-10-13",
+      "assunto": [
+        "6a5cc4"
+      ],
+      "base": [
+        "d887b8",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "0fe754"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "65183770",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "64770142",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "64638511",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "64605436",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "64215753",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "64196496",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "63748961",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [
+        "d887b8",
+        "57aa3b",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "0fe754",
+        "1cd795",
+        "af7ed7",
+        "514965"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "63528316",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "63392119",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "62966746",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "62964824",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "62917667",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "62700636",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "62643886",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "62637305",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "62635688",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "62355282",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "61645149",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "61473940",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "61116681",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "60686071",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "58133917",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "57505457",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "57376622",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "57133175",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "57072897",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "56569915",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "56311437",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "56227861",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "56147758",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "56139966",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "56067222",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "55651169",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "55561426",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "55549275",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "55165374",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "54990848",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "54653160",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "54618107",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "53045291",
+      "incluidoEm": "2026-10-13",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": true
     }
   ]
 }

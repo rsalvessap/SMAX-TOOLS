@@ -1,6 +1,6 @@
 {
   "_schema": 1,
-  "_version": 5,
+  "_version": 6,
   "_updatedAt": "2026-10-15",
   "eixos": {
     "assunto": [
@@ -2204,6 +2204,23 @@
       "base": [],
       "competencia": [
         "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "96727900",
+      "incluidoEm": "2026-10-15",
+      "assunto": [],
+      "base": [
+        "ed78fa",
+        "d887b8"
+      ],
+      "competencia": [
+        "0fe754",
+        "514965",
+        "af7ed7",
+        "1cd795"
       ],
       "nota": "",
       "arquivado": false

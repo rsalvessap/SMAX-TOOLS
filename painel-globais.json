@@ -1,6 +1,6 @@
 {
   "_schema": 1,
-  "_version": 4,
+  "_version": 5,
   "_updatedAt": "2026-10-15",
   "eixos": {
     "assunto": [
@@ -52,7 +52,7 @@
       },
       {
         "id": "ed78fa",
-        "nome": "UF"
+        "nome": "EF"
       },
       {
         "id": "14eebc",
@@ -2179,6 +2179,34 @@
       "competencia": [],
       "nota": "",
       "arquivado": true
+    },
+    {
+      "id": "96698668",
+      "incluidoEm": "2026-10-15",
+      "assunto": [
+        "a4fff2"
+      ],
+      "base": [
+        "ed78fa"
+      ],
+      "competencia": [
+        "0fe754"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "96652105",
+      "incluidoEm": "2026-10-15",
+      "assunto": [
+        "6a5cc4"
+      ],
+      "base": [],
+      "competencia": [
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
     }
   ]
 }

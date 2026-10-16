@@ -1,6 +1,6 @@
 {
   "_schema": 1,
-  "_version": 7,
+  "_version": 8,
   "_updatedAt": "2026-10-16",
   "eixos": {
     "assunto": [
@@ -2241,5 +2241,6 @@
       "nota": "",
       "arquivado": false
     }
-  ]
+  ],
+  "consultas": []
 }

@@ -1,7 +1,7 @@
 {
   "_schema": 1,
-  "_version": 6,
-  "_updatedAt": "2026-10-15",
+  "_version": 7,
+  "_updatedAt": "2026-10-16",
   "eixos": {
     "assunto": [
       {
@@ -2221,6 +2221,22 @@
         "514965",
         "af7ed7",
         "1cd795"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "96803144",
+      "incluidoEm": "2026-10-16",
+      "assunto": [
+        "6a5cc4"
+      ],
+      "base": [
+        "d887b8",
+        "57aa3b"
+      ],
+      "competencia": [
+        "af7ed7"
       ],
       "nota": "",
       "arquivado": false

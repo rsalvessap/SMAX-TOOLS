@@ -1,7 +1,7 @@
 {
   "_schema": 1,
-  "_version": 8,
-  "_updatedAt": "2026-10-16",
+  "_version": 9,
+  "_updatedAt": "2026-10-20",
   "eixos": {
     "assunto": [
       {
@@ -613,7 +613,7 @@
         "0fe754"
       ],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "95359124",
@@ -2237,6 +2237,26 @@
       ],
       "competencia": [
         "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "96956387",
+      "incluidoEm": "2026-10-20",
+      "assunto": [
+        "3c1d3f"
+      ],
+      "base": [
+        "d887b8",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795",
+        "0fe754"
       ],
       "nota": "",
       "arquivado": false

@@ -1,7 +1,7 @@
 {
   "_schema": 1,
-  "_version": 9,
-  "_updatedAt": "2026-10-20",
+  "_version": 10,
+  "_updatedAt": "2026-10-28",
   "eixos": {
     "assunto": [
       {
@@ -39,6 +39,10 @@
       {
         "id": "65dd02",
         "nome": "INFOJUD"
+      },
+      {
+        "id": "d1c25c",
+        "nome": "RPV/PRECATÓRIO"
       }
     ],
     "base": [
@@ -631,7 +635,7 @@
       "base": [],
       "competencia": [],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "94390986",
@@ -2193,7 +2197,7 @@
         "0fe754"
       ],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "96652105",
@@ -2259,8 +2263,188 @@
         "0fe754"
       ],
       "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "97144097",
+      "incluidoEm": "2026-10-21",
+      "assunto": [
+        "3c1d3f"
+      ],
+      "base": [
+        "d887b8",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "0fe754",
+        "1cd795",
+        "af7ed7",
+        "514965"
+      ],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "74912378",
+      "incluidoEm": "2026-10-21",
+      "assunto": [
+        "c43c80"
+      ],
+      "base": [
+        "d887b8",
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795"
+      ],
+      "nota": "",
+      "arquivado": true
+    },
+    {
+      "id": "97745590",
+      "incluidoEm": "2026-10-28",
+      "assunto": [
+        "6a5cc4"
+      ],
+      "base": [
+        "d887b8"
+      ],
+      "competencia": [
+        "af7ed7"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "97736889",
+      "incluidoEm": "2026-10-28",
+      "assunto": [
+        "3c1d3f"
+      ],
+      "base": [
+        "d887b8",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795",
+        "0fe754"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "97733635",
+      "incluidoEm": "2026-10-28",
+      "assunto": [],
+      "base": [
+        "d887b8",
+        "ed78fa"
+      ],
+      "competencia": [
+        "514965",
+        "0fe754"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "97684873",
+      "incluidoEm": "2026-10-28",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "97546124",
+      "incluidoEm": "2026-10-28",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
       "arquivado": false
     }
   ],
-  "consultas": []
+  "consultas": [
+    {
+      "id": "af7716",
+      "nome": "todas",
+      "gses": [
+        {
+          "id": "66561429",
+          "nome": "GSE - SGS - EPROC - MIGRAÇÃO 1G"
+        },
+        {
+          "id": "51642955",
+          "nome": "GSE - SGS - EPROC 1G - ACIV"
+        },
+        {
+          "id": "51642956",
+          "nome": "GSE - SGS - EPROC 1G - ACRIM"
+        },
+        {
+          "id": "51642761",
+          "nome": "GSE - SGS - EPROC 1G - AEXCRIM"
+        },
+        {
+          "id": "91806818",
+          "nome": "GSE - SGS - EPROC 1G - AEXFISCAL"
+        },
+        {
+          "id": "51644373",
+          "nome": "GSE - SGS - EPROC 1G - CEJUSCS"
+        },
+        {
+          "id": "51642766",
+          "nome": "GSE - SGS - EPROC 1G - CLMAND"
+        },
+        {
+          "id": "67109543",
+          "nome": "GSE - SGS - EPROC 1G - HOMOLOGACAO"
+        },
+        {
+          "id": "51643437",
+          "nome": "GSE - SGS - EPROC 1G - OAJUDS"
+        },
+        {
+          "id": "51642772",
+          "nome": "GSE - SGS - EPROC 1G - DISTR"
+        },
+        {
+          "id": "51642957",
+          "nome": "GSE - SGS - EPROC 1G - JUIESP"
+        },
+        {
+          "id": "51643315",
+          "nome": "GSE - SGS - EPROC 1G - CERT"
+        },
+        {
+          "id": "51643432",
+          "nome": "GSE - SGS - EPROC 1G - OFJUST"
+        },
+        {
+          "id": "51182381",
+          "nome": "GSE - STI 1 SUPORTE N3_eproc"
+        },
+        {
+          "id": "56931126",
+          "nome": "GSE - SGS 3 - GESTÃO SISTEMA EPROC"
+        },
+        {
+          "id": "86297660",
+          "nome": "GSE - STI 4 INFRA Suporte N3_eproc"
+        }
+      ],
+      "dias": 0,
+      "situacao": "todos",
+      "padrao": true
+    }
+  ]
 }

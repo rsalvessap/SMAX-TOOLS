@@ -1,6 +1,6 @@
 {
   "_schema": 1,
-  "_version": 10,
+  "_version": 11,
   "_updatedAt": "2026-10-28",
   "eixos": {
     "assunto": [
@@ -43,6 +43,10 @@
       {
         "id": "d1c25c",
         "nome": "RPV/PRECATÓRIO"
+      },
+      {
+        "id": "5603ce",
+        "nome": "Modelos/Minutas"
       }
     ],
     "base": [
@@ -2367,6 +2371,46 @@
       "incluidoEm": "2026-10-28",
       "assunto": [],
       "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "97094753",
+      "incluidoEm": "2026-10-28",
+      "assunto": [
+        "3c1d3f"
+      ],
+      "base": [
+        "d887b8",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795",
+        "0fe754"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "97316315",
+      "incluidoEm": "2026-10-28",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "97412046",
+      "incluidoEm": "2026-10-28",
+      "assunto": [],
+      "base": [
+        "ed78fa"
+      ],
       "competencia": [],
       "nota": "",
       "arquivado": false

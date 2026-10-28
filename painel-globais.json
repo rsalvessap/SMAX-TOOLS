@@ -1,6 +1,6 @@
 {
   "_schema": 1,
-  "_version": 11,
+  "_version": 12,
   "_updatedAt": "2026-10-28",
   "eixos": {
     "assunto": [
@@ -87,22 +87,6 @@
     ]
   },
   "globais": [
-    {
-      "id": "86606075",
-      "incluidoEm": "2026-10-09",
-      "assunto": [
-        "c43c80"
-      ],
-      "base": [
-        "d887b8"
-      ],
-      "competencia": [
-        "514965",
-        "af7ed7"
-      ],
-      "nota": "",
-      "arquivado": false
-    },
     {
       "id": "87291509",
       "incluidoEm": "2026-10-09",
@@ -2361,7 +2345,9 @@
       "id": "97684873",
       "incluidoEm": "2026-10-28",
       "assunto": [],
-      "base": [],
+      "base": [
+        "d887b8"
+      ],
       "competencia": [],
       "nota": "",
       "arquivado": false
@@ -2369,9 +2355,19 @@
     {
       "id": "97546124",
       "incluidoEm": "2026-10-28",
-      "assunto": [],
-      "base": [],
-      "competencia": [],
+      "assunto": [
+        "65dd02"
+      ],
+      "base": [
+        "d887b8",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795"
+      ],
       "nota": "",
       "arquivado": false
     },
@@ -2398,9 +2394,20 @@
     {
       "id": "97316315",
       "incluidoEm": "2026-10-28",
-      "assunto": [],
-      "base": [],
-      "competencia": [],
+      "assunto": [
+        "3c1d3f"
+      ],
+      "base": [
+        "d887b8",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "514965",
+        "af7ed7",
+        "1cd795",
+        "0fe754"
+      ],
       "nota": "",
       "arquivado": false
     },

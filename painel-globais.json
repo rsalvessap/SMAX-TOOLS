@@ -1,7 +1,7 @@
 {
   "_schema": 1,
-  "_version": 14,
-  "_updatedAt": "2026-11-03",
+  "_version": 15,
+  "_updatedAt": "2026-11-10",
   "eixos": {
     "assunto": [
       {
@@ -836,7 +836,7 @@
         "af7ed7"
       ],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "89311313",
@@ -2324,7 +2324,7 @@
         "0fe754"
       ],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "97733635",
@@ -2350,7 +2350,7 @@
       ],
       "competencia": [],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "97546124",
@@ -2429,7 +2429,7 @@
       "base": [],
       "competencia": [],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "97854780",
@@ -2438,11 +2438,82 @@
       "base": [],
       "competencia": [],
       "nota": "",
-      "arquivado": false
+      "arquivado": true
     },
     {
       "id": "97824673",
       "incluidoEm": "2026-11-03",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "98675312",
+      "incluidoEm": "2026-11-10",
+      "assunto": [
+        "3c1d3f"
+      ],
+      "base": [
+        "d887b8",
+        "ed78fa",
+        "14eebc"
+      ],
+      "competencia": [
+        "0fe754",
+        "1cd795",
+        "af7ed7",
+        "514965"
+      ],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "98668048",
+      "incluidoEm": "2026-11-10",
+      "assunto": [],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "98650992",
+      "incluidoEm": "2026-11-10",
+      "assunto": [
+        "5603ce"
+      ],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "98449911",
+      "incluidoEm": "2026-11-10",
+      "assunto": [
+        "5603ce"
+      ],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "98358093",
+      "incluidoEm": "2026-11-10",
+      "assunto": [
+        "1dc2ba"
+      ],
+      "base": [],
+      "competencia": [],
+      "nota": "",
+      "arquivado": false
+    },
+    {
+      "id": "98247893",
+      "incluidoEm": "2026-11-10",
       "assunto": [],
       "base": [],
       "competencia": [],

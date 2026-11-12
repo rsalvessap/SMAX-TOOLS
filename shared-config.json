@@ -1,5 +1,5 @@
 {
-  "_version": 15,
+  "_version": 16,
   "_updatedAt": "2026-11-12",
   "_description": "Configuracao compartilhada SMAX Toolkit TJSP. Edite para distribuir equipes e scripts para toda a equipe automaticamente.",
   "nameGroups": {
@@ -162,25 +162,29 @@
           "type": "regex",
           "pattern": "JEC",
           "scope": "location",
-          "_displayText": "JEC"
+          "_displayText": "JEC",
+          "_regex": {}
         },
         {
           "type": "regex",
           "pattern": "JUIZADO ESPECIAL CÍVEL",
           "scope": "location",
-          "_displayText": "JUIZADO ESPECIAL CÍVEL"
+          "_displayText": "JUIZADO ESPECIAL CÍVEL",
+          "_regex": {}
         },
         {
           "type": "regex",
           "pattern": "SEÇÃO ADMINISTRATIVA DE DISTRIBUIÇÃO DE MANDADOS",
           "scope": "location",
-          "_displayText": "SEÇÃO ADMINISTRATIVA DE DISTRIBUIÇÃO DE MANDADOS"
+          "_displayText": "SEÇÃO ADMINISTRATIVA DE DISTRIBUIÇÃO DE MANDADOS",
+          "_regex": {}
         },
         {
           "type": "regex",
           "pattern": "CENTRO JUDICIÁRIO DE SOLUÇÃO DE CONFLITOS E CIDADANIA",
           "scope": "location",
-          "_displayText": "CENTRO JUDICIÁRIO DE SOLUÇÃO DE CONFLITOS E CIDADANIA"
+          "_displayText": "CENTRO JUDICIÁRIO DE SOLUÇÃO DE CONFLITOS E CIDADANIA",
+          "_regex": {}
         }
       ],
       "workers": [
@@ -319,14 +323,6 @@
           "isAbsent": false
         }
       ],
-      "matchers": []
-    },
-    {
-      "id": "EXECUÇÃO FISCAL",
-      "name": "EXECUÇÃO FISCAL",
-      "priority": 0,
-      "gseRules": [],
-      "workers": [],
       "matchers": []
     }
   ],
